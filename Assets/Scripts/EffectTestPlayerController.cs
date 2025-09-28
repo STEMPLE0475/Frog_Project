@@ -7,6 +7,8 @@ using UnityEngine.InputSystem; // 새로운 Input System을 사용하기 위해 
 public class EffectTestPlayerController : MonoBehaviour
 {
     public List<ParticleSystem> particles;
+    private GameManager gameManager;
+
     #region 변수 선언
 
     // --- 인스펙터에서 조절할 수 있는 값들 ---
@@ -38,8 +40,9 @@ public class EffectTestPlayerController : MonoBehaviour
 
     #endregion
 
-    public void Initiate(Transform playerSpawnPos)
+    public void Initiate(GameManager gameManager, Transform playerSpawnPos)
     {
+        this.gameManager = gameManager;
         //스폰 지점을 정합니다. GameManager에서 받아온다.
         this.playerSpawnPos = playerSpawnPos;
 
@@ -105,6 +108,7 @@ public class EffectTestPlayerController : MonoBehaviour
         Debug.Log("착지");
         particles[0].Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         particles[0].Play();
+        gameManager.PerfactLand(); // 임시. 실제로는 콤보 수도 전달해야 함.
     }
 
     private void OnCollisionEnter(Collision collision)

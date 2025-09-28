@@ -8,8 +8,9 @@ public class GameManager : MonoBehaviour
     // 이 스크립트 오류만 없으면 다른 세부적인 부분 (PlayerContorller 등에서 설정 안해도 작동하도록 깔끔하게 해야함)
 
     [Header("Class")]
-    [SerializeField] private CinemachineCameraScript CinemachineCameraScript;
-    [SerializeField] private EffectTestPlayerController PlayerController;
+    [SerializeField] private CanvasManager canvasManager;
+    [SerializeField] private CinemachineCameraScript cinemachineCameraScript;
+    [SerializeField] private EffectTestPlayerController playerController;
 
     [Header("Variable")]
     [SerializeField] private Transform playerSpawnTransform;
@@ -19,12 +20,14 @@ public class GameManager : MonoBehaviour
     // 모든 프로세스의 시작을 분명히 하기 위해서. 모든 로직은 GameManager을 통해서 시작된다.
     private void Awake()
     {
-        CinemachineCameraScript.Initiate(PlayerController);
-        PlayerController.Initiate(playerSpawnTransform);
+        playerController.Initiate(this, playerSpawnTransform);
+        cinemachineCameraScript.Initiate(playerController);
+        canvasManager.Initiate();
     }
-    // Update is called once per frame
-    void Update()
+    
+    public void PerfactLand()
     {
-        
+        // 정확한 착지가 몇 콤보인지를 체크하여, Canvas 애니메이션을 실행
+        canvasManager.PlayIllustAnimation(0);
     }
 }

@@ -11,4 +11,9 @@ public class CinemachineCameraScript : MonoBehaviour
         cam = GetComponent<CinemachineCamera>();
         cam.Follow = playerController.transform;
     }
+
+    public void ZoomPlayer()
+    {
+        Debug.Log("플레이어를 일시적으로 줌 합니다");
+    }
 }

@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Variable")]
     [SerializeField] private Transform playerSpawnTransform;
+    private int combo = 0;
 
 
     // 본 프로젝트의 모든 Awake()나 Start()는 사용 금지.
@@ -25,9 +26,21 @@ public class GameManager : MonoBehaviour
         canvasManager.Initiate();
     }
     
-    public void PerfactLand()
+    public void Land(int accuracy)
     {
         // 정확한 착지가 몇 콤보인지를 체크하여, Canvas 애니메이션을 실행
-        canvasManager.PlayIllustAnimation(0);
+        switch (accuracy)
+        {
+            case 0:
+                combo += 1;
+                break;
+            case 1:
+                combo += 2;
+                break;
+            case 2:
+                combo += 5;
+                canvasManager.PlayIllustAnimation(0);
+                break;
+        }
     }
 }

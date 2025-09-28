@@ -30,6 +30,13 @@ public class EffectTestPlayerController : MonoBehaviour
     [Header("시작 포지션")]
     private Transform playerSpawnPos;
 
+    [SerializeField] private float perfectThreshold = 0.2f;
+    [SerializeField] private float goodThreshold = 0.8f;
+
+    public float GetPerfectThreshold()
+    {
+        return perfectThreshold;
+    }
 
     // --- 내부적으로 사용되는 변수들 ---
 
@@ -103,27 +110,82 @@ public class EffectTestPlayerController : MonoBehaviour
     }
 
     //추가
-    private void Land()
+    private void Land(int accuracy)
     {
-        Debug.Log("착지");
-        particles[0].Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-        particles[0].Play();
-        gameManager.PerfactLand(); // 임시. 실제로는 콤보 수도 전달해야 함.
+        AllParticleStop();
+        switch (accuracy)
+        {
+            case 0:
+                //particles[0].Play();
+                Debug.Log("BAD... (정확도: 0)");
+                break;
+            case 1:
+                particles[1].Play();
+                Debug.Log("GOOD (정확도: 1)");
+                    break;
+            case 2:
+                particles[2].Play();
+                Debug.Log("PERFECT! (정확도: 2)");
+                break;
+        }
+        gameManager.Land(accuracy); 
+    }
+
+    //진행중인 Player의 모든 파티클을 강제 종료
+    void AllParticleStop()
+    {
+        foreach (var particle in particles)
+        {
+            particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         if(collision.gameObject.CompareTag("Sea"))
         {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
             Debug.Log("실패! 강에 휩쓸려서 처음으로 돌아갑니다");
             transform.position = playerSpawnPos.position;
         }
-        else
+
+        if (collision.gameObject.CompareTag("Block"))
         {
-            //추가
-            Land();
+            Collider blockCollider = collision.collider;
+
+            // collision.contacts[0].point 대신 '플레이어의 현재 위치(중심)'를 사용합니다.
+            int accuracy = CalculateLandingAccuracy(transform.position, blockCollider);
+
+            Land(accuracy); // Land 함수에서 모든 처리를 하므로 여기서 호출
+            
         }
+    }
 
+    // 착지 지점과 블록 콜라이더를 기반으로 정확도를 계산합니다.
+    // <returns>정확도 점수 (2: Perfect, 1: Good, 0: Bad)</returns>
+    int CalculateLandingAccuracy(Vector3 landingPosition, Collider blockCollider)
+    {
+        BoxCollider box = blockCollider as BoxCollider;
+        if (box == null) return 0; // BoxCollider가 아니면 판정 불가
 
+        // 1. 플레이어의 월드 좌표를 블록의 '로컬 좌표'로 변환
+        Vector3 localLandingPos = blockCollider.transform.InverseTransformPoint(landingPosition);
+
+        // 2. 로컬 공간에서 각 축의 중심(0,0,0)으로부터의 거리 계산
+        float distanceX = Mathf.Abs(localLandingPos.x);
+        float distanceZ = Mathf.Abs(localLandingPos.z);
+
+        // 3. BoxCollider의 로컬 'size'를 이용해 정규화 (0:중앙, 1:끝)
+        float normalizedX = distanceX / (box.size.x / 2f + float.Epsilon);
+        float normalizedZ = distanceZ / (box.size.z / 2f + float.Epsilon);
+
+        // 4. 두 정규화 값 중 '더 큰 값'을 최종 거리로 사용
+        float finalNormalizedDistance = Mathf.Max(normalizedX, normalizedZ);
+
+        // 5. 최종 거리를 기준으로 점수 반환
+        if (finalNormalizedDistance <= perfectThreshold) return 2;
+        if (finalNormalizedDistance <= goodThreshold) return 1;
+        return 0;
     }
 }

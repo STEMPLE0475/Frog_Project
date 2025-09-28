@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
     public Transform startPos;
 
 
+
     // --- 내부적으로 사용되는 변수들 ---
 
     private Rigidbody rb;                 // 플레이어의 Rigidbody 컴포넌트

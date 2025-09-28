@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem; // 새로운 Input System을 사용하기 위해 꼭 추가해야 합니다.
+using UnityEngine.InputSystem;
 
-// 이 스크립트는 Rigidbody 컴포넌트가 있는 게임 오브젝트에 추가해야 합니다.
 [RequireComponent(typeof(Rigidbody))]
 public class EffectTestPlayerController : MonoBehaviour
 {
@@ -11,181 +11,216 @@ public class EffectTestPlayerController : MonoBehaviour
 
     #region 변수 선언
 
-    // --- 인스펙터에서 조절할 수 있는 값들 ---
-
     [Header("점프 파워 설정")]
-    [Tooltip("점프의 최소 힘")]
-    public float minJumpForce = 1f;
-
-    [Tooltip("점프의 최대 힘")]
-    public float maxJumpForce = 10f;
-
-    [Tooltip("초당 충전되는 힘의 양")]
-    public float chargeRate = 5f;
+    [SerializeField] private float minJumpForce = 4f;
+    [SerializeField] private float maxJumpForce = 15f;
+    [SerializeField] private float chargeRate = 9f;
 
     [Header("점프 방향 설정")]
-    [Tooltip("점프가 이루어질 방향 (기본값: X:1, Y:1, Z:1)")]
-    public Vector3 jumpDirection = new Vector3(1f, 1f, 1f);
+    [SerializeField] private Vector3 jumpDirection = new Vector3(1f, 3f, 1f);
 
-    [Header("시작 포지션")]
+    [Header("착지 판정 범위 (0~1)")]
+    [Range(0f, 1f)][SerializeField] private float perfectThreshold = 0.3f;
+    [Range(0f, 1f)][SerializeField] private float goodThreshold = 0.8f;
+
+    // --- 애니메이션 설정 ---
+    [Header("점프 애니메이션 설정")]
+    [Tooltip("힘을 모을 때 Y축으로 눌리는 정도")]
+    [SerializeField] private float squashAmount = 0.5f;
+    [Tooltip("점프 직후 Y축으로 늘어나는 정도")]
+    [SerializeField] private float stretchAmount = 1.5f;
+    [Tooltip("애니메이션이 원래 크기로 돌아오는 속도")]
+    [SerializeField] private float animationSpeed = 2.2f;
+
     private Transform playerSpawnPos;
+    private Rigidbody rb;
+    private float currentJumpForce;
+    private bool isCharging = false;
+    private Keyboard keyboard;
 
-    private float perfectThreshold = 0.3f;
-    private float goodThreshold = 0.8f;
+    // --- 애니메이션용 내부 변수 ---
+    private Vector3 originalScale;
+    private Coroutine scaleAnimationCoroutine;
 
-    public float GetPerfectThreshold()
-    {
-        return perfectThreshold;
-    }
-
-    // --- 내부적으로 사용되는 변수들 ---
-
-    private Rigidbody rb;                 // 플레이어의 Rigidbody 컴포넌트
-    private float currentJumpForce;       // 현재 충전된 점프 힘
-    private bool isCharging = false;      // 현재 힘을 충전 중인지 여부
-    private Keyboard keyboard;            // 현재 키보드 입력을 받기 위한 변수
+    // ↓↓↓↓↓↓ 공중 상태 추적 변수 추가 ↓↓↓↓↓↓
+    private bool isAirborne = false; // 플레이어가 공중에 떠 있는지 여부
 
     #endregion
 
     public void Initiate(GameManager gameManager, Transform playerSpawnPos)
     {
         this.gameManager = gameManager;
-        //스폰 지점을 정합니다. GameManager에서 받아온다.
         this.playerSpawnPos = playerSpawnPos;
-
-        // Rigidbody 컴포넌트를 가져옵니다.
         rb = GetComponent<Rigidbody>();
-
-        // 현재 사용 중인 키보드 장치를 가져옵니다.
         keyboard = Keyboard.current;
-
-        // 시작 시 현재 점프 힘을 최소값으로 초기화합니다.
         currentJumpForce = minJumpForce;
+
+        originalScale = transform.localScale;
+        isAirborne = false; // 초기에는 땅에 붙어있는 상태
     }
 
-    /// <summary>
-    /// 매 프레임마다 호출되는 함수
-    /// </summary>
     void Update()
     {
-        // 키보드가 연결되어 있는지 확인합니다. (필수)
-        if (keyboard == null)
-        {
-            Debug.LogWarning("키보드가 연결되지 않았습니다.");
-            return;
-        }
+        if (keyboard == null) return;
 
-        // 스페이스바를 처음 눌렀을 때 (wasPressedThisFrame)
+        HandleInput();
+    }
+
+    private void HandleInput()
+    {
+        // 스페이스바를 처음 눌렀을 때
         if (keyboard.spaceKey.wasPressedThisFrame)
         {
             isCharging = true;
             currentJumpForce = minJumpForce;
-            Debug.Log("점프 충전 시작!");
+
+            if (scaleAnimationCoroutine != null) StopCoroutine(scaleAnimationCoroutine);
+            scaleAnimationCoroutine = StartCoroutine(AnimateScale(new Vector3(originalScale.x, originalScale.y * squashAmount, originalScale.z)));
         }
 
-        // 스페이스바를 누르고 있는 동안 (isPressed)
+        // 스페이스바를 누르고 있는 동안
         if (keyboard.spaceKey.isPressed && isCharging)
         {
             currentJumpForce += chargeRate * Time.deltaTime;
             currentJumpForce = Mathf.Clamp(currentJumpForce, minJumpForce, maxJumpForce);
-            Debug.Log($"충전 중... 파워: {currentJumpForce:F1}");
         }
 
-        // 스페이스바에서 손을 뗐을 때 (wasReleasedThisFrame)
-        if (keyboard.spaceKey.wasReleasedThisFrame && isCharging)
+        // 스페이스바에서 손을 뗐을 때
+        if (keyboard.spaceKey.wasReleasedThisFrame && isCharging && !isAirborne)
         {
-            Jump();
             isCharging = false;
+            Jump();
+
+            if (scaleAnimationCoroutine != null) StopCoroutine(scaleAnimationCoroutine);
+            scaleAnimationCoroutine = StartCoroutine(AnimateJumpStretch());
         }
     }
 
-    /// <summary>
-    /// 실제 점프를 실행하는 함수
-    /// </summary>
     private void Jump()
     {
         Vector3 forceToApply = jumpDirection.normalized * currentJumpForce;
         rb.AddForce(forceToApply, ForceMode.Impulse);
-        Debug.Log($"점프! 방향: {forceToApply}, 힘: {currentJumpForce:F1}");
+        isAirborne = true; // 점프했으니 공중에 떠 있는 상태로 설정
     }
 
-    //추가
+    // --- 착지 및 충돌 처리 ---
+
     private void Land(int accuracy)
     {
+        // 공중에 떠 있지 않으면 착지 판정하지 않음 (이중 호출 방지 및 정확한 시점 제어) 
+        if (!isAirborne) return;
+
+        isAirborne = false; // 착지했으니 공중에 떠 있지 않은 상태로 설정
+
         AllParticleStop();
         switch (accuracy)
         {
-            case 0:
-                //particles[0].Play();
-                Debug.Log("BAD... (정확도: 0)");
-                break;
-            case 1:
-                particles[1].Play();
-                Debug.Log("GOOD (정확도: 1)");
-                    break;
-            case 2:
-                particles[2].Play();
+            case 2: // Perfect 
                 Debug.Log("PERFECT! (정확도: 2)");
+                if (particles.Count > 0 && particles[2] != null) particles[2].Play();
+                break;
+            case 1: // Good
+                Debug.Log("GOOD (정확도: 1)");
+                if (particles.Count > 1 && particles[1] != null) particles[1].Play();
+                break;
+            case 0: // Bad
+                Debug.Log("BAD... (정확도: 0)");
+                //if (particles.Count > 2 && particles[0] != null) particles[0].Play();
                 break;
         }
-        gameManager.Land(accuracy); 
-    }
+        if (gameManager != null) gameManager.Land(accuracy);
 
-    //진행중인 Player의 모든 파티클을 강제 종료
-    void AllParticleStop()
-    {
-        foreach (var particle in particles)
-        {
-            particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-        }
+        // 착지 후 스케일 애니메이션이 진행 중이었다면 멈추고 원래 크기로 복구
+        if (scaleAnimationCoroutine != null) StopCoroutine(scaleAnimationCoroutine);
+        transform.localScale = originalScale;
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.CompareTag("Sea"))
+        if (collision.gameObject.CompareTag("Sea"))
         {
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             Debug.Log("실패! 강에 휩쓸려서 처음으로 돌아갑니다");
             transform.position = playerSpawnPos.position;
+
+            // 물에 빠졌을 때도 스케일 원복
+            if (scaleAnimationCoroutine != null) StopCoroutine(scaleAnimationCoroutine);
+            transform.localScale = originalScale;
+            isAirborne = false; // 바다에 빠졌으니 공중에 떠 있지 않음
         }
 
-        if (collision.gameObject.CompareTag("Block"))
+        // 블록에 착지했을 때 (아래로 떨어지는 중이고, 공중에 떠 있는 상태였을 때만 판정)
+        if (collision.gameObject.CompareTag("Block") && isAirborne) 
         {
-            Collider blockCollider = collision.collider;
-
-            // collision.contacts[0].point 대신 '플레이어의 현재 위치(중심)'를 사용합니다.
-            int accuracy = CalculateLandingAccuracy(transform.position, blockCollider);
-
-            Land(accuracy); // Land 함수에서 모든 처리를 하므로 여기서 호출
-            
+            int accuracy = CalculateLandingAccuracy(transform.position, collision.collider);
+            Land(accuracy);
         }
     }
 
-    // 착지 지점과 블록 콜라이더를 기반으로 정확도를 계산합니다.
-    // <returns>정확도 점수 (2: Perfect, 1: Good, 0: Bad)</returns>
     int CalculateLandingAccuracy(Vector3 landingPosition, Collider blockCollider)
     {
         BoxCollider box = blockCollider as BoxCollider;
-        if (box == null) return 0; // BoxCollider가 아니면 판정 불가
+        if (box == null) return 0;
 
-        // 1. 플레이어의 월드 좌표를 블록의 '로컬 좌표'로 변환
         Vector3 localLandingPos = blockCollider.transform.InverseTransformPoint(landingPosition);
-
-        // 2. 로컬 공간에서 각 축의 중심(0,0,0)으로부터의 거리 계산
         float distanceX = Mathf.Abs(localLandingPos.x);
         float distanceZ = Mathf.Abs(localLandingPos.z);
-
-        // 3. BoxCollider의 로컬 'size'를 이용해 정규화 (0:중앙, 1:끝)
         float normalizedX = distanceX / (box.size.x / 2f + float.Epsilon);
         float normalizedZ = distanceZ / (box.size.z / 2f + float.Epsilon);
-
-        // 4. 두 정규화 값 중 '더 큰 값'을 최종 거리로 사용
         float finalNormalizedDistance = Mathf.Max(normalizedX, normalizedZ);
 
-        // 5. 최종 거리를 기준으로 점수 반환
         if (finalNormalizedDistance <= perfectThreshold) return 2;
         if (finalNormalizedDistance <= goodThreshold) return 1;
         return 0;
+    }
+
+    // --- 애니메이션 코루틴 ---
+
+    private IEnumerator AnimateScale(Vector3 targetScale)
+    {
+        while (Vector3.Distance(transform.localScale, targetScale) > 0.01f)
+        {
+            transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * animationSpeed);
+            yield return null;
+        }
+        transform.localScale = targetScale;
+    }
+
+    private IEnumerator AnimateJumpStretch()
+    {
+        Vector3 stretchTarget = new Vector3(originalScale.x, originalScale.y * stretchAmount, originalScale.z);
+
+        // 1. 빠르게 늘어납니다.
+        while (Vector3.Distance(transform.localScale, stretchTarget) > 0.01f)
+        {
+            transform.localScale = Vector3.Lerp(transform.localScale, stretchTarget, Time.deltaTime * animationSpeed * 2f);
+            yield return null;
+        }
+        transform.localScale = stretchTarget;
+
+        // 2. 원래 크기로 돌아옵니다.
+        while (Vector3.Distance(transform.localScale, originalScale) > 0.01f)
+        {
+            transform.localScale = Vector3.Lerp(transform.localScale, originalScale, Time.deltaTime * animationSpeed);
+            yield return null;
+        }
+        transform.localScale = originalScale;
+    }
+
+    // --- 기타 함수 ---
+
+    public float GetPerfectThreshold()
+    {
+        return perfectThreshold;
+    }
+
+    void AllParticleStop()
+    {
+        foreach (var particle in particles)
+        {
+            if (particle != null)
+                particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        }
     }
 }

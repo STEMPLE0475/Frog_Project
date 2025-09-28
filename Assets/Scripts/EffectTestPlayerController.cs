@@ -26,7 +26,7 @@ public class EffectTestPlayerController : MonoBehaviour
     public Vector3 jumpDirection = new Vector3(1f, 1f, 1f);
 
     [Header("시작 포지션")]
-    public Transform startPos;
+    private Transform playerSpawnPos;
 
 
     // --- 내부적으로 사용되는 변수들 ---
@@ -38,8 +38,11 @@ public class EffectTestPlayerController : MonoBehaviour
 
     #endregion
 
-    void Start()
+    public void Initiate(Transform playerSpawnPos)
     {
+        //스폰 지점을 정합니다. GameManager에서 받아온다.
+        this.playerSpawnPos = playerSpawnPos;
+
         // Rigidbody 컴포넌트를 가져옵니다.
         rb = GetComponent<Rigidbody>();
 
@@ -109,7 +112,7 @@ public class EffectTestPlayerController : MonoBehaviour
         if(collision.gameObject.CompareTag("Sea"))
         {
             Debug.Log("실패! 강에 휩쓸려서 처음으로 돌아갑니다");
-            transform.position = startPos.position;
+            transform.position = playerSpawnPos.position;
         }
         else
         {

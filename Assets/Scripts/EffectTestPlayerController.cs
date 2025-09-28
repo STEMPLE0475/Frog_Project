@@ -30,8 +30,8 @@ public class EffectTestPlayerController : MonoBehaviour
     [Header("시작 포지션")]
     private Transform playerSpawnPos;
 
-    [SerializeField] private float perfectThreshold = 0.2f;
-    [SerializeField] private float goodThreshold = 0.8f;
+    private float perfectThreshold = 0.3f;
+    private float goodThreshold = 0.8f;
 
     public float GetPerfectThreshold()
     {

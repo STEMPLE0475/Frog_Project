@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CanvasManager canvasManager;
     [SerializeField] private CinemachineCameraScript cinemachineCameraScript;
     [SerializeField] private EffectTestPlayerController playerController;
+    [SerializeField] private HUDController hudController;
 
     [Header("Variable")]
     [SerializeField] private Transform playerSpawnTransform;
@@ -24,6 +25,8 @@ public class GameManager : MonoBehaviour
         playerController.Initiate(this, playerSpawnTransform);
         cinemachineCameraScript.Initiate(playerController);
         canvasManager.Initiate();
+        playerController.EnableInput(false);
+        hudController?.Initiate(this);
     }
     
     public void Land(int accuracy)
@@ -43,4 +46,25 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
+    public void StartGame()
+    {
+        // HUD 숨김 + HUD입력 차단 + 커서 숨김
+        hudController.ShowHUD(false);
+        hudController.EnableHUDInputOnly(false);
+        hudController.SetCursor(false);
+
+        // 인게임 시작 
+        playerController.EnableInput(true);
+        //canvasManager.PlayIllustAnimation(0); //필요시 연출
+    }
+
+    public void QuitGame()
+    {
+#if UNITY_EDITOR
+    UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
 }

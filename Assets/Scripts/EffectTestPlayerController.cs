@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody))]
 public class EffectTestPlayerController : MonoBehaviour
 {
+    private bool _inputEnabled = true;
     public List<ParticleSystem> particles;
     private GameManager gameManager;
 
@@ -46,6 +47,7 @@ public class EffectTestPlayerController : MonoBehaviour
     private bool isAirborne = false; // 플레이어가 공중에 떠 있는지 여부
 
     #endregion
+    [SerializeField] private PlayerInput _playerInput;
 
     public void Initiate(GameManager gameManager, Transform playerSpawnPos)
     {
@@ -58,9 +60,22 @@ public class EffectTestPlayerController : MonoBehaviour
         originalScale = transform.localScale;
         isAirborne = false; // 초기에는 땅에 붙어있는 상태
     }
+    public void EnableInput(bool on)
+    {
+        _inputEnabled = on;
+
+        if (_playerInput == null) _playerInput = GetComponent<PlayerInput>();
+        if (_playerInput != null)
+        {
+            if (on) _playerInput.ActivateInput();
+            else _playerInput.DeactivateInput();
+        }
+    }
 
     void Update()
     {
+        if (!_inputEnabled) return;
+
         if (keyboard == null) return;
 
         HandleInput();

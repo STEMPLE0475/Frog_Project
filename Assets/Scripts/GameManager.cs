@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
     [Header("Variable")]
     [SerializeField] private Transform playerSpawnTransform;
     private int combo = 0;
+    private bool isPaused = false; // 일시정지 여부를 저장하는 플래그
+    
 
 
     // 본 프로젝트의 모든 Awake()나 Start()는 사용 금지.
@@ -25,8 +27,12 @@ public class GameManager : MonoBehaviour
         playerController.Initiate(this, playerSpawnTransform);
         cinemachineCameraScript.Initiate(playerController);
         canvasManager.Initiate();
+
         playerController.EnableInput(false);
         hudController?.Initiate(this);
+
+        // 처음엔 게임을 멈춘 상태로 시작 
+        Time.timeScale = 0f;
     }
     
     public void Land(int accuracy)
@@ -54,6 +60,8 @@ public class GameManager : MonoBehaviour
         hudController.SetCursor(false);
 
         // 인게임 시작 
+        Time.timeScale = 1f;
+        isPaused = false;
         playerController.EnableInput(true);
         //canvasManager.PlayIllustAnimation(0); //필요시 연출
     }
@@ -66,5 +74,46 @@ public class GameManager : MonoBehaviour
         Application.Quit();
 #endif
     }
+    
+
+    private void Update()         // 매 프레임마다 ESC 입력을 감지
+    {
+        // ESC 키를 누르면 일시정지 토글
+        if (Input.GetKeyDown(KeyCode.Escape)) 
+            TogglePause();
+    }
+    
+    private void TogglePause()
+    {
+        // 일시정지 상태를 전환하는 함수
+        // true ↔ false 전환
+        isPaused = !isPaused;
+
+        // 일시정지 상태에 따라 실행할 함수 분기
+        if (isPaused) PauseGame();
+        else ResumeGame();
+    }
+
+    public void PauseGame()     // 게임을 일시정지하는 로직
+    {
+        Time.timeScale = 0f;                        // 물리 연산 및 Update 정지
+        playerController.EnableInput(false);        // 플레이어 입력 비활성화
+        hudController.ShowHUD(true, instant: true); // HUD 표시 (즉시 활성화)
+        hudController.ShowMainMenu(false);          // 메인메뉴는 숨기기
+        hudController.ShowPausePanel(true);         // 일시정지 패널 표시
+        hudController.EnableHUDInputOnly(true);     // UI만 입력 받게 설정
+        hudController.SetCursor(true);              // 마우스 커서 표시
+    }
+
+    public void ResumeGame()
+    {
+        hudController.ShowPausePanel(false);      // 일시정지 패널 숨김
+        hudController.ShowHUD(false);             // HUD 전체 숨김
+        hudController.EnableHUDInputOnly(false);  // HUD 입력 비활성화
+        hudController.SetCursor(false);           // 커서 숨김
+        playerController.EnableInput(true);       // 플레이어 입력 활성화
+        Time.timeScale = 1f;                      // 게임 속도 정상화
+    }
+
 
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1060800979457",
+    "project_id": "frogtest-94b0b",
+    "storage_bucket": "frogtest-94b0b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1060800979457:android:dd5a37d04c6a2773665600",
+        "android_client_info": {
+          "package_name": "frog.test"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4nyhfoCXj9ntLck5dGyFOMIrimmEnh0I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

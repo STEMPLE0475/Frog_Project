@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
+using Firebase.Firestore;
+using Firebase.Extensions;
 
 public class GameManager : MonoBehaviour
 {
+    //private FirebaseFirestore db;
     // 게임의 전체적인 로직을 관리하는 스크립트
-
     // 해당하는 변수를 Editor에서 할당해줄 필요가 있음. (이것만은 반드시 해줘야함! 안하면 오류남)
     // 이 스크립트 오류만 없으면 다른 세부적인 부분 (PlayerContorller 등에서 설정 안해도 작동하도록 깔끔하게 해야함)
 
@@ -17,7 +20,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Transform playerSpawnTransform;
     private int combo = 0;
     private bool isPaused = false; // 일시정지 여부를 저장하는 플래그
-    
 
 
     // 본 프로젝트의 모든 Awake()나 Start()는 사용 금지.
@@ -33,6 +35,21 @@ public class GameManager : MonoBehaviour
 
         // 처음엔 게임을 멈춘 상태로 시작 
         Time.timeScale = 0f;
+    }
+    private void Start()
+    {
+        FirebaseFirestore db = FirebaseFirestore.DefaultInstance;
+
+        DocumentReference docRef = db.Collection("users").Document("alovelace");
+        Dictionary<string, object> user = new Dictionary<string, object>
+        {
+            { "First", "Ada" },
+            { "Last", "Lovelace" },
+            { "Born", 1815 },
+        };
+        docRef.SetAsync(user).ContinueWithOnMainThread(task => {
+            Debug.Log("Added data to the alovelace document in the users collection.");
+        });
     }
     
     public void Land(int accuracy)

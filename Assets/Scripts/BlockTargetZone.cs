@@ -12,7 +12,7 @@ public class BlockTargetZone : MonoBehaviour
         BoxCollider blockCollider = GetComponent<BoxCollider>();
 
         // 씬에서 플레이어를 찾아 Perfect 판정 범위를 가져옵니다.
-        EffectTestPlayerController player = FindAnyObjectByType<EffectTestPlayerController>();
+        PlayerController player = FindAnyObjectByType<PlayerController>();
         if (player != null && targetZoneVisual != null)
         {
             float perfectThreshold = player.GetPerfectThreshold();

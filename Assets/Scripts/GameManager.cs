@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     [Header("Class")]
     [SerializeField] private CanvasManager canvasManager;
     [SerializeField] private CinemachineCameraScript cinemachineCameraScript;
-    [SerializeField] private EffectTestPlayerController playerController;
+    [SerializeField] private PlayerController playerController;
     [SerializeField] private HUDController hudController;
 
     [Header("Variable")]

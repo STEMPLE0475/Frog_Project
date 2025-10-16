@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -11,6 +12,11 @@ public class EffectTestPlayerController : MonoBehaviour
     private GameManager gameManager;
 
     #region 변수 선언
+
+    // 점프 지속 시간 (초)
+    private float jumpDuration = 1.2f;
+    // 점프 거리(currentJumpForce)에 비례한 높이 계수
+    private float heightMultiplier = 1f;
 
     [Header("점프 파워 설정")]
     [SerializeField] private float minJumpForce = 4f;
@@ -46,8 +52,14 @@ public class EffectTestPlayerController : MonoBehaviour
     // ↓↓↓↓↓↓ 공중 상태 추적 변수 추가 ↓↓↓↓↓↓
     private bool isAirborne = false; // 플레이어가 공중에 떠 있는지 여부
 
-    #endregion
     [SerializeField] private PlayerInput _playerInput;
+    #endregion
+
+    #region Event
+    public event Action OnJumpStart;
+    public event Action OnLand;
+    #endregion
+
 
     public void Initiate(GameManager gameManager, Transform playerSpawnPos)
     {
@@ -104,24 +116,59 @@ public class EffectTestPlayerController : MonoBehaviour
         if (keyboard.spaceKey.wasReleasedThisFrame && isCharging && !isAirborne)
         {
             isCharging = false;
-            Jump();
+            StartJump();
 
             if (scaleAnimationCoroutine != null) StopCoroutine(scaleAnimationCoroutine);
             scaleAnimationCoroutine = StartCoroutine(AnimateJumpStretch());
         }
     }
 
-    private void Jump()
+    private void StartJump()
     {
-        Vector3 forceToApply = jumpDirection.normalized * currentJumpForce;
-        rb.AddForce(forceToApply, ForceMode.Impulse);
-        isAirborne = true; // 점프했으니 공중에 떠 있는 상태로 설정
+        if (isAirborne) return;
+        StartCoroutine(ParabolicJump());
+    }
+
+    private IEnumerator ParabolicJump()
+    {
+        OnJumpStart?.Invoke();
+
+        isAirborne = true; 
+
+        Vector3 startPos = transform.position;
+        Quaternion startRotation = transform.rotation;
+        Vector3 endPos = startPos + jumpDirection.normalized * currentJumpForce;
+
+        float elapsedTime = 0f;
+        float jumpHeight = currentJumpForce * heightMultiplier;
+
+        while (elapsedTime < jumpDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float progress = elapsedTime / jumpDuration;
+            progress = Mathf.Clamp01(progress);
+
+            float currentAngle = 360f * progress;
+            transform.rotation = startRotation * Quaternion.Euler(currentAngle, 0, 0);
+
+            Vector3 currentPos = Vector3.Lerp(startPos, endPos, progress);
+            currentPos.y += Mathf.Sin(progress * Mathf.PI) * jumpHeight;
+            transform.position = currentPos;
+
+            yield return null;
+        }
+
+        // 점프가 끝난 후, 회전 값을 시작 값으로 완벽하게 복원
+        transform.rotation = startRotation;
+
+        isAirborne = false;
     }
 
     // --- 착지 및 충돌 처리 ---
 
     private void Land(int accuracy)
     {
+        OnLand?.Invoke();
         // 공중에 떠 있지 않으면 착지 판정하지 않음 (이중 호출 방지 및 정확한 시점 제어) 
         if (!isAirborne) return;
 

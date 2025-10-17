@@ -307,9 +307,12 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Block") && isAirborne) 
         {
             Block blockScript = collision.gameObject.GetComponent<Block>();
-            blockScript.CollisionPlayer();
-            int accuracy = CalculateLandingAccuracy(transform.position, collision.collider, blockScript);
-            Land(accuracy);
+            if(blockScript.blockType == BlockType.Sink)
+            {
+                blockScript.CollisionPlayer();
+                int accuracy = CalculateLandingAccuracy(transform.position, collision.collider, blockScript);
+                Land(accuracy);
+            }
         }
     }
 

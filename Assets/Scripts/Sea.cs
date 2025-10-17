@@ -34,14 +34,14 @@ public class Sea : MonoBehaviour
     {
         // 1. 시간에 따라 부드럽게 -1과 1 사이를 반복하는 사인파 값을 계산합니다.
         //    Time.time * waveSpeed : 시간에 따라 파도의 속도를 조절합니다.
-        float waveOffset = Mathf.Sin(Time.time * waveSpeed) * waveHeight;
+        /*float waveOffset = Mathf.Sin(Time.time * waveSpeed) * waveHeight;
 
         // 2. 계산된 파도 높낮이(waveOffset)를 초기 Y 위치에 더해 새로운 위치를 만듭니다.
         transform.position = new Vector3(
             initialPosition.x,
             initialPosition.y + waveOffset,
             initialPosition.z
-        );
+        );*/
 
         MoveSea();
     }

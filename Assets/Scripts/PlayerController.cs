@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviour
     // 점프 거리(currentJumpForce)에 비례한 높이 계수
     private float heightMultiplier = 1f;
 
+    private int combo = 0;
+
     [Header("점프 파워 설정")]
     [SerializeField] private float minJumpForce = 4f;
     [SerializeField] private float maxJumpForce = 15f;
@@ -53,11 +55,20 @@ public class PlayerController : MonoBehaviour
     public bool isAirborne = false; // 플레이어가 공중에 떠 있는지 여부
 
     [SerializeField] private PlayerInput _playerInput;
+    [SerializeField] private TrailRenderer trailRenderer;
+    [SerializeField] private List<Material> trailRendererMaterials;
     #endregion
 
     #region Event
     public event Action OnJumpStart;
     public event Action OnLand;
+
+    public event Action Combo1;
+    public event Action Combo2;
+    public event Action Combo3;
+    public event Action Combo4;
+    public event Action Combo5;
+    public event Action Combo6;
     #endregion
 
 
@@ -71,7 +82,20 @@ public class PlayerController : MonoBehaviour
 
         originalScale = transform.localScale;
         isAirborne = false; // 초기에는 땅에 붙어있는 상태
+        EventBind();
     }
+
+    void EventBind()
+    {
+        Combo1 += UpdateCombo1;
+        Combo2 += UpdateCombo2;
+        Combo3 += UpdateCombo3;
+        Combo4 += UpdateCombo4;
+        Combo5 += UpdateCombo5;
+        Combo6 += UpdateCombo6;
+    }
+
+
     public void EnableInput(bool on)
     {
         _inputEnabled = on;
@@ -178,13 +202,16 @@ public class PlayerController : MonoBehaviour
             case 2: // Perfect 
                 Debug.Log("PERFECT! (정확도: 2)");
                 if (starParticles.Count > 0 && starParticles[2] != null) starParticles[2].Play();
+                PlusCombo();
                 break;
             case 1: // Good
                 Debug.Log("GOOD (정확도: 1)");
                 if (starParticles.Count > 1 && starParticles[1] != null) starParticles[1].Play();
+                ResetCombo();
                 break;
             case 0: // Bad
                 Debug.Log("BAD... (정확도: 0)");
+                ResetCombo();
                 //if (starParticles.Count > 2 && starParticles[0] != null) starParticles[0].Play();
                 break;
         }
@@ -195,6 +222,70 @@ public class PlayerController : MonoBehaviour
         // 착지 후 스케일 애니메이션이 진행 중이었다면 멈추고 원래 크기로 복구
         if (scaleAnimationCoroutine != null) StopCoroutine(scaleAnimationCoroutine);
         transform.localScale = originalScale;
+    }
+
+    private void PlusCombo()
+    {
+        combo++;
+        UpdateCombo();
+    }
+    private void ResetCombo()
+    {
+        combo = 0;
+        UpdateCombo();
+    }
+    private void UpdateCombo()
+    {
+        if (combo == 0) Combo1?.Invoke();
+        else if (combo == 1) Combo2?.Invoke();
+        else if (combo == 2) Combo3?.Invoke();
+        else if (combo == 3) Combo4?.Invoke();
+        else if (combo == 4) Combo5?.Invoke();
+        else if (combo == 5) Combo6?.Invoke();
+        else Combo6?.Invoke();
+    }
+
+    void UpdateCombo1()
+    {
+        Material[] newMaterials = trailRenderer.materials;
+        newMaterials[0] = trailRendererMaterials[0];
+        trailRenderer.materials = newMaterials;
+        Debug.Log("콤보 초기화");
+    }
+    void UpdateCombo2()
+    {
+        Material[] newMaterials = trailRenderer.materials;
+        newMaterials[0] = trailRendererMaterials[1];
+        trailRenderer.materials = newMaterials;
+        Debug.Log("1 콤보");
+    }
+    void UpdateCombo3()
+    {
+        Material[] newMaterials = trailRenderer.materials;
+        newMaterials[0] = trailRendererMaterials[2];
+        trailRenderer.materials = newMaterials;
+        Debug.Log("2 콤보");
+    }
+    void UpdateCombo4()
+    {
+        Material[] newMaterials = trailRenderer.materials;
+        newMaterials[0] = trailRendererMaterials[3];
+        trailRenderer.materials = newMaterials;
+        Debug.Log("3 콤보");
+    }
+    void UpdateCombo5()
+    {
+        Material[] newMaterials = trailRenderer.materials;
+        newMaterials[0] = trailRendererMaterials[4];
+        trailRenderer.materials = newMaterials;
+        Debug.Log("4 콤보");
+    }
+    void UpdateCombo6()
+    {
+        Material[] newMaterials = trailRenderer.materials;
+        newMaterials[0] = trailRendererMaterials[5];
+        trailRenderer.materials = newMaterials;
+        Debug.Log("5 콤보");
     }
 
     private void OnCollisionEnter(Collision collision)

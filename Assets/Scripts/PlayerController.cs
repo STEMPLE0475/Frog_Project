@@ -192,9 +192,9 @@ public class PlayerController : MonoBehaviour
     {
         OnLand?.Invoke();
         // 공중에 떠 있지 않으면 착지 판정하지 않음 (이중 호출 방지 및 정확한 시점 제어) 
-        if (!isAirborne) return;
+        //if (!isAirborne) return;
 
-        isAirborne = false; // 착지했으니 공중에 떠 있지 않은 상태로 설정
+        //isAirborne = false; // 착지했으니 공중에 떠 있지 않은 상태로 설정
 
         AllParticleStop();
         switch (accuracy)
@@ -307,7 +307,8 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Block") && isAirborne) 
         {
             Block blockScript = collision.gameObject.GetComponent<Block>();
-            if(blockScript.blockType == BlockType.Sink)
+            isAirborne = false;
+            if (blockScript.blockType == BlockType.Sink)
             {
                 blockScript.CollisionPlayer();
                 int accuracy = CalculateLandingAccuracy(transform.position, collision.collider, blockScript);

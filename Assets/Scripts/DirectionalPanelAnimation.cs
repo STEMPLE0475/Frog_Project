@@ -11,10 +11,10 @@ public class DirectionalPanelAnimation : MonoBehaviour
     [SerializeField] private float slideInDuration = 0.2f;
 
     [Tooltip("연출 이미지가 화면에 머무는 시간")]
-    [SerializeField] private float holdDuration = 1.0f;
+    [SerializeField] private float holdDuration = 0.5f;
 
     [Tooltip("연출 이미지가 사라지는 데 걸리는 시간")]
-    [SerializeField] private float fadeOutDuration = 0.5f;
+    [SerializeField] private float fadeOutDuration = 0.25f;
 
     [Tooltip("최대 투명도")]
     [SerializeField] private float maxOpacity = 0.9f;

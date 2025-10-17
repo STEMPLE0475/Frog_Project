@@ -8,7 +8,8 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     private bool _inputEnabled = true;
-    public List<ParticleSystem> particles;
+    public List<ParticleSystem> starParticles;
+    public GameObject groundParticle;
     private GameManager gameManager;
 
     #region 변수 선언
@@ -49,8 +50,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 originalScale;
     private Coroutine scaleAnimationCoroutine;
 
-    // ↓↓↓↓↓↓ 공중 상태 추적 변수 추가 ↓↓↓↓↓↓
-    private bool isAirborne = false; // 플레이어가 공중에 떠 있는지 여부
+    public bool isAirborne = false; // 플레이어가 공중에 떠 있는지 여부
 
     [SerializeField] private PlayerInput _playerInput;
     #endregion
@@ -160,8 +160,6 @@ public class PlayerController : MonoBehaviour
 
         // 점프가 끝난 후, 회전 값을 시작 값으로 완벽하게 복원
         transform.rotation = startRotation;
-
-        isAirborne = false;
     }
 
     // --- 착지 및 충돌 처리 ---
@@ -179,17 +177,19 @@ public class PlayerController : MonoBehaviour
         {
             case 2: // Perfect 
                 Debug.Log("PERFECT! (정확도: 2)");
-                if (particles.Count > 0 && particles[2] != null) particles[2].Play();
+                if (starParticles.Count > 0 && starParticles[2] != null) starParticles[2].Play();
                 break;
             case 1: // Good
                 Debug.Log("GOOD (정확도: 1)");
-                if (particles.Count > 1 && particles[1] != null) particles[1].Play();
+                if (starParticles.Count > 1 && starParticles[1] != null) starParticles[1].Play();
                 break;
             case 0: // Bad
                 Debug.Log("BAD... (정확도: 0)");
-                //if (particles.Count > 2 && particles[0] != null) particles[0].Play();
+                //if (starParticles.Count > 2 && starParticles[0] != null) starParticles[0].Play();
                 break;
         }
+        var obj = Instantiate(groundParticle, new Vector3(transform.position.x, transform.position.y - 0.5f, transform.position.z), groundParticle.transform.rotation);
+        obj.GetComponent<ParticleSystem>().Play();
         if (gameManager != null) gameManager.Land(accuracy);
 
         // 착지 후 스케일 애니메이션이 진행 중이었다면 멈추고 원래 크기로 복구
@@ -249,7 +249,7 @@ public class PlayerController : MonoBehaviour
         transform.localScale = targetScale;
     }
 
-    private IEnumerator AnimateJumpStretch()
+    /*private IEnumerator AnimateJumpStretch()
     {
         Vector3 stretchTarget = new Vector3(originalScale.x, originalScale.y * stretchAmount, originalScale.z);
 
@@ -268,6 +268,19 @@ public class PlayerController : MonoBehaviour
             yield return null;
         }
         transform.localScale = originalScale;
+    }*/
+
+    private IEnumerator AnimateJumpStretch()
+    {
+
+        // 1. 빠르게 늘어납니다.
+        while (Vector3.Distance(transform.localScale, originalScale) > 0.01f)
+        {
+            transform.localScale = Vector3.Lerp(transform.localScale, originalScale, Time.deltaTime * animationSpeed * 2f);
+            yield return null;
+        }
+        transform.localScale = originalScale;
+
     }
 
     // --- 기타 함수 ---
@@ -279,7 +292,7 @@ public class PlayerController : MonoBehaviour
 
     void AllParticleStop()
     {
-        foreach (var particle in particles)
+        foreach (var particle in starParticles)
         {
             if (particle != null)
                 particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);

@@ -10,7 +10,7 @@ public class CinemachineCameraScript : MonoBehaviour
     private float zoomChangeAmount = 1f; // FOV를 줄일 양 (현재 값에서 -1)
     private float zoomDefaultFOV = 5f;
     private float zoomEndFOV = 4.7f;
-    private float zoomDuration = 0.5f; // 줌 인/아웃에 걸리는 시간
+    private float zoomDuration = 0.2f; // 줌 인/아웃에 걸리는 시간
 
     public void Initiate(PlayerController playerController)
     {

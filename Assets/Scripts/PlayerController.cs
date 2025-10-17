@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     #region 변수 선언
 
     // 점프 지속 시간 (초)
-    private float jumpDuration = 1.2f;
+    public float jumpDuration = 1.2f;
     // 점프 거리(currentJumpForce)에 비례한 높이 계수
     private float heightMultiplier = 1f;
 

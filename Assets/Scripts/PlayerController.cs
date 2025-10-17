@@ -306,12 +306,14 @@ public class PlayerController : MonoBehaviour
         // 블록에 착지했을 때 (아래로 떨어지는 중이고, 공중에 떠 있는 상태였을 때만 판정)
         if (collision.gameObject.CompareTag("Block") && isAirborne) 
         {
-            int accuracy = CalculateLandingAccuracy(transform.position, collision.collider);
+            Block blockScript = collision.gameObject.GetComponent<Block>();
+            blockScript.CollisionPlayer();
+            int accuracy = CalculateLandingAccuracy(transform.position, collision.collider, blockScript);
             Land(accuracy);
         }
     }
 
-    int CalculateLandingAccuracy(Vector3 landingPosition, Collider blockCollider)
+    int CalculateLandingAccuracy(Vector3 landingPosition, Collider blockCollider, Block blockScript)
     {
         BoxCollider box = blockCollider as BoxCollider;
         if (box == null) return 0;
@@ -323,8 +325,8 @@ public class PlayerController : MonoBehaviour
         float normalizedZ = distanceZ / (box.size.z / 2f + float.Epsilon);
         float finalNormalizedDistance = Mathf.Max(normalizedX, normalizedZ);
 
-        if (finalNormalizedDistance <= perfectThreshold) return 2;
-        if (finalNormalizedDistance <= goodThreshold) return 1;
+        if (finalNormalizedDistance <= blockScript.perfectThreshold) return 2;
+        if (finalNormalizedDistance <= blockScript.goodThreshold) return 1;
         return 0;
     }
 
@@ -340,26 +342,6 @@ public class PlayerController : MonoBehaviour
         transform.localScale = targetScale;
     }
 
-    /*private IEnumerator AnimateJumpStretch()
-    {
-        Vector3 stretchTarget = new Vector3(originalScale.x, originalScale.y * stretchAmount, originalScale.z);
-
-        // 1. 빠르게 늘어납니다.
-        while (Vector3.Distance(transform.localScale, stretchTarget) > 0.01f)
-        {
-            transform.localScale = Vector3.Lerp(transform.localScale, stretchTarget, Time.deltaTime * animationSpeed * 2f);
-            yield return null;
-        }
-        transform.localScale = stretchTarget;
-
-        // 2. 원래 크기로 돌아옵니다.
-        while (Vector3.Distance(transform.localScale, originalScale) > 0.01f)
-        {
-            transform.localScale = Vector3.Lerp(transform.localScale, originalScale, Time.deltaTime * animationSpeed);
-            yield return null;
-        }
-        transform.localScale = originalScale;
-    }*/
 
     private IEnumerator AnimateJumpStretch()
     {

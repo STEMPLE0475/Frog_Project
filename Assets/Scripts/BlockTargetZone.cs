@@ -6,25 +6,13 @@ public class BlockTargetZone : MonoBehaviour
 {
     [Tooltip("자식 오브젝트에 있는 Perfect 존 시각적 표시 오브젝트")]
     [SerializeField] private GameObject targetZoneVisual;
+    private float perfectThreshold;
 
-    void Start()
+    public void EnableTargetZone(float perfectThreshold)
     {
+        this.perfectThreshold = perfectThreshold;
         BoxCollider blockCollider = GetComponent<BoxCollider>();
-
-        // 씬에서 플레이어를 찾아 Perfect 판정 범위를 가져옵니다.
-        PlayerController player = FindAnyObjectByType<PlayerController>();
-        if (player != null && targetZoneVisual != null)
-        {
-            float perfectThreshold = player.GetPerfectThreshold();
-            SetupTargetZone(blockCollider, perfectThreshold);
-        }
-        else
-        {
-            // 플레이어나 시각적 오브젝트를 찾지 못하면 그냥 숨깁니다.
-            if (targetZoneVisual != null)
-                targetZoneVisual.SetActive(false);
-            Debug.LogWarning("Player 또는 TargetZoneVisual을 찾을 수 없어 Target Zone을 설정할 수 없습니다.");
-        }
+        SetupTargetZone(blockCollider, perfectThreshold);
     }
 
     /// <summary>

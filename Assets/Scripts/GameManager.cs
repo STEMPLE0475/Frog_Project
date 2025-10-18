@@ -21,11 +21,23 @@ public class GameManager : MonoBehaviour
     private int combo = 0;
     private bool isPaused = false; // 일시정지 여부를 저장하는 플래그
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource bgmSource;  // 배경음악용 AudioSource
+    [SerializeField] private AudioClip bgmClip;      // 배경음악 파일
+
 
     // 본 프로젝트의 모든 Awake()나 Start()는 사용 금지.
     // 모든 프로세스의 시작을 분명히 하기 위해서. 모든 로직은 GameManager을 통해서 시작된다.
     private void Awake()
     {
+        if (bgmSource != null && bgmClip != null)
+        {
+            bgmSource.clip = bgmClip;
+            bgmSource.loop = true;     // 계속 재생
+            bgmSource.volume = 0.5f;   // 음량 (0~1)
+            bgmSource.Play();          // 재생 시작
+        }
+
         playerController.Initiate(this, playerSpawnTransform);
         cinemachineCameraScript.Initiate(playerController);
         canvasManager.Initiate();
@@ -120,6 +132,7 @@ public class GameManager : MonoBehaviour
         hudController.ShowPausePanel(true);         // 일시정지 패널 표시
         hudController.EnableHUDInputOnly(true);     // UI만 입력 받게 설정
         hudController.SetCursor(true);              // 마우스 커서 표시
+        if (bgmSource != null) bgmSource.Pause();   // BGM 일시정지
     }
 
     public void ResumeGame()
@@ -130,6 +143,7 @@ public class GameManager : MonoBehaviour
         hudController.SetCursor(false);           // 커서 숨김
         playerController.EnableInput(true);       // 플레이어 입력 활성화
         Time.timeScale = 1f;                      // 게임 속도 정상화
+        if (bgmSource != null) bgmSource.UnPause();// BGM 재개
     }
 
 

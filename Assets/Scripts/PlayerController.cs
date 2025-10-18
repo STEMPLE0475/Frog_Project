@@ -57,6 +57,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerInput _playerInput;
     [SerializeField] private TrailRenderer trailRenderer;
     [SerializeField] private List<Material> trailRendererMaterials;
+    [SerializeField] private AudioSource sfxSource;  // 점프 사운드 재생용
+    [SerializeField] private AudioClip jumpSfx;      // 점프 사운드 파일
     #endregion
 
     #region Event
@@ -150,6 +152,9 @@ public class PlayerController : MonoBehaviour
     private void StartJump()
     {
         if (isAirborne) return;
+        if (sfxSource != null && jumpSfx != null)
+            sfxSource.PlayOneShot(jumpSfx);
+
         StartCoroutine(ParabolicJump());
     }
 

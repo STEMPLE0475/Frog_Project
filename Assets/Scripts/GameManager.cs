@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private AudioSource bgmSource;  // 배경음악용 AudioSource
     [SerializeField] private AudioClip bgmClip;      // 배경음악 파일
+    [SerializeField] private AudioSource uiSfxSource;        // 버튼 사운드용 AudioSource
+    [SerializeField] private List<ButtonSound> buttonSounds; // 버튼 리스트
+    [SerializeField, Range(0f, 2f)] private float uiVolume = 1.0f; // UI볼륨 배수(편의)
 
 
     // 본 프로젝트의 모든 Awake()나 Start()는 사용 금지.
@@ -34,8 +37,19 @@ public class GameManager : MonoBehaviour
         {
             bgmSource.clip = bgmClip;
             bgmSource.loop = true;     // 계속 재생
-            bgmSource.volume = 0.5f;   // 음량 (0~1)
+            bgmSource.volume = 0.3f;   // 음량 (0~1)
             bgmSource.Play();          // 재생 시작
+        }
+        // === 버튼 클릭 사운드 연결 ===
+        foreach (var btnSound in buttonSounds)
+        {
+            if (btnSound != null && btnSound.button != null && uiSfxSource != null)
+            {
+                btnSound.button.onClick.AddListener(() =>
+                {
+                    uiSfxSource.PlayOneShot(btnSound.clickSfx);
+                });
+            }
         }
 
         playerController.Initiate(this, playerSpawnTransform);

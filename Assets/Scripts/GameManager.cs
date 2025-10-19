@@ -1,7 +1,9 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using Firebase.Extensions;
 using Firebase.Firestore;
-using Firebase.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
@@ -31,7 +33,12 @@ public class GameManager : MonoBehaviour
     private int score = 0;
     private int max_score = 0; // start 호출시 최고 점수를 DB에서 불러와야 함.
 
+    //firebase
     public string player_name;
+    private FirebaseFirestore db;
+    private const string DEVICE_ID_KEY = "LocalDeviceID";
+    private string currentDeviceID;
+    private UserData loadedUserData;
 
     // 본 프로젝트의 모든 Awake()나 Start()는 사용 금지.
     // 모든 프로세스의 시작을 분명히 하기 위해서. 모든 로직은 GameManager을 통해서 시작된다.
@@ -55,6 +62,11 @@ public class GameManager : MonoBehaviour
 
         // 처음엔 게임을 멈춘 상태로 시작 
         Time.timeScale = 0f;
+
+
+        // 게임 시작 시 기기 ID를 먼저 확보합니다.
+        db = FirebaseFirestore.DefaultInstance;
+        currentDeviceID = GetOrCreateDeviceID();
     }
     private void Start()
     {
@@ -71,7 +83,6 @@ public class GameManager : MonoBehaviour
                 });
             }
         }
-        FirebaseFirestore db = FirebaseFirestore.DefaultInstance;
 
         DocumentReference docRef = db.Collection("users").Document("alovelace");
         Dictionary<string, object> user = new Dictionary<string, object>
@@ -117,6 +128,7 @@ public class GameManager : MonoBehaviour
         //canvasManager.PlayIllustAnimation(0); //필요시 연출
 
         canvasManager.InGameScoreTMP.gameObject.SetActive(true);
+        IncrementGameStartCount();
     }
 
     public void QuitGame()
@@ -168,6 +180,7 @@ public class GameManager : MonoBehaviour
         playerController.EnableInput(true);       // 플레이어 입력 활성화
         Time.timeScale = 1f;                      // 게임 속도 정상화
         if (bgmSource != null) bgmSource.UnPause();// BGM 재개
+        IncrementGameStartCount();
     }
 
     public void GameOver()
@@ -199,5 +212,144 @@ public class GameManager : MonoBehaviour
         if (max_score < score) max_score = score;
         canvasManager.gameOverScoreBestTMP.text = "최고 점수 : " +  max_score + "점";
         Debug.Log("최고 점수" + max_score);
+
+        if (loadedUserData == null || score <= loadedUserData.HighScore) return;
+        DocumentReference docRef = db.Collection("users").Document(currentDeviceID);
+        // 💡 UpdateAsync에 필드명과 새 값을 바로 전달
+        docRef.UpdateAsync("HighScore", score).ContinueWithOnMainThread(task =>
+        {
+            if (task.IsCompleted)
+            {
+                loadedUserData.HighScore = score;
+            }
+        });
     }
+
+
+    /// <summary>
+    /// 기기에 저장된 고유 ID를 가져오거나 새로 생성합니다.
+    /// </summary>
+    public string GetOrCreateDeviceID()
+    {
+        // 1. PlayerPrefs에서 기존 ID를 로드
+        string deviceID = PlayerPrefs.GetString(DEVICE_ID_KEY, "");
+
+        if (string.IsNullOrEmpty(deviceID))
+        {
+            // 2. ID가 없으면 UUID(고유 식별자)를 새로 생성
+            deviceID = System.Guid.NewGuid().ToString();
+            PlayerPrefs.SetString(DEVICE_ID_KEY, deviceID);
+            PlayerPrefs.Save();
+            Debug.Log($"🔑 New Device ID Created: {deviceID}");
+        }
+        else
+        {
+            Debug.Log($"🔑 Existing Device ID Loaded: {deviceID}");
+        }
+        return deviceID;
+    }
+
+    /// <summary>
+    /// 닉네임을 검색하거나, 닉네임이 없으면 기존 기기 ID로 데이터를 처리합니다.
+    /// </summary>
+    // 닉네임 검색 로직 (이 함수는 간결함을 위해 유지)
+    public void HandleUserAuthentication(string inputNickname)
+    {
+        if (string.IsNullOrEmpty(inputNickname))
+        {
+            ProcessDataByDeviceID(currentDeviceID, inputNickname);
+            return;
+        }
+
+        db.Collection("users")
+            .WhereEqualTo("Nickname", inputNickname)
+            .Limit(1)
+            .GetSnapshotAsync()
+            .ContinueWithOnMainThread(queryTask =>
+            {
+                QuerySnapshot snapshot = queryTask.Result;
+
+                if (snapshot.Count > 0)
+                {
+                    // 닉네임 일치 시 ID 교체
+                    string existingDocId = snapshot[0].Id;
+                    PlayerPrefs.SetString(DEVICE_ID_KEY, existingDocId);
+                    PlayerPrefs.Save();
+                    currentDeviceID = existingDocId;
+
+                    ProcessDataByDeviceID(existingDocId, inputNickname);
+                }
+                else
+                {
+                    ProcessDataByDeviceID(currentDeviceID, inputNickname);
+                }
+            });
+    }
+    // 문서 ID 기반 데이터 처리 로직 (간소화)
+    private void ProcessDataByDeviceID(string docId, string inputNickname)
+    {
+        DocumentReference docRef = db.Collection("users").Document(docId);
+        string finalNickname = string.IsNullOrEmpty(inputNickname) ?
+                               "User_" + docId.Substring(0, 5).ToUpper() :
+                               inputNickname;
+
+        docRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
+        {
+            DocumentSnapshot snapshot = task.Result;
+
+            if (snapshot.Exists)
+            {
+                // 4-A. 문서가 존재함: 횟수 증가 (Dictionary 사용은 이 경우만 유지)
+                docRef.UpdateAsync("GameOpenedCount", FieldValue.Increment(1));
+
+                // 데이터 로드 후 내부 변수에 저장
+                loadedUserData = snapshot.ConvertTo<UserData>();
+            }
+            else
+            {
+                // 4-B. 문서가 없음: 신규 데이터 생성 (UserData 객체 직접 사용)
+                UserData initialData = new UserData
+                {
+                    Nickname = finalNickname,
+                    FirstStartTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    HighScore = 0,
+                    GameOpenedCount = 1,
+                    GameStartCount = 0
+                };
+                // 💡 SetAsync에 클래스 객체를 바로 전달
+                docRef.SetAsync(initialData);
+                loadedUserData = initialData;
+            }
+        });
+    }
+
+    /// <summary>
+    /// 게임 시작 버튼을 누를 때 호출하여 횟수를 증가시킵니다.
+    /// </summary>
+    public void IncrementGameStartCount()
+    {
+        db.Collection("users")
+          .Document(currentDeviceID) // 기기 ID 사용
+          .UpdateAsync("GameStartCount", FieldValue.Increment(1));
+    }
+}
+
+
+[FirestoreData]
+public class UserData
+{
+    [FirestoreProperty]
+    public string Nickname { get; set; }
+
+    [FirestoreProperty]
+    public string FirstStartTime { get; set; }
+
+    [FirestoreProperty]
+    public int HighScore { get; set; }
+
+    [FirestoreProperty]
+    public long GameOpenedCount { get; set; }
+
+    [FirestoreProperty]
+    public long GameStartCount { get; set; }
 }

@@ -132,6 +132,11 @@ public class PlayerController : MonoBehaviour
                 if (scaleAnimationCoroutine != null) StopCoroutine(scaleAnimationCoroutine);
                 scaleAnimationCoroutine = StartCoroutine(AnimateScale(new Vector3(originalScale.x, originalScale.y * squashAmount, originalScale.z)));
             }
+            /*if (!isAirborne)
+            {
+                if (scaleAnimationCoroutine != null) StopCoroutine(scaleAnimationCoroutine);
+                scaleAnimationCoroutine = StartCoroutine(AnimateScale(new Vector3(originalScale.x, originalScale.y * squashAmount, originalScale.z)));
+            }*/
         }
 
         // 스페이스바를 누르고 있는 동안

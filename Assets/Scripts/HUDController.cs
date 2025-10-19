@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using TMPro;
 
 public class HUDController : MonoBehaviour
 {
@@ -23,7 +24,7 @@ public class HUDController : MonoBehaviour
     [SerializeField] private float fadeTime = 0.3f;
 
     [Header("Input Text")]
-    [SerializeField] private InputField input_field;
+    [SerializeField] private TextMeshProUGUI input_field;
 
     private GameManager gm;
 
@@ -149,14 +150,7 @@ public class HUDController : MonoBehaviour
         ShowHUD(false);
         EnableHUDInputOnly(false);
         //SetCursor(false);
-        if (input_field.text != null)
-        {
-            gm.player_name = input_field.text;
-        }
-        else
-        {
-
-        }
+        gm.HandleUserAuthentication(input_field.text);
         gm?.StartGame();
     }
 

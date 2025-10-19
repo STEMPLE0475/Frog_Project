@@ -1,5 +1,4 @@
-﻿using UnityEditor.TerrainTools;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Sea : MonoBehaviour
 {

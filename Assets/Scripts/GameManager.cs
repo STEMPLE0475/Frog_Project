@@ -31,6 +31,8 @@ public class GameManager : MonoBehaviour
     private int score = 0;
     private int max_score = 0; // start 호출시 최고 점수를 DB에서 불러와야 함.
 
+    public string player_name;
+
     // 본 프로젝트의 모든 Awake()나 Start()는 사용 금지.
     // 모든 프로세스의 시작을 분명히 하기 위해서. 모든 로직은 GameManager을 통해서 시작된다.
     private void Awake()

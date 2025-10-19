@@ -23,12 +23,12 @@ public class CanvasManager : MonoBehaviour
     [SerializeField] public TextMeshProUGUI gameOverScoreBestTMP;
     private Coroutine runningComboCoroutine;
 
-    public void Initiate(PlayerController playerManager)
+    public void Initiate(PlayerController playerController)
     {
-        this.playerManager = playerManager;
+        this.playerManager = playerController;
         effectManager = GetComponentInChildren<CanvasEffectManager>();
-        effectManager.Initiate();
-        playerManager.OnCombo += ComboHandler;
+        effectManager.Initiate(playerController);
+        playerController.OnCombo += ComboHandler;
 
         comboTMP.gameObject.SetActive(false);
     }

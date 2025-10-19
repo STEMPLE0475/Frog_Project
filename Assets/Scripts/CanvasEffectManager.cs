@@ -5,9 +5,12 @@ public class CanvasEffectManager : MonoBehaviour
 {
     [Tooltip("관리할 연출 효과 Panel들의 리스트")]
     [SerializeField]private List<GameObject> illustEffectList = new List<GameObject>();
+    [SerializeField]private List<AudioClip> soundClips = new List<AudioClip>();
+    private AudioSource audioSource;
 
-    public void Initiate()
+    public void Initiate(PlayerController playerController)
     {
+        audioSource = GetComponent<AudioSource>();
         // 게임 시작 시 모든 연출 Panel을 미리 비활성화
         foreach (GameObject effect in illustEffectList)
         {
@@ -16,19 +19,23 @@ public class CanvasEffectManager : MonoBehaviour
                 effect.SetActive(false);
             }
         }
+
+        playerController.OnCombo += PlayIllustEffect;
+        playerController.OnCombo += PlaySound;
     }
 
-    public void PlayIllustEffect(int index)
+    public void PlayIllustEffect(int combo)
     {
-        // 인덱스에 해당하는 리스트(일러스트)가 존재하는지 검증
-        if (index < 0 || index >= illustEffectList.Count)
+        if (combo == 0) return;
+        int index = combo - 1;
+        int illustEffectListSize = illustEffectList.Count;
+       
+        if (index >= illustEffectList.Count)
         {
-            Debug.LogError($"[CanvasEffectManager] 잘못된 이펙트 인덱스({index})가 호출되었습니다.");
-            return;
+            index = illustEffectList.Count - 1;
         }
 
         GameObject selectedEffect = illustEffectList[index];
-
         // Panel에서 애니메이션 스크립트를 가져옵니다.
         DirectionalPanelAnimation animation = selectedEffect.GetComponent<DirectionalPanelAnimation>();
 
@@ -41,5 +48,18 @@ public class CanvasEffectManager : MonoBehaviour
         {
             Debug.LogError($"[CanvasEffectManager] {selectedEffect.name}에 DirectionalPanelAnimation 스크립트가 없습니다.");
         }
+    }
+
+    public void PlaySound(int combo)
+    {
+        if (combo == 0) return;
+        int index = combo ;
+        int size = soundClips.Count;
+
+        if (index >= soundClips.Count)
+        {
+            index = soundClips.Count - 1;
+        }
+        audioSource.PlayOneShot(soundClips[index]);
     }
 }

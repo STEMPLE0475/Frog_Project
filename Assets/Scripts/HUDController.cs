@@ -22,6 +22,9 @@ public class HUDController : MonoBehaviour
     [Header("Fade Settings")]
     [SerializeField] private float fadeTime = 0.3f;
 
+    [Header("Input Text")]
+    [SerializeField] private InputField input_field;
+
     private GameManager gm;
 
     // GameManager에서만 호출
@@ -146,6 +149,14 @@ public class HUDController : MonoBehaviour
         ShowHUD(false);
         EnableHUDInputOnly(false);
         //SetCursor(false);
+        if (input_field.text != null)
+        {
+            gm.player_name = input_field.text;
+        }
+        else
+        {
+
+        }
         gm?.StartGame();
     }
 

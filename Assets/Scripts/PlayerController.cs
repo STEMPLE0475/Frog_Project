@@ -66,6 +66,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private List<Material> trailRendererMaterials;
     [SerializeField] private AudioSource sfxSource;  // 점프 사운드 재생용
     [SerializeField] private AudioClip jumpSfx;      // 점프 사운드 파일
+    [SerializeField] private AudioClip landSfx;      // 점프 사운드 파일
     #endregion
 
     #region Event

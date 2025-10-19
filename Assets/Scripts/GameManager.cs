@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private List<ButtonSound> buttonSounds; // 버튼 리스트
     [SerializeField, Range(0f, 2f)] private float uiVolume = 1.0f; // UI볼륨 배수(편의)
 
+    private int score = 0;
+    private int max_score = 0; // start 호출시 최고 점수를 DB에서 불러와야 함.
 
     // 본 프로젝트의 모든 Awake()나 Start()는 사용 금지.
     // 모든 프로세스의 시작을 분명히 하기 위해서. 모든 로직은 GameManager을 통해서 시작된다.
@@ -81,6 +83,7 @@ public class GameManager : MonoBehaviour
     public void Land(int accuracy)
     {
         // 정확한 착지가 몇 콤보인지를 체크하여, Canvas 애니메이션을 실행
+        // 수정 필요함. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         switch (accuracy)
         {
             case 0:
@@ -100,13 +103,15 @@ public class GameManager : MonoBehaviour
         // HUD 숨김 + HUD입력 차단 + 커서 숨김
         hudController.ShowHUD(false);
         hudController.EnableHUDInputOnly(false);
-        hudController.SetCursor(false);
+        //hudController.SetCursor(false);
 
         // 인게임 시작 
         Time.timeScale = 1f;
         isPaused = false;
         playerController.EnableInput(true);
         //canvasManager.PlayIllustAnimation(0); //필요시 연출
+
+        canvasManager.InGameScoreTMP.gameObject.SetActive(true);
     }
 
     public void QuitGame()
@@ -145,7 +150,7 @@ public class GameManager : MonoBehaviour
         hudController.ShowMainMenu(false);          // 메인메뉴는 숨기기
         hudController.ShowPausePanel(true);         // 일시정지 패널 표시
         hudController.EnableHUDInputOnly(true);     // UI만 입력 받게 설정
-        hudController.SetCursor(true);              // 마우스 커서 표시
+        //hudController.SetCursor(true);              // 마우스 커서 표시
         if (bgmSource != null) bgmSource.Pause();   // BGM 일시정지
     }
 
@@ -154,11 +159,40 @@ public class GameManager : MonoBehaviour
         hudController.ShowPausePanel(false);      // 일시정지 패널 숨김
         hudController.ShowHUD(false);             // HUD 전체 숨김
         hudController.EnableHUDInputOnly(false);  // HUD 입력 비활성화
-        hudController.SetCursor(false);           // 커서 숨김
+        //hudController.SetCursor(false);           // 커서 숨김
         playerController.EnableInput(true);       // 플레이어 입력 활성화
         Time.timeScale = 1f;                      // 게임 속도 정상화
         if (bgmSource != null) bgmSource.UnPause();// BGM 재개
     }
 
+    public void GameOver()
+    {
+        
 
+        canvasManager.InGameScoreTMP.gameObject.SetActive(true);
+        playerController.GameOver();
+    }
+
+    // 스코어 관련
+    public void ResetScore(){
+        score = 0;
+        canvasManager.InGameScoreTMP.text = "0점";
+        canvasManager.gameOverScoreTMP.text = "0점";
+        canvasManager.gameOverScoreBestTMP.text = max_score + "점";
+
+    }
+    public void PlusScore(int addScore)
+    {
+        this.score += addScore;
+        canvasManager.InGameScoreTMP.text = score.ToString() + "점";
+        canvasManager.gameOverScoreTMP.text = "현재 점수 : " + score.ToString() + "점";
+    }
+
+    public void SaveScore()
+    {
+        Debug.Log("현재 점수" + score);
+        if (max_score < score) max_score = score;
+        canvasManager.gameOverScoreBestTMP.text = "최고 점수 : " +  max_score + "점";
+        Debug.Log("최고 점수" + max_score);
+    }
 }

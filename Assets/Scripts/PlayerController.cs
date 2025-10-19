@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Burst.Intrinsics;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SocialPlatforms.Impl;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
@@ -14,6 +15,7 @@ public class PlayerController : MonoBehaviour
     private GameManager gameManager;
 
     #region 변수 선언
+    private bool isFloating = false;
 
     // 점프 지속 시간 (초)
     public float jumpDuration = 1.2f;
@@ -21,6 +23,9 @@ public class PlayerController : MonoBehaviour
     private float heightMultiplier = 1f;
 
     private int combo = 0;
+    [Header("플레이어 Mesh 설정")]
+    [SerializeField] private MeshRenderer PlayerMesh;
+    [SerializeField] private MeshRenderer PlayerShadow;
 
     [Header("점프 파워 설정")]
     [SerializeField] private float minJumpForce = 4f;
@@ -43,6 +48,7 @@ public class PlayerController : MonoBehaviour
     [Tooltip("애니메이션이 원래 크기로 돌아오는 속도")]
     [SerializeField] private float animationSpeed = 2.2f;
 
+    [SerializeField] private GameObject gameOverPanel;
     private Transform playerSpawnPos;
     private Rigidbody rb;
     private float currentJumpForce;
@@ -113,14 +119,18 @@ public class PlayerController : MonoBehaviour
 
     private void HandleInput()
     {
+        if (isFloating) return;
         // 스페이스바를 처음 눌렀을 때
         if (keyboard.spaceKey.wasPressedThisFrame)
         {
             isCharging = true;
             currentJumpForce = minJumpForce;
 
-            if (scaleAnimationCoroutine != null) StopCoroutine(scaleAnimationCoroutine);
-            scaleAnimationCoroutine = StartCoroutine(AnimateScale(new Vector3(originalScale.x, originalScale.y * squashAmount, originalScale.z)));
+            if (!isAirborne)
+            {
+                if (scaleAnimationCoroutine != null) StopCoroutine(scaleAnimationCoroutine);
+                scaleAnimationCoroutine = StartCoroutine(AnimateScale(new Vector3(originalScale.x, originalScale.y * squashAmount, originalScale.z)));
+            }
         }
 
         // 스페이스바를 누르고 있는 동안
@@ -202,11 +212,13 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("PERFECT! (정확도: 2)");
                 if (starParticles.Count > 0 && starParticles[2] != null) starParticles[2].Play();
                 PlusCombo();
+                PlusScoreByCombo();
                 break;
             case 1: // Good
                 Debug.Log("GOOD (정확도: 1)");
                 if (starParticles.Count > 1 && starParticles[1] != null) starParticles[1].Play();
                 ResetCombo();
+                PlusScore();
                 break;
             case 0: // Bad
                 Debug.Log("BAD... (정확도: 0)");
@@ -217,11 +229,15 @@ public class PlayerController : MonoBehaviour
         var obj = Instantiate(groundParticle, new Vector3(transform.position.x, transform.position.y - 0.5f, transform.position.z), groundParticle.transform.rotation);
         obj.GetComponent<ParticleSystem>().Play();
         if (gameManager != null) gameManager.Land(accuracy);
-
+        
         // 착지 후 스케일 애니메이션이 진행 중이었다면 멈추고 원래 크기로 복구
         if (scaleAnimationCoroutine != null) StopCoroutine(scaleAnimationCoroutine);
         transform.localScale = originalScale;
     }
+
+    // 점수 설정
+    private void PlusScore() => gameManager.PlusScore(10);
+    private void PlusScoreByCombo() => gameManager.PlusScore(10 * combo);
 
     // 콤보 설정
 
@@ -263,7 +279,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Sea")) HandleCollideSea();
+        if (collision.gameObject.CompareTag("Sea"))StartCoroutine(HandleCollideSea(transform.position));
 
         // 블록에 착지했을 때 (아래로 떨어지는 중이고, 공중에 떠 있는 상태였을 때만 판정)
         if (collision.gameObject.CompareTag("Block") && isAirborne) 
@@ -296,10 +312,46 @@ public class PlayerController : MonoBehaviour
         return 0;
     }
 
-    private void HandleCollideSea()
+    private IEnumerator HandleCollideSea(Vector3 startPosition)
     {
-        GameOver();
+        DisableTrail();
+        OnPlayerShadowMesh();
+        GetComponent<BoxCollider>().enabled = false;
+        isFloating = true;
+        gameOverPanel.SetActive(true);
+        gameManager.SaveScore();
+
+        const float floatSpeed = 2f;    // 둥둥 속도
+        const float floatHeight = 0.25f; // 둥둥 높이
+
+        while (isFloating)
+        {
+            float yOffset = Mathf.Sin(Time.time * floatSpeed) * floatHeight;
+            transform.position = new Vector3(
+                startPosition.x,
+                startPosition.y - 0.4f + yOffset,
+                startPosition.z
+            );
+            yield return null;
+        }
+    }   
+
+    void OnPlayerShadowMesh()
+    {
+        PlayerMesh.enabled = false;
+        PlayerShadow.enabled = true;
+        PlayerShadow.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
     }
+
+    void OnPlayerMesh()
+    {
+        PlayerMesh.enabled = true;
+        PlayerShadow.enabled = true;
+        PlayerShadow.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+    }
+
+    void DisableTrail() => trailRenderer.enabled = false;
+    void EnableTrail() => trailRenderer.enabled = true;
 
     // --- 애니메이션 코루틴 ---
 
@@ -343,10 +395,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void GameOver()
+    public void GameOver()
     {
         ResetCombo();
         RespawnPlayer();
+        OnPlayerMesh();
+        EnableTrail();
+        gameManager.ResetScore();
+        gameOverPanel.SetActive(false);
     }
 
     void RespawnPlayer()
@@ -359,5 +415,7 @@ public class PlayerController : MonoBehaviour
         if (scaleAnimationCoroutine != null) StopCoroutine(scaleAnimationCoroutine);
         transform.localScale = originalScale;
         isAirborne = false; // 바다에 빠졌으니 공중에 떠 있지 않음
+        isFloating = false;
+        GetComponent<BoxCollider>().enabled = true;
     }
 }

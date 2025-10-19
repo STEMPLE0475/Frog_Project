@@ -1,13 +1,13 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
 public class HUDController : MonoBehaviour
 {
     [Header("Root & Panels")]
-    [SerializeField] private CanvasGroup inGameUI;   // InGameUI (HUD ÀüÃ¼ ·çÆ®)
-    [SerializeField] private GameObject mainMenu;    // MainMenu ÆĞ³Î
-    [SerializeField] private GameObject guidePanel;  // ÃßÈÄ ¼³¸í ÆĞ³Î (Áö±İÀº ºñ¿öµÖµµ µÊ)
+    [SerializeField] private CanvasGroup inGameUI;   // InGameUI (HUD ì „ì²´ ë£¨íŠ¸)
+    [SerializeField] private GameObject mainMenu;    // MainMenu íŒ¨ë„
+    [SerializeField] private GameObject guidePanel;  // ì¶”í›„ ì„¤ëª… íŒ¨ë„ (ì§€ê¸ˆì€ ë¹„ì›Œë‘¬ë„ ë¨)
 
     [SerializeField] private GameObject pausePanel;
     [SerializeField] private GameObject blocker;
@@ -15,40 +15,40 @@ public class HUDController : MonoBehaviour
     [SerializeField] private Button pauseQuitB;
 
     [Header("Buttons (Main Menu)")]
-    [SerializeField] private Button gameStartB;      // GameStartB ¹öÆ°
-    [SerializeField] private Button gameExplainB;    // GameExplainB ¹öÆ°
-    [SerializeField] private Button gameEndB;        // GameEndB ¹öÆ°
+    [SerializeField] private Button gameStartB;      // GameStartB ë²„íŠ¼
+    [SerializeField] private Button gameExplainB;    // GameExplainB ë²„íŠ¼
+    [SerializeField] private Button gameEndB;        // GameEndB ë²„íŠ¼
 
     [Header("Fade Settings")]
     [SerializeField] private float fadeTime = 0.3f;
 
     private GameManager gm;
 
-    // GameManager¿¡¼­¸¸ È£Ãâ
+    // GameManagerì—ì„œë§Œ í˜¸ì¶œ
     public void Initiate(GameManager owner)
     {
         gm = owner;
 
-        // ¹öÆ° ÀÌº¥Æ® ÃÊ±âÈ­
+        // ë²„íŠ¼ ì´ë²¤íŠ¸ ì´ˆê¸°í™”
         if (gameStartB) { gameStartB.onClick.RemoveAllListeners(); gameStartB.onClick.AddListener(OnClickStart); }
         if (gameExplainB) { gameExplainB.onClick.RemoveAllListeners(); gameExplainB.onClick.AddListener(OnClickExplain); }
         if (gameEndB) { gameEndB.onClick.RemoveAllListeners(); gameEndB.onClick.AddListener(OnClickEnd); }
 
-        // Ã³À½¿£ HUD º¸ÀÌ±â
+        // ì²˜ìŒì—” HUD ë³´ì´ê¸°
         ShowHUD(true, instant: true);
         ShowMainMenu(true);
         ShowGuidePanel(false);
 
-        // HUD ÀÔ·Â¸¸ ¹Ş°Ô ¼³Á¤
+        // HUD ì…ë ¥ë§Œ ë°›ê²Œ ì„¤ì •
         EnableHUDInputOnly(true);
-        SetCursor(true);
+        //SetCursor(true);
 
-        // ÀÏ½ÃÁ¤Áö ¹öÆ° ¹ÙÀÎµù
+        // ì¼ì‹œì •ì§€ ë²„íŠ¼ ë°”ì¸ë”©
         if (pauseResumeB) { pauseResumeB.onClick.RemoveAllListeners(); pauseResumeB.onClick.AddListener(OnClickResume); }
         if (pauseQuitB) { pauseQuitB.onClick.RemoveAllListeners(); pauseQuitB.onClick.AddListener(OnClickEnd); } 
     }
 
-    // ========== HUD Ç¥½Ã / ÀüÈ¯ ==========
+    // ========== HUD í‘œì‹œ / ì „í™˜ ==========
     public void ShowHUD(bool on, bool instant = false)
     {
         if (!inGameUI)
@@ -57,7 +57,7 @@ public class HUDController : MonoBehaviour
             return;
         }
 
-        // ÀÌ¹Ì ²¨Á®ÀÖ´Âµ¥ ¶Ç ²ô·Á ÇÏ¸é ÄÚ·çÆ¾ µ¹¸®Áö ¸»°í ±×³É Á¾·á
+        // ì´ë¯¸ êº¼ì ¸ìˆëŠ”ë° ë˜ ë„ë ¤ í•˜ë©´ ì½”ë£¨í‹´ ëŒë¦¬ì§€ ë§ê³  ê·¸ëƒ¥ ì¢…ë£Œ
         if (!on && !gameObject.activeInHierarchy)
             return;
 
@@ -65,7 +65,7 @@ public class HUDController : MonoBehaviour
 
         if (on)
         {
-            // ÄÓ ¶§´Â º»Ã¼ºÎÅÍ ÄÒ µÚ ÁøÇà
+            // ì¼¤ ë•ŒëŠ” ë³¸ì²´ë¶€í„° ì¼  ë’¤ ì§„í–‰
             if (!gameObject.activeSelf) gameObject.SetActive(true);
             inGameUI.gameObject.SetActive(true);
         }
@@ -76,12 +76,12 @@ public class HUDController : MonoBehaviour
             inGameUI.interactable = on;
             inGameUI.blocksRaycasts = on;
 
-            // ²ø ¶§´Â ¹Ù·Î ºñÈ°¼º Ã³¸®
+            // ëŒ ë•ŒëŠ” ë°”ë¡œ ë¹„í™œì„± ì²˜ë¦¬
             if (!on) gameObject.SetActive(false);
         }
         else
         {
-            // ÀÌ ½ÃÁ¡¿£ gameObject°¡ È°¼º »óÅÂ(ÄÑ´Â °æ¿ì)¶ó ÄÚ·çÆ¾ °¡´É
+            // ì´ ì‹œì ì—” gameObjectê°€ í™œì„± ìƒíƒœ(ì¼œëŠ” ê²½ìš°)ë¼ ì½”ë£¨í‹´ ê°€ëŠ¥
             StartCoroutine(FadeHUD(on));
         }
     }
@@ -120,11 +120,11 @@ public class HUDController : MonoBehaviour
     public void ShowPausePanel(bool on)
     {
         pausePanel?.SetActive(on);
-        blocker?.SetActive(on); // ¹è°æ ¾îµÓ°Ô
+        blocker?.SetActive(on); // ë°°ê²½ ì–´ë‘¡ê²Œ
     }
 
 
-    // ========== ¸¶¿ì½º ÀÔ·Â ¹× Ä¿¼­ Á¦¾î ==========
+    // ========== ë§ˆìš°ìŠ¤ ì…ë ¥ ë° ì»¤ì„œ ì œì–´ ==========
     public void EnableHUDInputOnly(bool hudOnly)
     {
         if (inGameUI)
@@ -134,18 +134,18 @@ public class HUDController : MonoBehaviour
         }
     }
 
-    public void SetCursor(bool visible)
+    /*public void SetCursor(bool visible)
     {
         Cursor.visible = visible;
         Cursor.lockState = visible ? CursorLockMode.None : CursorLockMode.Locked;
-    }
+    }*/
 
-    // ========== ¹öÆ° Å¬¸¯ ÀÌº¥Æ® ==========
+    // ========== ë²„íŠ¼ í´ë¦­ ì´ë²¤íŠ¸ ==========
     private void OnClickStart()
     {
         ShowHUD(false);
         EnableHUDInputOnly(false);
-        SetCursor(false);
+        //SetCursor(false);
         gm?.StartGame();
     }
 
@@ -155,18 +155,18 @@ public class HUDController : MonoBehaviour
         ShowGuidePanel(true);
     }
 
-    private void OnClickEnd()
+    public void OnClickEnd()
     {
         gm?.QuitGame();
     }
 
-    //°è¼ÓÇÏ±â
+    //ê³„ì†í•˜ê¸°
     private void OnClickResume()
     {
         ShowPausePanel(false);
         ShowHUD(false);
         EnableHUDInputOnly(false);
-        SetCursor(false);
+        //SetCursor(false);
         gm?.ResumeGame();
     }
 }

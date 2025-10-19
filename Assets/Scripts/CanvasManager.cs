@@ -18,6 +18,9 @@ public class CanvasManager : MonoBehaviour
     [SerializeField] Vector3 worldSpaceOffset = new Vector3(0, 2f, 0); // "살짝 위" (플레이어 기준 월드 좌표 오프셋)
     [SerializeField] Vector3 screenSpaceOffset = new Vector3(50f, 0, 0);  // 스폰 위치의 스크린 좌표 추가 오프셋 (예: 왼쪽으로 -100)
 
+    [SerializeField] public TextMeshProUGUI InGameScoreTMP;
+    [SerializeField] public TextMeshProUGUI gameOverScoreTMP;
+    [SerializeField] public TextMeshProUGUI gameOverScoreBestTMP;
     private Coroutine runningComboCoroutine;
 
     public void Initiate(PlayerController playerManager)

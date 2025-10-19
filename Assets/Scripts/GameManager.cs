@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour
 
         playerController.Initiate(this, playerSpawnTransform);
         cinemachineCameraScript.Initiate(playerController);
-        canvasManager.Initiate();
+        canvasManager.Initiate(playerController);
 
         playerController.EnableInput(false);
         hudController?.Initiate(this);

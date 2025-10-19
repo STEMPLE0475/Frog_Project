@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.Intrinsics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -64,13 +65,8 @@ public class PlayerController : MonoBehaviour
     #region Event
     public event Action OnJumpStart;
     public event Action OnLand;
+    public event Action<int> OnCombo;
 
-    public event Action Combo1;
-    public event Action Combo2;
-    public event Action Combo3;
-    public event Action Combo4;
-    public event Action Combo5;
-    public event Action Combo6;
     #endregion
 
 
@@ -89,14 +85,10 @@ public class PlayerController : MonoBehaviour
 
     void EventBind()
     {
-        Combo1 += UpdateCombo1;
-        Combo2 += UpdateCombo2;
-        Combo3 += UpdateCombo3;
-        Combo4 += UpdateCombo4;
-        Combo5 += UpdateCombo5;
-        Combo6 += UpdateCombo6;
+        OnCombo += TrailEffectHandler;
     }
 
+    // Input
 
     public void EnableInput(bool on)
     {
@@ -148,6 +140,8 @@ public class PlayerController : MonoBehaviour
             scaleAnimationCoroutine = StartCoroutine(AnimateJumpStretch());
         }
     }
+
+    // 점프 관련
 
     private void StartJump()
     {
@@ -229,6 +223,8 @@ public class PlayerController : MonoBehaviour
         transform.localScale = originalScale;
     }
 
+    // 콤보 설정
+
     private void PlusCombo()
     {
         combo++;
@@ -241,72 +237,33 @@ public class PlayerController : MonoBehaviour
     }
     private void UpdateCombo()
     {
-        if (combo == 0) Combo1?.Invoke();
-        else if (combo == 1) Combo2?.Invoke();
-        else if (combo == 2) Combo3?.Invoke();
-        else if (combo == 3) Combo4?.Invoke();
-        else if (combo == 4) Combo5?.Invoke();
-        else if (combo == 5) Combo6?.Invoke();
-        else Combo6?.Invoke();
+        OnCombo?.Invoke(combo);
     }
 
-    void UpdateCombo1()
+    // 콤보에 따른 꼬리 이펙트 설정
+
+    void TrailEffectHandler(int combo)
+    {
+        if (combo == 0) UpdateTrail(0);
+        else if (combo == 1) UpdateTrail(1);
+        else if (combo == 2) UpdateTrail(2);
+        else if (combo == 3) UpdateTrail(3);
+        else if (combo == 4) UpdateTrail(4);
+        else UpdateTrail(5);
+    }
+
+    void UpdateTrail(int trailIndex)
     {
         Material[] newMaterials = trailRenderer.materials;
-        newMaterials[0] = trailRendererMaterials[0];
+        newMaterials[0] = trailRendererMaterials[trailIndex];
         trailRenderer.materials = newMaterials;
-        Debug.Log("콤보 초기화");
     }
-    void UpdateCombo2()
-    {
-        Material[] newMaterials = trailRenderer.materials;
-        newMaterials[0] = trailRendererMaterials[1];
-        trailRenderer.materials = newMaterials;
-        Debug.Log("1 콤보");
-    }
-    void UpdateCombo3()
-    {
-        Material[] newMaterials = trailRenderer.materials;
-        newMaterials[0] = trailRendererMaterials[2];
-        trailRenderer.materials = newMaterials;
-        Debug.Log("2 콤보");
-    }
-    void UpdateCombo4()
-    {
-        Material[] newMaterials = trailRenderer.materials;
-        newMaterials[0] = trailRendererMaterials[3];
-        trailRenderer.materials = newMaterials;
-        Debug.Log("3 콤보");
-    }
-    void UpdateCombo5()
-    {
-        Material[] newMaterials = trailRenderer.materials;
-        newMaterials[0] = trailRendererMaterials[4];
-        trailRenderer.materials = newMaterials;
-        Debug.Log("4 콤보");
-    }
-    void UpdateCombo6()
-    {
-        Material[] newMaterials = trailRenderer.materials;
-        newMaterials[0] = trailRendererMaterials[5];
-        trailRenderer.materials = newMaterials;
-        Debug.Log("5 콤보");
-    }
+
+    // 충돌 처리
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Sea"))
-        {
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            Debug.Log("실패! 강에 휩쓸려서 처음으로 돌아갑니다");
-            transform.position = playerSpawnPos.position;
-
-            // 물에 빠졌을 때도 스케일 원복
-            if (scaleAnimationCoroutine != null) StopCoroutine(scaleAnimationCoroutine);
-            transform.localScale = originalScale;
-            isAirborne = false; // 바다에 빠졌으니 공중에 떠 있지 않음
-        }
+        if (collision.gameObject.CompareTag("Sea")) HandleCollideSea();
 
         // 블록에 착지했을 때 (아래로 떨어지는 중이고, 공중에 떠 있는 상태였을 때만 판정)
         if (collision.gameObject.CompareTag("Block") && isAirborne) 
@@ -337,6 +294,11 @@ public class PlayerController : MonoBehaviour
         if (finalNormalizedDistance <= blockScript.perfectThreshold) return 2;
         if (finalNormalizedDistance <= blockScript.goodThreshold) return 1;
         return 0;
+    }
+
+    private void HandleCollideSea()
+    {
+        GameOver();
     }
 
     // --- 애니메이션 코루틴 ---
@@ -379,5 +341,23 @@ public class PlayerController : MonoBehaviour
             if (particle != null)
                 particle.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         }
+    }
+
+    void GameOver()
+    {
+        ResetCombo();
+        RespawnPlayer();
+    }
+
+    void RespawnPlayer()
+    {
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        Debug.Log("실패! 강에 휩쓸려서 처음으로 돌아갑니다");
+        transform.position = playerSpawnPos.position;
+
+        if (scaleAnimationCoroutine != null) StopCoroutine(scaleAnimationCoroutine);
+        transform.localScale = originalScale;
+        isAirborne = false; // 바다에 빠졌으니 공중에 떠 있지 않음
     }
 }

@@ -42,17 +42,7 @@ public class GameManager : MonoBehaviour
             bgmSource.volume = 0.3f;   // 음량 (0~1)
             bgmSource.Play();          // 재생 시작
         }
-        // === 버튼 클릭 사운드 연결 ===
-        foreach (var btnSound in buttonSounds)
-        {
-            if (btnSound != null && btnSound.button != null && uiSfxSource != null)
-            {
-                btnSound.button.onClick.AddListener(() =>
-                {
-                    uiSfxSource.PlayOneShot(btnSound.clickSfx);
-                });
-            }
-        }
+        
 
         playerController.Initiate(this, playerSpawnTransform);
         cinemachineCameraScript.Initiate(playerController);
@@ -66,6 +56,19 @@ public class GameManager : MonoBehaviour
     }
     private void Start()
     {
+
+        // === 버튼 클릭 사운드 연결 ===
+        foreach (var btnSound in buttonSounds)
+        {
+            if (btnSound != null && btnSound.button != null && uiSfxSource != null)
+            {
+                btnSound.button.onClick.AddListener(() =>
+                {
+                    uiSfxSource.PlayOneShot(btnSound.clickSfx);
+                    Debug.Log("btn");
+                });
+            }
+        }
         FirebaseFirestore db = FirebaseFirestore.DefaultInstance;
 
         DocumentReference docRef = db.Collection("users").Document("alovelace");

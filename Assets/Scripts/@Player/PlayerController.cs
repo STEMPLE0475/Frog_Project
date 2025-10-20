@@ -1,0 +1,185 @@
+﻿using UnityEngine;
+using System.Collections;
+using System;
+
+// 모든 전문가 컴포넌트가 반드시 있도록 강제
+[RequireComponent(typeof(PlayerState))]
+[RequireComponent(typeof(PlayerInputHandler))]
+[RequireComponent(typeof(PlayerMovement))]
+[RequireComponent(typeof(PlayerEffects))]
+[RequireComponent(typeof(PlayerCollisionHandler))]
+public class PlayerController : MonoBehaviour
+{
+    private Vector3 playerSpawnPos;
+
+    [Header("콤보")]
+    private int combo = 0;
+
+    // 전문가 컴포넌트 참조
+    private PlayerState playerState;
+    private PlayerInputHandler inputHandler;
+    private PlayerMovement movement;
+    private PlayerEffects effects;
+    private PlayerCollisionHandler collisionHandler;
+
+    // --- 이벤트 선언 ---
+
+    // 1. 내부용 이벤트 (Player -> PlayerEffects)
+    public event Action<int> OnCombo;
+
+    // 2. 외부 보고용 이벤트 (Player -> GameManager/ScoreManager 등)
+    public event Action<float> OnJumpStart;
+    public event Action<LandingAccuracy, int> OnLanded; // (⭐ 수정됨: 콤보 정보를 포함)
+    public event Action OnSeaCollision; // (⭐ 신규: 바다 충돌 보고용)
+
+    public void Initiate()
+    {
+        this.playerSpawnPos = transform.position;
+
+        // 컴포넌트 참조 가져오기
+        playerState = GetComponent<PlayerState>();
+        inputHandler = GetComponent<PlayerInputHandler>();
+        movement = GetComponent<PlayerMovement>();
+        effects = GetComponent<PlayerEffects>();
+        collisionHandler = GetComponent<PlayerCollisionHandler>();
+
+        inputHandler.initiate();
+        movement.Initiate();
+        effects.Initiate();
+        collisionHandler.Initiate();
+
+        transform.position = playerSpawnPos;
+
+        EventBind();
+    }
+
+    // 모든 컴포넌트의 이벤트를 구독
+    void EventBind()
+    {
+        inputHandler.OnChargeStarted += HandleChargeStarted;
+        inputHandler.OnJumpRequested += HandleJumpRequested;
+
+        collisionHandler.OnLanded += HandleLand;
+        collisionHandler.OnSeaCollision += HandleSeaCollision;
+
+        OnCombo += effects.UpdateTrail; // 콤보 변경 시 이펙트 업데이트
+    }
+
+    // --- 이벤트 핸들러 (보고 처리) ---
+
+    // 1. 입력 핸들러가 "충전 시작" 보고
+    private void HandleChargeStarted()
+    {
+        effects.PlayChargeAnimation();
+    }
+
+    // 2. 입력 핸들러가 "점프 요청" 보고
+    private void HandleJumpRequested(float jumpForce)
+    {
+        movement.ExecuteJump(jumpForce, () => {
+            effects.PlayJumpSound();
+            effects.PlayJumpAnimation();
+            OnJumpStart?.Invoke(movement.jumpDuration);
+        });
+    }
+
+    // 3. 충돌 핸들러가 "착지 결과" 보고
+    private void HandleLand(LandingAccuracy accuracy)
+    {
+        playerState.SetAirborne(false); // 상태 변경
+        effects.PlayLandSound();
+        effects.PlayLandParticles(accuracy);
+        effects.ResetScale();
+
+        // 콤보 계산 (내부 이펙트 연동을 위해 콤보는 Player가 관리)
+        switch (accuracy)
+        {
+            case LandingAccuracy.Perfect:
+                PlusCombo();
+                break;
+            case LandingAccuracy.Good:
+                ResetCombo(); // (기획에 따라 굿도 콤보 유지?)
+                break;
+            case LandingAccuracy.Bad:
+                ResetCombo();
+                break;
+            case LandingAccuracy.Excep:
+                return;
+        }
+
+        OnLanded?.Invoke(accuracy, combo);
+    }
+
+    // 4. 충돌 핸들러가 "바다 충돌" 보고
+    private void HandleSeaCollision(Vector3 collisionPos)
+    {
+        inputHandler.EnableInput(false);
+        effects.SetTrail(false);
+        effects.SetPlayerMesh(true); // 섀도우 모드
+        collisionHandler.SetCollider(false);
+        playerState.SetFloating(true); // 상태 변경
+
+        // (⭐ 수정됨: UI, GameManager 로직 제거)
+        // gameOverPanel.SetActive(true); (제거)
+        // gameManager.SaveScore(); (제거)
+
+        StartCoroutine(FloatingCoroutine(collisionPos));
+
+        // (⭐ 신규: 외부에 "바다에 빠졌다"고 보고)
+        OnSeaCollision?.Invoke();
+    }
+
+    // --- 외부 호출용 public 함수 ---
+
+    public void EnableInput(bool on)
+    {
+        inputHandler.EnableInput(on);
+    }
+
+    // (⭐ 수정됨: GameOver() -> RespawnPlayer()로 변경 및 통합)
+    // GameStateManager가 게임 시작/재시작 시 이 함수를 호출
+    public void RespawnPlayer()
+    {
+        StopAllCoroutines(); // 둥둥 코루틴 정지
+        ResetCombo();
+
+        movement.ResetVelocity();
+        transform.position = playerSpawnPos;
+        effects.ResetScale();
+        playerState.ResetState(); // 상태 초기화
+        collisionHandler.SetCollider(true);
+        effects.SetPlayerMesh(false); // 원본 메시
+        effects.SetTrail(true);
+        inputHandler.EnableInput(true);
+    }
+
+    // --- 내부 로직 ---
+
+    private IEnumerator FloatingCoroutine(Vector3 startPosition)
+    {
+        const float floatSpeed = 2f;
+        const float floatHeight = 0.25f;
+
+        while (playerState.IsFloating)
+        {
+            float yOffset = Mathf.Sin(Time.time * floatSpeed) * floatHeight;
+            transform.position = new Vector3(
+                startPosition.x,
+                startPosition.y - 0.4f + yOffset,
+                startPosition.z
+            );
+            yield return null;
+        }
+    }
+
+    private void PlusCombo()
+    {
+        combo++;
+        OnCombo?.Invoke(combo); // 내부 이펙트 갱신용
+    }
+    private void ResetCombo()
+    {
+        combo = 0;
+        OnCombo?.Invoke(combo); // 내부 이펙트 갱신용
+    }
+}

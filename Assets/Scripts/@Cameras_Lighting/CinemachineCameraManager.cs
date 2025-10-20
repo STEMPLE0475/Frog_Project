@@ -2,46 +2,37 @@
 using Unity.Cinemachine;
 using UnityEngine;
 
-public class CinemachineCameraScript : MonoBehaviour
+public class CinemachineCameraManager : MonoBehaviour
 {
     private CinemachineCamera cam;
-    private PlayerController playerController;
+    private Transform playerTransform;
 
-    private float zoomChangeAmount = 1f; // FOV를 줄일 양 (현재 값에서 -1)
-    private float zoomDefaultFOV = 5f;
-    private float zoomEndFOV = 4.7f;
-    private float zoomDuration = 0.2f; // 줌 인/아웃에 걸리는 시간
+    private Coroutine runningZoomCoroutine;
 
-    public void Initiate(PlayerController playerController)
+    [SerializeField] private float zoomDefaultFOV = 5f;
+    [SerializeField] private float zoomEndFOV = 4.7f;
+    [SerializeField] private float zoomDuration = 0.2f; // 줌 인/아웃에 걸리는 시간
+
+    public void Initiate(Transform playerTransform)
     {
-        this.playerController = playerController;
-        //카메라가 player을 Follow하도록 합니다.
+        this.playerTransform = playerTransform;
         cam = GetComponent<CinemachineCamera>();
-        cam.Follow = playerController.transform;
+        OnFollowStart();
         cam.Lens.OrthographicSize = zoomDefaultFOV;
-        BindEvents();
     }
 
-    void BindEvents()
-    {
-        playerController.OnJumpStart += OnZoomStart;
-    }
+    private void OnFollowStart() => cam.Follow = playerTransform;
 
-    private void OnDestroy()
+    public void OnZoomStart(float jumpDuration)
     {
-        if (playerController != null)
+        if (runningZoomCoroutine != null)
         {
-            playerController.OnJumpStart -= OnZoomStart;
+            StopCoroutine(runningZoomCoroutine);
         }
+        StartCoroutine(SmoothZoom(jumpDuration));
     }
 
-    public void OnZoomStart()
-    {
-        float targetFOV = cam.Lens.OrthographicSize - zoomChangeAmount;
-        StartCoroutine(SmoothZoom(zoomEndFOV));
-    }
-
-    private IEnumerator SmoothZoom(float targetFOV)
+    private IEnumerator SmoothZoom(float jumpDuration)
     {
         float startFOV = cam.Lens.OrthographicSize;
 
@@ -64,31 +55,24 @@ public class CinemachineCameraScript : MonoBehaviour
 
         // 정확한 목표 값으로 최종 설정
         var lensAfterZoomIn = cam.Lens;
-        lensAfterZoomIn.OrthographicSize = targetFOV;
+        lensAfterZoomIn.OrthographicSize = zoomEndFOV;
         cam.Lens = lensAfterZoomIn;
 
 
         // 2. 대기 (Hold / Wait)
         // 점프 지속 시간 - 줌 인/아웃 시간을 뺀 나머지 시간 동안 대기
-        float waitTime = playerController.jumpDuration - (2 * zoomDuration);
+        float waitTime = jumpDuration - (2 * zoomDuration);
         if (waitTime > 0)
         {
-            float holdTime = 0f;
-            while (holdTime < waitTime)
-            {
-                holdTime += Time.deltaTime;
-                yield return null;
-            }
+            yield return new WaitForSeconds(waitTime);
         }
 
         // 3. 줌 아웃 (Zoom Out)
         float zoomOutTime = 0f;
         while (zoomOutTime < zoomDuration)
         {
-            // 0부터 1까지 진행되는 비율: zoomOutTime / zoomDuration
             float t = zoomOutTime / zoomDuration;
-            // targetFOV(줌 엔드)에서 zoomDefaultFOV(시작 값)으로 보간
-            float newFOV = Mathf.Lerp(targetFOV, zoomDefaultFOV, t);
+            float newFOV = Mathf.Lerp(zoomEndFOV, zoomDefaultFOV, t);
 
             var lens = cam.Lens;
             lens.OrthographicSize = newFOV;
@@ -102,5 +86,7 @@ public class CinemachineCameraScript : MonoBehaviour
         var finalLens = cam.Lens;
         finalLens.OrthographicSize = zoomDefaultFOV; // 원래 기본값으로 돌아감
         cam.Lens = finalLens;
+
+        runningZoomCoroutine = null;
     }
 }

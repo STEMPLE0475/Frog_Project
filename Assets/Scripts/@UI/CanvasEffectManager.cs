@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class CanvasEffectManager : MonoBehaviour
 {
-    [Tooltip("관리할 연출 효과 Panel들의 리스트")]
-    [SerializeField]private List<GameObject> illustEffectList = new List<GameObject>();
-    [SerializeField]private List<AudioClip> soundClips = new List<AudioClip>();
-    private AudioSource audioSource;
+    [SerializeField] private List<GameObject> illustEffectList = new List<GameObject>();
+    // --- (AudioClip, AudioSource 참조 제거) ---
 
-    public void Initiate(PlayerController playerController)
+    public void Initiate()
     {
-        audioSource = GetComponent<AudioSource>();
+        // --- (PlayerController 구독 제거) ---
+        // --- (AudioSource 초기화 제거) ---
+
         // 게임 시작 시 모든 연출 Panel을 미리 비활성화
         foreach (GameObject effect in illustEffectList)
         {
@@ -19,29 +19,28 @@ public class CanvasEffectManager : MonoBehaviour
                 effect.SetActive(false);
             }
         }
-
-        playerController.OnCombo += PlayIllustEffect;
-        playerController.OnCombo += PlaySound;
     }
 
+    // GameManager가 PlayerController.OnCombo 이벤트를 받아서 호출해줄 함수
     public void PlayIllustEffect(int combo)
     {
         if (combo == 0) return;
+
+        // 콤보 1일 때 -> 0번 인덱스
         int index = combo - 1;
-        int illustEffectListSize = illustEffectList.Count;
-       
+
         if (index >= illustEffectList.Count)
         {
             index = illustEffectList.Count - 1;
         }
 
+        if (index < 0) return; // (안전장치)
+
         GameObject selectedEffect = illustEffectList[index];
-        // Panel에서 애니메이션 스크립트를 가져옵니다.
         DirectionalPanelAnimation animation = selectedEffect.GetComponent<DirectionalPanelAnimation>();
 
         if (animation != null)
         {
-            // 4. 애니메이션 스크립트의 재생함수 호출
             animation.StartDirectionalAnimation();
         }
         else
@@ -50,16 +49,5 @@ public class CanvasEffectManager : MonoBehaviour
         }
     }
 
-    public void PlaySound(int combo)
-    {
-        if (combo == 0) return;
-        int index = combo ;
-        int size = soundClips.Count;
-
-        if (index >= soundClips.Count)
-        {
-            index = soundClips.Count - 1;
-        }
-        audioSource.PlayOneShot(soundClips[index]);
-    }
+    // --- (PlaySound 메서드 제거) ---
 }

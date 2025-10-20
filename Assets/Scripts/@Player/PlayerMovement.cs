@@ -33,7 +33,7 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 startPos = transform.position;
         Quaternion startRotation = transform.rotation;
-        Vector3 endPos = startPos + jumpDirection.normalized * jumpForce;
+        Vector3 endPos = startPos + jumpDirection.normalized * jumpForce + Vector3.up * 0.5f;
 
         float elapsedTime = 0f;
         float jumpHeight = jumpForce * heightMultiplier;

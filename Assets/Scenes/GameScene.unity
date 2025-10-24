@@ -22650,7 +22650,7 @@ MonoBehaviour:
   m_OnFocusSelectAll: 1
   m_ResetOnDeActivation: 1
   m_KeepTextSelectionVisible: 0
-  m_RestoreOriginalTextOnEscape: 1
+  m_RestoreOriginalTextOnEscape: 0
   m_isRichTextEditingAllowed: 0
   m_LineLimit: 0
   isAlert: 0
@@ -25419,6 +25419,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f044ace1db1dc9499a946d1a03c974b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ENABLE_DB_START_TEST: 1
 --- !u!114 &1991530924
 MonoBehaviour:
   m_ObjectHideFlags: 0

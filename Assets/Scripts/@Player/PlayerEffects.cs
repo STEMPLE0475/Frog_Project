@@ -22,7 +22,7 @@ public class PlayerEffects : MonoBehaviour
     [SerializeField] private AudioClip landSfx; // 없어도 될 듯
 
     [Header("애니메이션 설정")]
-    [SerializeField] private float squashAmount = 0.5f;
+    [SerializeField] private float squashAmount = 0.1f;
     [SerializeField] private float stretchAmount = 1.5f; 
     [SerializeField] private float animationSpeed = 2.2f;
 
@@ -72,7 +72,7 @@ public class PlayerEffects : MonoBehaviour
         yield return StartCoroutine(AnimateScale(stretchScale, animationSpeed * 1f));*/
 
         // 2. 원래대로 돌아옴
-        yield return StartCoroutine(AnimateScale(originalScale, animationSpeed));
+        yield return StartCoroutine(AnimateScale(originalScale, animationSpeed * 2.0f));
     }
 
     // --- 사운드 ---

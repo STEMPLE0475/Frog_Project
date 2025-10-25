@@ -80,6 +80,7 @@ public class GameManager : MonoBehaviour
         gameStateManager.OnGameStart += playerController.RespawnPlayer;
         gameStateManager.OnGameStart += () => canvasManager.SetInGameScoreActive(true);
         gameStateManager.OnGameStart += () => databaseManager.StartNewSession("start_button");
+        gameStateManager.OnGameStart += canvasManager.StartTutorialImageBlink;
 
         gameStateManager.OnGameOver += scoreManager.SaveScore;
         gameStateManager.OnGameOver += () => databaseManager.EndCurrentSession(scoreManager.GetMaxScore());

@@ -7,6 +7,7 @@ public class CanvasManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI InGameScoreTMP;
     [SerializeField] private TextMeshProUGUI gameOverScoreTMP;
     [SerializeField] private TextMeshProUGUI gameOverScoreBestTMP;
+    [SerializeField] private TutorialImage tutorialImage;
 
     public void Initiate()
     {
@@ -17,7 +18,10 @@ public class CanvasManager : MonoBehaviour
         UpdateGameOverCurrentScore(0);
         UpdateGameOverMaxScore(0); 
     }
-
+    public void StartTutorialImageBlink()
+    {
+        tutorialImage.StartBlink();
+    }
     // === ScoreManager가 호출할 공개 메서드들 ===
 
     public void UpdateInGameScore(int score)

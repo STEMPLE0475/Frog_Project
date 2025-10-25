@@ -62,7 +62,7 @@ public class Block : MonoBehaviour
     IEnumerator StartSink()
     {
         Vector3 startPos = originalPosition; 
-        Vector3 endPos1 = startPos + Vector3.down * 0.25f;
+        Vector3 endPos1 = startPos + Vector3.down * 0.1f;
         Vector3 endPos2 = startPos + Vector3.down * 1f;
 
         // === 1. 첫 번째 하강 ===
@@ -78,7 +78,7 @@ public class Block : MonoBehaviour
         transform.position = endPos1;
 
         // === 3. 두 번째 하강 ===
-        float duration2 = 3.5f;
+        float duration2 = 5f;
         float secondSinkingTimer = 0;
         while (secondSinkingTimer < duration2)
         {

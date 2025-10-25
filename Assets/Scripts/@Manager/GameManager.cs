@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private HUDController hudController;
 
     [SerializeField] private BlockManager blockManager;
+    [SerializeField] private SeaManager seaManager;
 
     [Header("Game Variables")]
     [SerializeField] private List<ButtonSound> buttonSounds;
@@ -51,6 +52,7 @@ public class GameManager : MonoBehaviour
 
         blockManager.Initiate();
         windManager.Initiate();
+        seaManager.Initiate();
 
         canvasManager.Initiate();
         canvasEffectManager.Initiate();
@@ -142,6 +144,8 @@ public class GameManager : MonoBehaviour
         // --- WindManager Event
         windManager.OnWindChanged += (wind) => playerController.ApplyNewWind(wind);
         windManager.OnWindChanged += (wind) => canvasManager.UpdateWind(wind);
+        windManager.OnWindChanged += (wind) => seaManager.SetSeaSpeed(wind);
+
     }
 
     // === 함수 ===

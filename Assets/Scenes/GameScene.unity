@@ -5558,6 +5558,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetMaterial: {fileID: 0}
+  windSpeed: 1
   scrollSpeed: {x: 0.05, y: 0.05}
 --- !u!65 &453413177
 BoxCollider:
@@ -7159,6 +7160,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetMaterial: {fileID: 0}
+  windSpeed: 1
   scrollSpeed: {x: 0.05, y: 0.05}
 --- !u!1 &594002719 stripped
 GameObject:
@@ -11580,6 +11582,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetMaterial: {fileID: 0}
+  windSpeed: 1
   scrollSpeed: {x: 0.05, y: 0.05}
 --- !u!65 &975000714
 BoxCollider:
@@ -15046,6 +15049,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetMaterial: {fileID: 0}
+  windSpeed: 1
   scrollSpeed: {x: 0.05, y: 0.05}
 --- !u!65 &1204119735
 BoxCollider:
@@ -16019,6 +16023,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetMaterial: {fileID: 0}
+  windSpeed: 1
   scrollSpeed: {x: 0.05, y: 0.05}
 --- !u!65 &1308404681
 BoxCollider:
@@ -17731,6 +17736,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetMaterial: {fileID: 0}
+  windSpeed: 1
   scrollSpeed: {x: 0.05, y: 0.05}
 --- !u!65 &1445353756
 BoxCollider:
@@ -18408,6 +18414,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1478511141}
+  - component: {fileID: 1478511142}
   m_Layer: 0
   m_Name: Seas
   m_TagString: Untagged
@@ -18436,6 +18443,26 @@ Transform:
   - {fileID: 1445353759}
   m_Father: {fileID: 2146700912}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1478511142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1478511140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a503ceb3f1761504fabddc3d62367222, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  seas:
+  - {fileID: 590939713}
+  - {fileID: 453413176}
+  - {fileID: 975000713}
+  - {fileID: 1204119734}
+  - {fileID: 1308404680}
+  - {fileID: 1445353755}
+  seaSpeed: 5
 --- !u!1 &1481567895
 GameObject:
   m_ObjectHideFlags: 0
@@ -25873,6 +25900,7 @@ MonoBehaviour:
   playerController: {fileID: 1785993167}
   hudController: {fileID: 311343986}
   blockManager: {fileID: 372073052}
+  seaManager: {fileID: 1478511142}
   buttonSounds:
   - {fileID: 417549611}
   - {fileID: 1996942608}
@@ -39112,9 +39140,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a56f4c89aa5e8054aa13e117ef1cf858, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minJumpForce: 4
+  minJumpForce: 3
   maxJumpForce: 15
-  chargeRate: 9
+  chargeRate: 12
 --- !u!114 &7466288415502755223
 MonoBehaviour:
   m_ObjectHideFlags: 0

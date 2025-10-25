@@ -5,36 +5,43 @@ using UnityEngine;
 public class CinemachineCameraManager : MonoBehaviour
 {
     private CinemachineCamera cam;
+    [SerializeField] private Camera effect_cam;
+
     private Transform playerTransform;
+    private Vector3 defaultCinemachineFollowOffset;
 
-    private Coroutine runningZoomCoroutine;
+    [SerializeField] private float defaultFOV = 5f;
+    [SerializeField] private Vector3 targetCinemachineFollowOffset = new Vector3(1f, 10f, -10f);
+    Coroutine zoomCoroutine;
 
-    [SerializeField] private float zoomDefaultFOV = 5f;
     [SerializeField] private float zoomEndFOV = 4.7f;
     [SerializeField] private float zoomDuration = 0.2f; // 줌 인/아웃에 걸리는 시간
+
+    [SerializeField] private float deathZoomFov = 4f;
+    [SerializeField] private float deathZoomDuration = 3f;
 
     public void Initiate(Transform playerTransform)
     {
         this.playerTransform = playerTransform;
         cam = GetComponent<CinemachineCamera>();
         OnFollowStart();
-        cam.Lens.OrthographicSize = zoomDefaultFOV;
+        SetAllCameraFOV(defaultFOV);
     }
 
     private void OnFollowStart() => cam.Follow = playerTransform;
 
     public void OnZoomStart(float jumpDuration)
     {
-        if (runningZoomCoroutine != null)
+        if (zoomCoroutine != null)
         {
-            StopCoroutine(runningZoomCoroutine);
+            StopCoroutine(zoomCoroutine);
         }
-        StartCoroutine(SmoothZoom(jumpDuration));
+        zoomCoroutine = StartCoroutine(SmoothZoom(jumpDuration));
     }
 
     private IEnumerator SmoothZoom(float jumpDuration)
     {
-        float startFOV = cam.Lens.OrthographicSize;
+        float startFOV = defaultFOV;
 
         //줌 인
         float zoomInTime = 0f;
@@ -42,12 +49,10 @@ public class CinemachineCameraManager : MonoBehaviour
         {
             // Lerp를 사용하여 시작 값에서 목표 값으로 부드럽게 보간
             float t = zoomInTime / zoomDuration;
-            float newFOV = Mathf.Lerp(zoomDefaultFOV, zoomEndFOV, t);
+            float newFOV = Mathf.Lerp(defaultFOV, zoomEndFOV, t);
 
             // Cinemachine 카메라의 FOV(렌즈) 값 업데이트
-            var lens = cam.Lens;
-            lens.OrthographicSize = newFOV;
-            cam.Lens = lens;
+            SetAllCameraFOV(newFOV);
 
             zoomInTime += Time.deltaTime;
             yield return null; // 다음 프레임까지 대기
@@ -72,11 +77,9 @@ public class CinemachineCameraManager : MonoBehaviour
         while (zoomOutTime < zoomDuration)
         {
             float t = zoomOutTime / zoomDuration;
-            float newFOV = Mathf.Lerp(zoomEndFOV, zoomDefaultFOV, t);
+            float newFOV = Mathf.Lerp(zoomEndFOV, defaultFOV, t);
 
-            var lens = cam.Lens;
-            lens.OrthographicSize = newFOV;
-            cam.Lens = lens;
+            SetAllCameraFOV(newFOV);
 
             zoomOutTime += Time.deltaTime;
             yield return null;
@@ -84,9 +87,41 @@ public class CinemachineCameraManager : MonoBehaviour
 
         // 줌 아웃 완료: 원래의 시작 FOV로 정확히 설정
         var finalLens = cam.Lens;
-        finalLens.OrthographicSize = zoomDefaultFOV; // 원래 기본값으로 돌아감
+        SetAllCameraFOV(defaultFOV);
         cam.Lens = finalLens;
 
-        runningZoomCoroutine = null;
+        zoomCoroutine = null;
+    }
+
+    public void DeathZoomStart() => zoomCoroutine = StartCoroutine(DeathZoomCoroutine());
+    private IEnumerator DeathZoomCoroutine()
+    {
+        float elapsedTime = 0f;
+        while (elapsedTime < deathZoomDuration)
+        {
+            float t = elapsedTime / deathZoomDuration;
+            SetAllCameraFOV(Mathf.Lerp(defaultFOV, deathZoomFov, t));
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        SetAllCameraFOV(deathZoomFov);
+        zoomCoroutine = null;
+    }
+
+    public void ResetCamera()
+    {
+        if (zoomCoroutine != null)
+        {
+            StopCoroutine(zoomCoroutine);
+        }
+        SetAllCameraFOV(defaultFOV);
+    }
+
+    //유틸리티
+    private void SetAllCameraFOV(float targetFOV)
+    {
+        cam.Lens.OrthographicSize = targetFOV;
+        effect_cam.orthographicSize = targetFOV;
     }
 }

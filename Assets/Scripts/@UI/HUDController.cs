@@ -12,6 +12,8 @@ public class HUDController : MonoBehaviour
     public event Action OnQuitGameClicked;
     public event Action OnRestartClicked; // (⭐ 추가됨: 게임오버 패널의 '다시하기')
 
+    [SerializeField] private float gameOverDelay = 3f;
+
     [Header("Root & Panels")]
     [SerializeField] private CanvasGroup inGameUI;
     [SerializeField] private GameObject mainMenu;
@@ -137,6 +139,20 @@ public class HUDController : MonoBehaviour
         }
     }
 
+    public void GameOver()
+    {
+        ShowGameOverPanel(false);
+        ShowHUD(true);
+        ShowMainMenu(false);
+        ShowPausePanel(false);
+        StartCoroutine(GameOverCoroutine());}
+
+    IEnumerator GameOverCoroutine()
+    {
+        yield return new WaitForSecondsRealtime(gameOverDelay);
+        ShowGameOverPanel(true);
+        ShowHUD(true);
+    }
 
     // ========== 버튼 클릭 이벤트 ==========
 

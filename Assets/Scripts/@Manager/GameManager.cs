@@ -78,23 +78,17 @@ public class GameManager : MonoBehaviour
         gameStateManager.OnGameStart += databaseManager.IncrementGameStartCount;
         gameStateManager.OnGameStart += scoreManager.ResetScore;
         gameStateManager.OnGameStart += playerController.RespawnPlayer;
+        gameStateManager.OnGameStart += cinemachineCameraManager.ResetCamera;
         gameStateManager.OnGameStart += () => canvasManager.SetInGameScoreActive(true);
         gameStateManager.OnGameStart += () => databaseManager.StartNewSession("start_button");
         gameStateManager.OnGameStart += canvasManager.StartTutorialImageBlink;
 
         gameStateManager.OnGameOver += scoreManager.SaveScore;
         gameStateManager.OnGameOver += () => databaseManager.EndCurrentSession(scoreManager.GetMaxScore());
-        gameStateManager.OnGameOver += () =>
-        {
-            hudController.ShowGameOverPanel(true);
-            hudController.ShowHUD(true);
-            hudController.ShowMainMenu(false);
-            hudController.ShowPausePanel(false);
-        };
+        gameStateManager.OnGameOver += hudController.GameOver;
+        gameStateManager.OnGameOver += cinemachineCameraManager.DeathZoomStart;
         
-        gameStateManager.OnGameOver += () => {
-            canvasManager.SetInGameScoreActive(false);
-        };
+        gameStateManager.OnGameOver += () => canvasManager.SetInGameScoreActive(false);
 
         // --- HUD 버튼 이벤트 ---
         hudController.OnStartGameClicked += HandleStartGameRequest;

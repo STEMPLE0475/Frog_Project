@@ -114,6 +114,7 @@ public class PlayerController : MonoBehaviour
     private void HandleSeaCollision(Vector3 collisionPos)
     {
         inputHandler.EnableInput(false);
+        effects.PlaySeaCollisionSound();
         effects.SetTrail(false);
         effects.SetPlayerMesh(true); // 섀도우 모드
         collisionHandler.SetCollider(false);

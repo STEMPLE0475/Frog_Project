@@ -5,7 +5,7 @@ public class TutorialImage : MonoBehaviour
 {
     [SerializeField] private GameObject SpaceOffImage;
     [SerializeField] private GameObject SpaceOnImage;
-    [SerializeField] private float showPeriod = 5f;
+    [SerializeField] private float showPeriod = 3f;
     [SerializeField] private float blinkPeriod = 0.4f;
     private bool isActive = false;
     private Coroutine blinkCoroutine;

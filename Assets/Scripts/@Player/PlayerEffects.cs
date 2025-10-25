@@ -19,7 +19,9 @@ public class PlayerEffects : MonoBehaviour
     [Header("사운드")]
     [SerializeField] private AudioSource sfxSource;
     [SerializeField] private AudioClip jumpSfx;
-    [SerializeField] private AudioClip landSfx; // 없어도 될 듯
+    [SerializeField] private AudioClip landSfx;
+    [SerializeField] private AudioClip waterSplashSfx;
+    [SerializeField] private AudioClip gameOverSfx;
 
     [Header("애니메이션 설정")]
     [SerializeField] private float squashAmount = 0.1f;
@@ -87,6 +89,15 @@ public class PlayerEffects : MonoBehaviour
         // (착지 사운드 재생 로직)
         if (sfxSource != null && landSfx != null)
             sfxSource.PlayOneShot(landSfx);
+    }
+
+    public void PlaySeaCollisionSound()
+    {
+        if(waterSplashSfx != null && gameOverSfx != null)
+        {
+            sfxSource.PlayOneShot(waterSplashSfx);
+            sfxSource.PlayOneShot(gameOverSfx);
+        }
     }
 
     // --- 파티클 ---

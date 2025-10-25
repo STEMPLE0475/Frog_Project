@@ -29,8 +29,8 @@ public class PlayerController : MonoBehaviour
 
     // 2. 외부 보고용 이벤트 (Player -> GameManager/ScoreManager 등)
     public event Action<float> OnJumpStart;
-    public event Action<LandingAccuracy, int, Vector3> OnLanded; // (⭐ 수정됨: 콤보 정보를 포함)
-    public event Action OnSeaCollision; // (⭐ 신규: 바다 충돌 보고용)
+    public event Action<LandingAccuracy, int, Vector3> OnLanded; 
+    public event Action OnSeaCollision; 
 
     public void Initiate()
     {
@@ -155,6 +155,13 @@ public class PlayerController : MonoBehaviour
         effects.SetPlayerMesh(false); // 원본 메시
         effects.SetTrail(true);
         inputHandler.EnableInput(true);
+    }
+
+    public void ApplyNewWind(Wind wind)
+    {
+        playerState.SetWind(wind);
+        Debug.Log("바람 플레이어에게 Set. In Player Controller");
+        Debug.Log(wind.power + " " +  wind.direction);
     }
 
     // --- 내부 로직 ---

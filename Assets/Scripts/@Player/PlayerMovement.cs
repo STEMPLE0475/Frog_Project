@@ -23,10 +23,10 @@ public class PlayerMovement : MonoBehaviour
     public void ExecuteJump(float jumpForce, Action onJumpStartCallback)
     {
         if (playerState.IsAirborne) return;
-        StartCoroutine(ParabolicJump(jumpForce, onJumpStartCallback));
+        StartCoroutine(ParabolicJump(jumpForce, onJumpStartCallback, GetWindForceVector()));
     }
 
-    private IEnumerator ParabolicJump(float jumpForce, Action onJumpStartCallback)
+    private IEnumerator ParabolicJump(float jumpForce, Action onJumpStartCallback, Vector3 windForce)
     {
         onJumpStartCallback?.Invoke(); // 점프 시작 콜백 (이펙트 재생용)
         playerState.SetAirborne(true);
@@ -38,6 +38,8 @@ public class PlayerMovement : MonoBehaviour
         float elapsedTime = 0f;
         float jumpHeight = jumpForce * heightMultiplier;
 
+        Vector3 accumulatedWindMovement = Vector3.zero;
+
         while (elapsedTime < jumpDuration)
         {
             elapsedTime += Time.deltaTime;
@@ -48,11 +50,29 @@ public class PlayerMovement : MonoBehaviour
 
             Vector3 currentPos = Vector3.Lerp(startPos, endPos, progress);
             currentPos.y += Mathf.Sin(progress * Mathf.PI) * jumpHeight;
-            transform.position = currentPos;
+
+            accumulatedWindMovement += windForce * Time.deltaTime;
+
+            transform.position = currentPos + accumulatedWindMovement;
 
             yield return null;
         }
         transform.rotation = startRotation;
+    }
+    public Vector3 GetWindForceVector()
+    {
+        Wind windData = playerState.GetWind();
+
+        if (windData == null) return Vector3.zero;
+
+        float windDirectionFactor = (float)windData.direction;
+        float windPower = windData.power;
+        float finalWindMagnitude = windDirectionFactor * windPower;
+
+        Vector3 windDirectionVector = new Vector3(1f, 0f, 1f).normalized;
+        Vector3 windForce = windDirectionVector * finalWindMagnitude;
+
+        return windForce;
     }
 
     public void ResetVelocity()

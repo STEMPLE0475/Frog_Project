@@ -7,6 +7,8 @@ public class CanvasManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI InGameScoreTMP;
     [SerializeField] private TextMeshProUGUI gameOverScoreTMP;
     [SerializeField] private TextMeshProUGUI gameOverScoreBestTMP;
+    [SerializeField] private TextMeshProUGUI windDirectionTMP;
+    [SerializeField] private TextMeshProUGUI windPowerTMP;
     [SerializeField] private TutorialImage tutorialImage;
 
     public void Initiate()
@@ -42,5 +44,11 @@ public class CanvasManager : MonoBehaviour
     public void SetInGameScoreActive(bool isActive)
     {
         InGameScoreTMP.gameObject.SetActive(isActive);
+    }
+
+    public void UpdateWind(Wind wind)
+    {
+        windDirectionTMP.text = "바람 방향 : " + wind.direction.ToString();
+        windPowerTMP.text = "바람 힘 " + wind.power.ToString();
     }
 }

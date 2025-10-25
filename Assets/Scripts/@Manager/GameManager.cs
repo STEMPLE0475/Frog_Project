@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     private ScoreManager scoreManager;
     private AudioManager audioManager;
     private DatabaseManager databaseManager;
+    private WindManager windManager;
 
     [Header("Scene Dependencies (Assign in Editor)")]
     // (⭐ 수정됨: UI/Effect 매니저들을 세분화하여 참조)
@@ -37,6 +38,7 @@ public class GameManager : MonoBehaviour
         scoreManager = GetComponent<ScoreManager>();
         audioManager = GetComponent<AudioManager>();
         databaseManager = GetComponent<DatabaseManager>();
+        windManager = GetComponent<WindManager>();
 
         // 2. 각 매니저 'Initiate' (의존성 주입)
         databaseManager.Initiate();
@@ -48,6 +50,7 @@ public class GameManager : MonoBehaviour
         cinemachineCameraManager.Initiate(playerController.transform);
 
         blockManager.Initiate();
+        windManager.Initiate();
 
         canvasManager.Initiate();
         canvasEffectManager.Initiate();
@@ -75,20 +78,30 @@ public class GameManager : MonoBehaviour
         };
 
         // --- 게임 상태 이벤트 ---
-        gameStateManager.OnGameStart += databaseManager.IncrementGameStartCount;
-        gameStateManager.OnGameStart += scoreManager.ResetScore;
-        gameStateManager.OnGameStart += playerController.RespawnPlayer;
-        gameStateManager.OnGameStart += cinemachineCameraManager.ResetCamera;
-        gameStateManager.OnGameStart += () => canvasManager.SetInGameScoreActive(true);
-        gameStateManager.OnGameStart += () => databaseManager.StartNewSession("start_button");
-        gameStateManager.OnGameStart += canvasManager.StartTutorialImageBlink;
 
-        gameStateManager.OnGameOver += scoreManager.SaveScore;
-        gameStateManager.OnGameOver += () => databaseManager.EndCurrentSession(scoreManager.GetMaxScore());
-        gameStateManager.OnGameOver += hudController.GameOver;
-        gameStateManager.OnGameOver += cinemachineCameraManager.DeathZoomStart;
-        
-        gameStateManager.OnGameOver += () => canvasManager.SetInGameScoreActive(false);
+        //  게임 시작
+        gameStateManager.OnGameStart += () =>
+        {
+            databaseManager.IncrementGameStartCount();
+            scoreManager.ResetScore();
+            playerController.RespawnPlayer();
+            windManager.ResetWindMangaer();
+            cinemachineCameraManager.ResetCamera();
+            canvasManager.SetInGameScoreActive(true);
+            databaseManager.StartNewSession("start_button");
+            canvasManager.StartTutorialImageBlink();
+        };
+
+        // 게임 종료
+        gameStateManager.OnGameOver += () =>
+        {
+            scoreManager.SaveScore();
+            databaseManager.EndCurrentSession(scoreManager.GetMaxScore());
+            hudController.GameOver();
+            cinemachineCameraManager.DeathZoomStart();
+            canvasManager.SetInGameScoreActive(false);
+        };
+
 
         // --- HUD 버튼 이벤트 ---
         hudController.OnStartGameClicked += HandleStartGameRequest;
@@ -97,12 +110,14 @@ public class GameManager : MonoBehaviour
 
         hudController.OnRestartClicked += gameStateManager.RestartGame;
         hudController.OnRestartClicked += blockManager.ResetBlocks;
+        hudController.OnRestartClicked += windManager.ResetWindMangaer;
         hudController.OnRestartClicked += () => databaseManager.StartNewSession("restart_button");
 
         // --- 플레이어 이벤트 
 
         playerController.OnLanded += (acc, combo, playerPos) => scoreManager.HandleLanding(acc);
         playerController.OnLanded += (acc, combo, playerPos) => databaseManager.LogLanding(playerPos, acc.ToString());
+        playerController.OnLanded += (acc, combo, playerPos) => windManager.PlusLandCount();
         /*playerController.OnLanded += (acc, combo) =>
         {
             if (acc == LandingAccuracy.Perfect) canvasEffectManager.PlayIllustEffect(combo);
@@ -120,7 +135,13 @@ public class GameManager : MonoBehaviour
         // (Player의 OnSeaCollision 이벤트를 GameStateManager가 구독)
         playerController.OnSeaCollision += gameStateManager.TriggerGameOver;
         playerController.OnSeaCollision += () => databaseManager.LogDeath(playerController.GetPlayerPos());
+
         playerController.OnJumpStart += cinemachineCameraManager.OnZoomStart;
+        playerController.OnJumpStart += (jumpDuration) => windManager.StartMakeNewWind();
+
+        // --- WindManager Event
+        windManager.OnWindChanged += (wind) => playerController.ApplyNewWind(wind);
+        windManager.OnWindChanged += (wind) => canvasManager.UpdateWind(wind);
     }
 
     // === 함수 ===

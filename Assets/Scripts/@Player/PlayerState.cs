@@ -5,9 +5,12 @@ public class PlayerState : MonoBehaviour
 {
     public bool IsAirborne { get; private set; } = false;
     public bool IsFloating { get; private set; } = false;
+    private Wind wind;
 
     public void SetAirborne(bool state) => IsAirborne = state;
     public void SetFloating(bool state) => IsFloating = state;
+    public void SetWind(Wind wind) => this.wind = wind;
+    public Wind GetWind() => wind;
 
     public void ResetState()
     {

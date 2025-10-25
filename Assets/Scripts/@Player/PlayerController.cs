@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour
 
     // 2. 외부 보고용 이벤트 (Player -> GameManager/ScoreManager 등)
     public event Action<float> OnJumpStart;
-    public event Action<LandingAccuracy, int> OnLanded; // (⭐ 수정됨: 콤보 정보를 포함)
+    public event Action<LandingAccuracy, int, Vector3> OnLanded; // (⭐ 수정됨: 콤보 정보를 포함)
     public event Action OnSeaCollision; // (⭐ 신규: 바다 충돌 보고용)
 
     public void Initiate()
@@ -107,7 +107,7 @@ public class PlayerController : MonoBehaviour
                 return;
         }
 
-        OnLanded?.Invoke(accuracy, combo);
+        OnLanded?.Invoke(accuracy, combo, GetPlayerPos());
     }
 
     // 4. 충돌 핸들러가 "바다 충돌" 보고
@@ -130,6 +130,9 @@ public class PlayerController : MonoBehaviour
     }
 
     // --- 외부 호출용 public 함수 ---
+    public Vector3 GetPlayerPos(){
+        return transform.position;
+    }
 
     public void EnableInput(bool on)
     {

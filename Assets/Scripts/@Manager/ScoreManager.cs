@@ -12,8 +12,6 @@ public class ScoreManager : MonoBehaviour
     private int max_score = 0;
     private int combo = 0; // (GameManager의 콤보 로직을 가져옴)
 
-    private DatabaseManager databaseManager; // 점수 저장을 위해
-
     // DB에서 로드된 최고 점수를 설정
     public void SetInitialMaxScore(UserData data)
     {
@@ -23,9 +21,8 @@ public class ScoreManager : MonoBehaviour
     }
 
     // DB 매니저를 외부에서 주입받음
-    public void Initiate(DatabaseManager dbManager)
+    public void Initiate()
     {
-        this.databaseManager = dbManager;
     }
 
     // PlayerController가 Land 이벤트를 발생시키면 GameManager가 이 함수를 호출
@@ -73,9 +70,11 @@ public class ScoreManager : MonoBehaviour
         {
             max_score = score;
             OnMaxScoreChanged?.Invoke(max_score);
-
-            // DB에 저장 요청
-            databaseManager?.SaveHighScore(max_score);
         }
+    }
+
+    public int GetMaxScore()
+    {
+        return max_score;
     }
 }

@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
         // 2. 각 매니저 'Initiate' (의존성 주입)
         databaseManager.Initiate();
         audioManager.Initiate(buttonSounds);
-        scoreManager.Initiate(databaseManager);
+        scoreManager.Initiate();
 
         // (씬에 있는 객체들 초기화)
         playerController.Initiate();
@@ -78,11 +78,11 @@ public class GameManager : MonoBehaviour
         gameStateManager.OnGameStart += databaseManager.IncrementGameStartCount;
         gameStateManager.OnGameStart += scoreManager.ResetScore;
         gameStateManager.OnGameStart += playerController.RespawnPlayer;
-        gameStateManager.OnGameStart += () => {
-            canvasManager.SetInGameScoreActive(true);
-        };
+        gameStateManager.OnGameStart += () => canvasManager.SetInGameScoreActive(true);
+        gameStateManager.OnGameStart += () => databaseManager.StartNewSession("start_button");
 
         gameStateManager.OnGameOver += scoreManager.SaveScore;
+        gameStateManager.OnGameOver += () => databaseManager.EndCurrentSession(scoreManager.GetMaxScore());
         gameStateManager.OnGameOver += () =>
         {
             hudController.ShowGameOverPanel(true);
@@ -99,27 +99,32 @@ public class GameManager : MonoBehaviour
         hudController.OnStartGameClicked += HandleStartGameRequest;
         hudController.OnResumeGameClicked += gameStateManager.ResumeGame;
         hudController.OnQuitGameClicked += gameStateManager.QuitGame;
+
         hudController.OnRestartClicked += gameStateManager.RestartGame;
         hudController.OnRestartClicked += blockManager.ResetBlocks;
+        hudController.OnRestartClicked += () => databaseManager.StartNewSession("restart_button");
 
         // --- 플레이어 이벤트 
 
-        playerController.OnLanded += (acc, combo) => scoreManager.HandleLanding(acc);
-        playerController.OnLanded += (acc, combo) =>
+        playerController.OnLanded += (acc, combo, playerPos) => scoreManager.HandleLanding(acc);
+        playerController.OnLanded += (acc, combo, playerPos) => databaseManager.LogLanding(playerPos, acc.ToString());
+        /*playerController.OnLanded += (acc, combo) =>
         {
             if (acc == LandingAccuracy.Perfect) canvasEffectManager.PlayIllustEffect(combo);
-        };
+        };*/
 
-        // (⭐ 수정됨: Player의 OnCombo 이벤트를 각 이펙트가 구독)
+        // (Player의 OnCombo 이벤트를 각 이펙트가 구독)
         playerController.OnCombo += (combo) =>
         {
             Vector3 pos = playerController.transform.position;
             comboTextEffect.Show(combo, pos);
         };
         playerController.OnCombo += audioManager.PlayComboSound; // (AudioManager에 이 기능이 추가되었다고 가정)
+        playerController.OnCombo += (combo) => databaseManager.LogCombo(combo);
 
-        // (⭐ 수정됨: Player의 OnSeaCollision 이벤트를 GameStateManager가 구독)
+        // (Player의 OnSeaCollision 이벤트를 GameStateManager가 구독)
         playerController.OnSeaCollision += gameStateManager.TriggerGameOver;
+        playerController.OnSeaCollision += () => databaseManager.LogDeath(playerController.GetPlayerPos());
         playerController.OnJumpStart += cinemachineCameraManager.OnZoomStart;
     }
 

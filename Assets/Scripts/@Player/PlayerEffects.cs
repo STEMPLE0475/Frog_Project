@@ -68,8 +68,8 @@ public class PlayerEffects : MonoBehaviour
     private IEnumerator AnimateJumpStretch()
     {
         // 1. 빠르게 늘어남
-        Vector3 stretchScale = new Vector3(originalScale.x, originalScale.y * stretchAmount, originalScale.z);
-        yield return StartCoroutine(AnimateScale(stretchScale, animationSpeed * 2f));
+/*        Vector3 stretchScale = new Vector3(originalScale.x, originalScale.y * stretchAmount, originalScale.z);
+        yield return StartCoroutine(AnimateScale(stretchScale, animationSpeed * 1f));*/
 
         // 2. 원래대로 돌아옴
         yield return StartCoroutine(AnimateScale(originalScale, animationSpeed));

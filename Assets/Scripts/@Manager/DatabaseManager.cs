@@ -54,8 +54,8 @@ public class DatabaseManager : MonoBehaviour
             // 4) 사망 위치 기록
             LogDeath(new Vector3(5.0f, -2.0f, 8.0f));
 
-            // 5) 세션 종료(최종점수=1234, 재도전여부=true)
-            EndCurrentSession(finalScore: 1234, isRetry: true);
+            // 5) 세션 종료(최종점수=1234)
+            EndCurrentSession(finalScore: 1234);
         }
     }
 
@@ -198,7 +198,7 @@ public class DatabaseManager : MonoBehaviour
     // ===================== 신규: 세션 로깅용 공개 API =====================
 
     /// <summary>
-    /// ✅ 세션 시작 함수
+    /// 세션 시작 함수
     /// - 언제 호출? : "게임 시작" 버튼 직후(실제 플레이 진입 시)
     /// - 인수 : startReason(string) - 세션 시작 사유(예: "start_button", "retry" 등)
     /// - 반환 : sessionId(string) - 이후 이벤트/종료에 사용할 세션 식별자
@@ -231,7 +231,6 @@ public class DatabaseManager : MonoBehaviour
             { "jumpCount", 0 },
             { "bestCombo", 0 },
             { "finalScore", 0 },
-            { "isRetry", false },
             { "endedAt", null },
             { "lastDeathPos", null }
         };
@@ -243,16 +242,15 @@ public class DatabaseManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ✅ 세션 종료 함수
+    /// 세션 종료 함수
     /// - 언제 호출? : "게임 오버" 또는 "스테이지 클리어" 등 플레이 종료 시점
     /// - 인수 :
     ///   finalScore(int) - 세션 최종 점수
-    ///   isRetry(bool)   - 재도전 여부(게임오버 후 바로 재시작 등)
     /// - 반환 : void
     /// - 저장 위치 : /users/{uid}/sessions/{sessionId}
     /// - 효과 : endedAt, 최종 점수, 점프 수, 최고 콤보, 사망 지점까지 요약 반영
     /// </summary>
-    public void EndCurrentSession(int finalScore, bool isRetry)
+    public void EndCurrentSession(int finalScore)
     {
         if (!EnsureSession("EndCurrentSession")) return;
 
@@ -265,7 +263,6 @@ public class DatabaseManager : MonoBehaviour
         {
             { "endedAt", FieldValue.ServerTimestamp },
             { "finalScore", finalScore },
-            { "isRetry", isRetry },
             { "jumpCount", _sessionJumpCount },
             { "bestCombo", _sessionBestCombo },
             { "lastDeathPos", _lastDeathPosition.HasValue ? Vec(_lastDeathPosition.Value) : null }

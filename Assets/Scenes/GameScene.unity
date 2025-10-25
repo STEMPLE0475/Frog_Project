@@ -39140,7 +39140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a56f4c89aa5e8054aa13e117ef1cf858, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minJumpForce: 3
+  minJumpForce: 2
   maxJumpForce: 15
   chargeRate: 12
 --- !u!114 &7466288415502755223

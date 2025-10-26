@@ -7,6 +7,8 @@ public class PlayerEffects : MonoBehaviour
     [Header("파티클")]
     [SerializeField] private List<ParticleSystem> starParticles;
     [SerializeField] private GameObject groundParticle;
+    [SerializeField] private ParticleSystem chargeParticle;
+    [SerializeField] private ParticleSystem chargeCoreParticle;
 
     [Header("메시 렌더러")]
     [SerializeField] private MeshRenderer PlayerMesh;
@@ -77,6 +79,12 @@ public class PlayerEffects : MonoBehaviour
         // 2. 원래대로 돌아옴
         yield return StartCoroutine(AnimateScale(originalScale, animationSpeed * 2.0f));
     }
+
+    public void PlayChargeEffect() => chargeParticle.Play();
+    public void StopChargeEffect(){
+        chargeParticle.Stop();
+        chargeCoreParticle.Stop();
+    } 
 
     // --- 사운드 ---
     public void PlayJumpSound()

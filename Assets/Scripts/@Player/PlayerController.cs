@@ -72,6 +72,7 @@ public class PlayerController : MonoBehaviour
     {
         effects.PlayChargeAnimation();
         effects.PlayChargingSfx();
+        effects.PlayChargeEffect();
     }
 
     // 2. 입력 핸들러가 "점프 요청" 보고
@@ -81,6 +82,7 @@ public class PlayerController : MonoBehaviour
             effects.StopChargingSfx();
             effects.PlayJumpSound();
             effects.PlayJumpAnimation();
+            effects.StopChargeEffect();
             OnJumpStart?.Invoke(movement.jumpDuration);
         });
     }

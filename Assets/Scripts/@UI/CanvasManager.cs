@@ -12,8 +12,7 @@ public class CanvasManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI gameOverScoreBestTMP;
     [SerializeField] private TutorialImage tutorialImage;
     [SerializeField] private WindChangeEffect windChangeEffect;
-    [SerializeField] private Image windUI;
-    [SerializeField] private List<Sprite> windUISprites;
+    [SerializeField] private TextMeshProUGUI windIcon;
 
     public void Initiate()
     {
@@ -53,53 +52,67 @@ public class CanvasManager : MonoBehaviour
 
     public void UpdateWind(Wind wind)
     {
+        // 디버그 로그는 그대로 유지
         Debug.Log("바람 방향 : " + wind.direction.ToString());
         Debug.Log("바람 힘 " + wind.power.ToString());
-        int spriteIndex = GetWindSpriteIndex(wind);
 
-        // UI 이미지에 스프라이트 적용
-        if (windUI != null && windUISprites != null && spriteIndex >= 0 && spriteIndex < windUISprites.Count)
+        // 1. 바람 텍스트 설정
+        if (windIcon != null)
         {
-            windUI.sprite = windUISprites[spriteIndex];
+            windIcon.text = GetWindText(wind);
 
-            // 바람 힘이 0일 때 (Index 0)는 Image를 비활성화하거나 투명하게 처리할 수도 있습니다.
-            // 여기서는 스프라이트만 할당하고, 바람의 힘이 0일 때 '바람 없음' 스프라이트가 표시되도록 가정합니다.
-            windUI.enabled = true; // Image 컴포넌트 활성화
+            // 텍스트가 -이 아닐 경우 (바람이 있을 경우) 텍스트 컴포넌트를 활성화하고
+            // -일 경우 (바람이 없을 경우) 그대로 두거나 비활성화 여부를 선택할 수 있습니다.
+            // 여기서는 텍스트가 -이더라도 표시하는 것을 기본으로 합니다.
+            // windIcon.enabled = true; 
         }
-        else if (windUI != null)
+        else
         {
-            // 스프라이트 리스트가 부족하거나 잘못된 인덱스일 경우 대비
-            windUI.enabled = false;
-            Debug.LogError("바람 스프라이트 설정이 잘못되었습니다. Index: " + spriteIndex);
+            Debug.LogError("windIcon (TextMeshProUGUI)이 할당되지 않았습니다.");
         }
 
-
+        // 기존 바람 변화 효과 메서드는 그대로 유지
         windChangeEffect.StartWindChangeEffect(wind);
     }
 
-    private int GetWindSpriteIndex(Wind wind)
+    // GetWindSpriteIndex 대신 GetWindText 메서드 사용
+    private string GetWindText(Wind wind)
     {
-        // 1. 바람 힘이 0일 경우 (바람 없음) -> Index 0
+        // 1. 바람 힘이 0일 경우 (바람 없음) -> "-" 표시
         if (wind.power == 0)
         {
-            return 0;
+            return "-";
         }
 
         // 2. 힘을 1, 2, 3으로 제한 (안전 장치)
-        int power = Mathf.Clamp(wind.power, 1, 3);
+        // Mathf.Clamp는 Unity의 UnityEngine 네임스페이스에 있습니다.
+        int power = UnityEngine.Mathf.Clamp(wind.power, 1, 3);
 
-        // 3. 인덱스 계산
-        if (wind.direction == 1) // 방향 1 (우측): Index 1, 2, 3
+        // 3. 바람 방향에 따른 문자열 생성
+        string arrowString = "";
+
+        if (wind.direction == 1) // 방향 1 (우측)
         {
-            // 힘 1 -> Index 1, 힘 2 -> Index 2, 힘 3 -> Index 3
-            return power;
+            // 힘 1 -> ">", 힘 2 -> ">>", 힘 3 -> ">>>"
+            for (int i = 0; i < power; i++)
+            {
+                arrowString += ">";
+            }
         }
-        else // 방향 -1 (좌측): Index 4, 5, 6 (wind.direction이 -1일 경우)
+        else if (wind.direction == -1) // 방향 -1 (좌측)
         {
-            // 힘 1 -> Index 4 (3 + 1)
-            // 힘 2 -> Index 5 (3 + 2)
-            // 힘 3 -> Index 6 (3 + 3)
-            return 3 + power;
+            // 힘 1 -> "<", 힘 2 -> "<<", 힘 3 -> "<<<"
+            for (int i = 0; i < power; i++)
+            {
+                arrowString += "<";
+            }
         }
+        else // 방향이 0이거나 기타 값일 경우 (예: 바람 없음으로 처리되지 않은 상태)
+        {
+            // 안전을 위해 - 반환
+            return "-";
+        }
+
+        return arrowString;
     }
 }

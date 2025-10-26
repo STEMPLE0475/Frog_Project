@@ -84,6 +84,7 @@ public class GameManager : MonoBehaviour
         //  게임 시작
         gameStateManager.OnGameStart += () =>
         {
+            playerController.ResetCurSessionLandCount();
             databaseManager.IncrementGameStartCount();
             scoreManager.ResetScore();
             playerController.RespawnPlayer();
@@ -113,13 +114,17 @@ public class GameManager : MonoBehaviour
         hudController.OnRestartClicked += gameStateManager.RestartGame;
         hudController.OnRestartClicked += blockManager.ResetBlocks;
         hudController.OnRestartClicked += windManager.ResetWindMangaer;
+        hudController.OnRestartClicked += playerController.ResetCurSessionLandCount;
         hudController.OnRestartClicked += () => databaseManager.StartNewSession("restart_button");
 
         // --- 플레이어 이벤트 
 
-        playerController.OnLanded += (acc, combo, playerPos) => scoreManager.HandleLanding(acc);
-        playerController.OnLanded += (acc, combo, playerPos) => databaseManager.LogLanding(playerPos, acc.ToString());
-        playerController.OnLanded += (acc, combo, playerPos) => windManager.PlusLandCount();
+        playerController.OnLanded += (acc, combo, playerPos, sessionLandCount) =>
+        {
+            scoreManager.HandleLanding(acc);
+            databaseManager.LogLanding(playerPos, acc.ToString());
+            windManager.SetLandCount(sessionLandCount);
+        };
         /*playerController.OnLanded += (acc, combo) =>
         {
             if (acc == LandingAccuracy.Perfect) canvasEffectManager.PlayIllustEffect(combo);

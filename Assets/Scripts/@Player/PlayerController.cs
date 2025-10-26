@@ -15,6 +15,11 @@ public class PlayerController : MonoBehaviour
     [Header("콤보")]
     private int combo = 0;
 
+    private int curSessionLandCount = 0;
+    public void PlusCurSessionLandCount() => curSessionLandCount++;
+    public void ResetCurSessionLandCount() => curSessionLandCount = 0;
+    public int GetCurSessionLandCount() => curSessionLandCount;
+
     // 전문가 컴포넌트 참조
     private PlayerState playerState;
     private PlayerInputHandler inputHandler;
@@ -29,7 +34,7 @@ public class PlayerController : MonoBehaviour
 
     // 2. 외부 보고용 이벤트 (Player -> GameManager/ScoreManager 등)
     public event Action<float> OnJumpStart;
-    public event Action<LandingAccuracy, int, Vector3> OnLanded; 
+    public event Action<LandingAccuracy, int, Vector3, int> OnLanded; 
     public event Action OnSeaCollision; 
 
     public void Initiate()
@@ -110,8 +115,8 @@ public class PlayerController : MonoBehaviour
             case LandingAccuracy.Excep:
                 return;
         }
-
-        OnLanded?.Invoke(accuracy, combo, GetPlayerPos());
+        PlusCurSessionLandCount();
+        OnLanded?.Invoke(accuracy, combo, GetPlayerPos(), GetCurSessionLandCount());
     }
 
     // 4. 충돌 핸들러가 "바다 충돌" 보고

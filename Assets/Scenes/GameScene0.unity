@@ -27160,8 +27160,8 @@ MonoBehaviour:
   maxWindPower: 3
   minWindPower: 0
   makeNewWindDelay: 0.5
-  windDifficultyFactor: 0.05
-  noWindBaseWeight: 6
+  windDifficultyFactor: 0.1
+  noWindBaseWeight: 3
 --- !u!1 &1996942603
 GameObject:
   m_ObjectHideFlags: 0

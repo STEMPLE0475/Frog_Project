@@ -32,14 +32,20 @@ public class PlayerCollisionHandler : MonoBehaviour
         {
             Block blockScript = collision.gameObject.GetComponent<Block>();
             if (blockScript == null) return;
-
-            // 상태 변경은 PlayerController가 하도록 여기서는 이벤트만 보냄
-
+           
             if (blockScript.blockType == BlockType.Sink)
             {
-                blockScript.CollisionPlayer();
-                LandingAccuracy accuracy = CalculateLandingAccuracy(transform.position, collision.collider, blockScript);
-                OnLanded?.Invoke(accuracy); // "착지 결과 보고!"
+                if (blockScript.isComboable == true)
+                {
+                    blockScript.CollisionPlayer();
+                    LandingAccuracy accuracy = CalculateLandingAccuracy(transform.position, collision.collider, blockScript);
+                    OnLanded?.Invoke(accuracy);
+                }
+                else
+                {
+                    OnLanded?.Invoke(LandingAccuracy.Excep);
+                }
+                
             } else if (blockScript.blockType == BlockType.Normal)
             {
                 blockScript.CollisionPlayer();

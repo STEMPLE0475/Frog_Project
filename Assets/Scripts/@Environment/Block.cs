@@ -6,6 +6,7 @@ public class Block : MonoBehaviour
     public BlockType blockType = BlockType.Sink;
     public float perfectThreshold = 0.35f;
     public float goodThreshold = 0.8f;
+    public bool isComboable = true;
 
     // 1. 블록의 '진짜' 시작 위치를 저장할 변수
     private Vector3 originalPosition;
@@ -29,6 +30,7 @@ public class Block : MonoBehaviour
         {
             GetComponent<BlockTargetZone>().EnableTargetZone(perfectThreshold);
         }
+        isComboable = true;
     }
 
     public void CollisionPlayer()
@@ -43,6 +45,7 @@ public class Block : MonoBehaviour
             // 2. 코루틴을 변수에 저장
             runningSinkCoroutine = StartCoroutine(StartSink());
         }
+        isComboable = false;
     }
 
     // 3. BlockManager가 호출할 공개 리셋 함수
@@ -57,6 +60,7 @@ public class Block : MonoBehaviour
 
         // 2. 위치를 '진짜' 시작 위치로 되돌림
         transform.position = originalPosition;
+        isComboable = true;
     }
 
     IEnumerator StartSink()

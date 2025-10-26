@@ -2,16 +2,13 @@
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-// (ButtonSound 클래스는 기존과 동일하게 어딘가에 있어야 함)
-// [System.Serializable]
-// public class ButtonSound { ... }
-
 public class AudioManager : MonoBehaviour
 {
     [Header("Audio Sources")]
     [SerializeField] private AudioSource bgmSource;
     [SerializeField] private AudioSource uiSfxSource;
     [SerializeField] private AudioSource inGameSfxSource;
+    [SerializeField] private AudioSource windStartSource;
 
     [Header("Clips & Settings")]
     [SerializeField] private AudioClip bgmClip;
@@ -58,5 +55,10 @@ public class AudioManager : MonoBehaviour
         int index = combo - 1;
         index = Mathf.Clamp(index, 0, comboClips.Count - 1);
         inGameSfxSource.PlayOneShot(comboClips[index]); 
+    }
+
+    public void PlayStartWindSound(Wind wind) {
+        if(wind.power == 0) return;
+        windStartSource.Play();
     }
 }

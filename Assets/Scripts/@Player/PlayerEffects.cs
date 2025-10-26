@@ -18,6 +18,7 @@ public class PlayerEffects : MonoBehaviour
 
     [Header("사운드")]
     [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioSource chargingSfxSource;
     [SerializeField] private AudioClip jumpSfx;
     [SerializeField] private AudioClip landSfx;
     [SerializeField] private AudioClip waterSplashSfx;
@@ -99,6 +100,9 @@ public class PlayerEffects : MonoBehaviour
             sfxSource.PlayOneShot(gameOverSfx);
         }
     }
+
+    public void PlayChargingSfx() => chargingSfxSource.Play();
+    public void StopChargingSfx() => chargingSfxSource.Stop();
 
     // --- 파티클 ---
     public void PlayLandParticles(LandingAccuracy accuracy)

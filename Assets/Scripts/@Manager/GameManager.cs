@@ -145,6 +145,7 @@ public class GameManager : MonoBehaviour
         windManager.OnWindChanged += (wind) => playerController.ApplyNewWind(wind);
         windManager.OnWindChanged += (wind) => canvasManager.UpdateWind(wind);
         windManager.OnWindChanged += (wind) => seaManager.SetSeaSpeed(wind);
+        windManager.OnWindChanged += (wind) => audioManager.PlayStartWindSound(wind);
 
     }
 

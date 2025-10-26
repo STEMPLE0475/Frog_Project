@@ -71,12 +71,14 @@ public class PlayerController : MonoBehaviour
     private void HandleChargeStarted()
     {
         effects.PlayChargeAnimation();
+        effects.PlayChargingSfx();
     }
 
     // 2. 입력 핸들러가 "점프 요청" 보고
     private void HandleJumpRequested(float jumpForce)
     {
         movement.ExecuteJump(jumpForce, () => {
+            effects.StopChargingSfx();
             effects.PlayJumpSound();
             effects.PlayJumpAnimation();
             OnJumpStart?.Invoke(movement.jumpDuration);

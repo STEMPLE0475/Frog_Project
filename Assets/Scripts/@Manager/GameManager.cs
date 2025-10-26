@@ -124,6 +124,7 @@ public class GameManager : MonoBehaviour
             scoreManager.HandleLanding(acc);
             databaseManager.LogLanding(playerPos, acc.ToString());
             windManager.SetLandCount(sessionLandCount);
+            cinemachineCameraManager.ShakeCamera(combo);
         };
         /*playerController.OnLanded += (acc, combo) =>
         {

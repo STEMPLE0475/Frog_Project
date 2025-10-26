@@ -9,6 +9,7 @@ public class CinemachineCameraManager : MonoBehaviour
 
     private Transform playerTransform;
     private Vector3 defaultCinemachineFollowOffset;
+    private CinemachineImpulseSource impulseSource;
 
     [SerializeField] private float defaultFOV = 5f;
     [SerializeField] private Vector3 targetCinemachineFollowOffset = new Vector3(1f, 10f, -10f);
@@ -20,9 +21,13 @@ public class CinemachineCameraManager : MonoBehaviour
     [SerializeField] private float deathZoomFov = 4f;
     [SerializeField] private float deathZoomDuration = 3f;
 
+    //흔들림 강도 계수
+    public float baseIntensityPerLevel = 0.1f;
+
     public void Initiate(Transform playerTransform)
     {
         this.playerTransform = playerTransform;
+        impulseSource = GetComponent<CinemachineImpulseSource>();
         cam = GetComponent<CinemachineCamera>();
         OnFollowStart();
         SetAllCameraFOV(defaultFOV);
@@ -91,6 +96,20 @@ public class CinemachineCameraManager : MonoBehaviour
         cam.Lens = finalLens;
 
         zoomCoroutine = null;
+    }
+
+    public void ShakeCamera(int combo)
+    {
+        // 1. Level을 float 강도 계수로 변환
+        // 예: Level 8 * 0.1f = 최종 강도 0.8f
+        if (combo == 0) return;
+        float finalIntensity = combo * baseIntensityPerLevel;
+
+        // 2. 최종 강도 값이 너무 낮거나 높지 않도록 Clamp (선택 사항)
+        // finalIntensity = Mathf.Clamp(finalIntensity, 0f, 1.5f); 
+
+        // 3. GenerateImpulse()에 계산된 강도(Velocity)를 전달하여 스케일 조절
+        impulseSource.GenerateImpulse(finalIntensity);
     }
 
     public void DeathZoomStart() => zoomCoroutine = StartCoroutine(DeathZoomCoroutine());

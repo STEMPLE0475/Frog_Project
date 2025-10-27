@@ -44,7 +44,7 @@ public class WindManager : MonoBehaviour
     }
 
     public void StartMakeNewWind() {
-        Debug.Log(currentSessionLandCount);
+        //Debug.Log(currentSessionLandCount);
         if (currentSessionLandCount > 0 && currentSessionLandCount % baseChangeWindCycleTerm == 0)
         {
             StartCoroutine(MakeNewWindCoroutine(currentSessionLandCount));

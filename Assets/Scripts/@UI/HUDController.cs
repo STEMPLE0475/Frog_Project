@@ -6,7 +6,6 @@ using System; // (⭐ Event 사용을 위해 추가)
 
 public class HUDController : MonoBehaviour
 {
-    // --- (⭐ 신규: 외부 보고용 이벤트) ---
     public event Action<string> OnStartGameClicked; // 닉네임을 함께 보냄
     public event Action OnResumeGameClicked;
     public event Action OnQuitGameClicked;
@@ -32,8 +31,8 @@ public class HUDController : MonoBehaviour
     [SerializeField] private Button pauseQuitB;
 
     [Header("Buttons (GameOverPanel)")]
-    [SerializeField] private Button restartB; 
-    [SerializeField] private Button gameOverEndB; 
+    [SerializeField] private Button restartB;
+    [SerializeField] private Button gameOverEndB;
 
     [Header("Fade Settings")]
     [SerializeField] private float fadeTime = 0.3f;
@@ -41,7 +40,8 @@ public class HUDController : MonoBehaviour
     [Header("Input Text")]
     [SerializeField] private TextMeshProUGUI input_field;
 
-    // --- (⭐ GameManager gm; 삭제) ---
+    [Header("Leader Board")]
+    [SerializeField] private TextMeshProUGUI leaderBoard;
 
     // (⭐ 수정됨: GameManager 참조 제거)
     public void Initiate()
@@ -145,7 +145,7 @@ public class HUDController : MonoBehaviour
         ShowHUD(true);
         ShowMainMenu(false);
         ShowPausePanel(false);
-        StartCoroutine(GameOverCoroutine());}
+        StartCoroutine(GameOverCoroutine()); }
 
     IEnumerator GameOverCoroutine()
     {
@@ -156,7 +156,6 @@ public class HUDController : MonoBehaviour
 
     // ========== 버튼 클릭 이벤트 ==========
 
-    // (⭐ 수정됨: GameManager 호출 대신 이벤트 발생)
     private void OnClickStart()
     {
         // 1. 내부 UI 로직은 스스로 처리
@@ -198,5 +197,11 @@ public class HUDController : MonoBehaviour
     {
         ShowGameOverPanel(false);
         OnRestartClicked?.Invoke();
+    }
+
+    public void Update_LeaderBoardTMP(string txt)
+    {
+        leaderBoard.text = txt;
+        Debug.Log("리더보드 갱신");
     }
 }

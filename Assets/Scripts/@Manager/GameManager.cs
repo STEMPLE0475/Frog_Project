@@ -62,21 +62,24 @@ public class GameManager : MonoBehaviour
         // 게임 상태 매니저 초기화 (제어할 대상들을 넘겨줌)
         gameStateManager.Initiate(playerController, hudController, audioManager);
 
+        ShowTop10Ranking();
+
         // 3. === 이벤트 연결 ===
 
         // --- DB 로드 이벤트 ---
         databaseManager.OnUserDataLoaded += scoreManager.SetInitialMaxScore;
         databaseManager.OnUserDataLoaded += (userData) => {
-            canvasManager.UpdateGameOverMaxScore(userData.HighScore);
+            canvasManager.Update_GameOverMaxScore(userData.HighScore);
+            canvasManager.Update_Header_MaxScore(userData.HighScore);
         };
 
         // --- 스코어 변경 이벤트 ---
         scoreManager.OnScoreChanged += (score) => {
-            canvasManager.UpdateInGameScore(score);
-            canvasManager.UpdateGameOverCurrentScore(score);
+            canvasManager.Update_Header_CurrentScore(score);
+            canvasManager.Update_GameOverCurrentScore(score);
         };
         scoreManager.OnMaxScoreChanged += (maxScore) => {
-            canvasManager.UpdateGameOverMaxScore(maxScore);
+            canvasManager.Update_GameOverMaxScore(maxScore);
         };
 
         // --- 게임 상태 이벤트 ---
@@ -90,10 +93,10 @@ public class GameManager : MonoBehaviour
             playerController.RespawnPlayer();
             windManager.ResetWindMangaer();
             cinemachineCameraManager.ResetCamera();
-            canvasManager.SetInGameScoreActive(true);
+            canvasManager.SetActive_Header(true);
             databaseManager.StartNewSession("start_button");
             canvasManager.StartTutorialImageBlink();
-
+            
         };
 
         // 게임 종료
@@ -101,11 +104,11 @@ public class GameManager : MonoBehaviour
         {
             scoreManager.SaveScore();
             databaseManager.EndCurrentSession(scoreManager.GetMaxScore());
-            // 랭킹(최고기록) 반영
+            // 랭킹(최고기록) 반영 -> 비동기 실행
             _ = databaseManager.SaveHighScoreIfBestAsync(scoreManager.GetMaxScore());
             hudController.GameOver();
             cinemachineCameraManager.DeathZoomStart();
-            canvasManager.SetInGameScoreActive(false);
+            canvasManager.SetActive_Header(false);
         };
 
 
@@ -196,8 +199,7 @@ public class GameManager : MonoBehaviour
         }
 
         string top10 = task.Result;
-        // TODO: 프로젝트 UI에 맞게 표시 (예시)
-        // canvasManager.UpdateTop10Text(top10);
-        Debug.Log($"[TOP10]\n{top10}");
+
+        hudController.Update_LeaderBoardTMP(top10);
     }
 }

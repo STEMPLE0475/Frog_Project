@@ -58,8 +58,7 @@ public class GameStateManager : MonoBehaviour
         isGameStarted = true;
         playerController.EnableInput(true);
 
-        // canvasManager.InGameScoreTMP.gameObject.SetActive(true); // 이건 CanvasManager가
-        OnGameStart?.Invoke(); // 게임 시작 이벤트 발생
+        OnGameStart?.Invoke(); 
     }
 
     public void PauseGame()

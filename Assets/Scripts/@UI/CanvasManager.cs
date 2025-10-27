@@ -6,53 +6,42 @@ using UnityEngine.UI;
 
 public class CanvasManager : MonoBehaviour
 {
-    [Header("점수판 UI")]
-    [SerializeField] private TextMeshProUGUI InGameScoreTMP;
+    [Header("Header")]
+    [SerializeField] private GameObject Header;
+    [SerializeField] private TextMeshProUGUI Header_CurrentScoreTMP;
+    [SerializeField] private TextMeshProUGUI Header_MaxScoreTMP;
+    [SerializeField] private TextMeshProUGUI windIcon;
+
+    [Header("ETC")]
     [SerializeField] private TextMeshProUGUI gameOverScoreTMP;
     [SerializeField] private TextMeshProUGUI gameOverScoreBestTMP;
     [SerializeField] private TutorialImage tutorialImage;
     [SerializeField] private WindChangeEffect windChangeEffect;
-    [SerializeField] private TextMeshProUGUI windIcon;
 
     public void Initiate()
     {
-        InGameScoreTMP.gameObject.SetActive(false);
+        SetActive_Header(false);
 
         // 게임 시작 시 점수판 초기화
-        UpdateInGameScore(0);
-        UpdateGameOverCurrentScore(0);
-        UpdateGameOverMaxScore(0);
+        Update_Header_CurrentScore(0);
+        Update_GameOverCurrentScore(0);
+        Update_GameOverMaxScore(0);
         windChangeEffect.Initiate();
     }
-    public void StartTutorialImageBlink()
-    {
-        tutorialImage.StartBlink();
-    }
-    // === ScoreManager가 호출할 공개 메서드들 ===
+    public void StartTutorialImageBlink() => tutorialImage.StartBlink();
 
-    public void UpdateInGameScore(int score)
-    {
-        InGameScoreTMP.text = score.ToString() + "점";
-    }
+    // 헤더 UI
+    public void SetActive_Header(bool isActive) => Header.SetActive(isActive);
+    public void Update_Header_CurrentScore(int score) => Header_CurrentScoreTMP.text = score.ToString() + "점";
+    public void Update_Header_MaxScore(int score) => Header_MaxScoreTMP.text = score.ToString() + "점";
 
-    public void UpdateGameOverCurrentScore(int currentScore)
-    {
-        gameOverScoreTMP.text = "현재 점수 : " + currentScore.ToString() + "점";
-    }
+    // 게임 종료 UI
+    public void Update_GameOverCurrentScore(int currentScore) => gameOverScoreTMP.text = "현재 점수 : " + currentScore.ToString() + "점";
+    public void Update_GameOverMaxScore(int maxScore) => gameOverScoreBestTMP.text = "최고 점수 : " + maxScore.ToString() + "점";
 
-    public void UpdateGameOverMaxScore(int maxScore)
-    {
-        gameOverScoreBestTMP.text = "최고 점수 : " + maxScore.ToString() + "점";
-    }
-
-    public void SetInGameScoreActive(bool isActive)
-    {
-        InGameScoreTMP.gameObject.SetActive(isActive);
-    }
-
+    // Wind 관련
     public void UpdateWind(Wind wind)
     {
-        // 디버그 로그는 그대로 유지
         Debug.Log("바람 방향 : " + wind.direction.ToString());
         Debug.Log("바람 힘 " + wind.power.ToString());
 
@@ -74,8 +63,6 @@ public class CanvasManager : MonoBehaviour
         // 기존 바람 변화 효과 메서드는 그대로 유지
         windChangeEffect.StartWindChangeEffect(wind);
     }
-
-    // GetWindSpriteIndex 대신 GetWindText 메서드 사용
     private string GetWindText(Wind wind)
     {
         // 1. 바람 힘이 0일 경우 (바람 없음) -> "-" 표시

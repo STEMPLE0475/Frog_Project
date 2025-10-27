@@ -71,6 +71,7 @@ public class GameManager : MonoBehaviour
         databaseManager.OnUserDataLoaded += (userData) => {
             canvasManager.Update_GameOverMaxScore(userData.HighScore);
             canvasManager.Update_Header_MaxScore(userData.HighScore);
+            gameStateManager.StartGame();
         };
 
         // --- 스코어 변경 이벤트 ---
@@ -79,6 +80,7 @@ public class GameManager : MonoBehaviour
             canvasManager.Update_GameOverCurrentScore(score);
         };
         scoreManager.OnMaxScoreChanged += (maxScore) => {
+            canvasManager.Update_Header_MaxScore(maxScore);
             canvasManager.Update_GameOverMaxScore(maxScore);
         };
 
@@ -106,6 +108,7 @@ public class GameManager : MonoBehaviour
             databaseManager.EndCurrentSession(scoreManager.GetMaxScore());
             // 랭킹(최고기록) 반영 -> 비동기 실행
             _ = databaseManager.SaveHighScoreIfBestAsync(scoreManager.GetMaxScore());
+            ShowTop10Ranking(); // 리더보드 갱신
             hudController.GameOver();
             cinemachineCameraManager.DeathZoomStart();
             canvasManager.SetActive_Header(false);
@@ -163,22 +166,14 @@ public class GameManager : MonoBehaviour
 
     // === 함수 ===
 
-    private async void HandleStartGameRequest(string nickname)
+    private void HandleStartGameRequest(string nickname) // async 필요 없음
     {
         if (string.IsNullOrWhiteSpace(nickname))
         {
             Debug.LogWarning("닉네임이 비어있습니다.");
             return;
         }
-
-        // 🔹 닉네임을 그대로 저장 (중복 허용)
-        await databaseManager.SaveNicknameRawAsync(nickname);
-
-        // 🔹 유저 데이터 로드 및 세션 준비
         databaseManager.HandleUserAuthentication(nickname);
-
-        // 🔹 게임 시작
-        gameStateManager.StartGame();
     }
 
     // 랭킹 화면을 열 때 호출 (버튼 OnClick 등에 연결해도 됨)

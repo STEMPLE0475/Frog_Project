@@ -42,6 +42,7 @@ public class HUDController : MonoBehaviour
 
     [Header("Leader Board")]
     [SerializeField] private TextMeshProUGUI leaderBoard;
+    [SerializeField] private TextMeshProUGUI leaderBoard2;
 
     // (⭐ 수정됨: GameManager 참조 제거)
     public void Initiate()
@@ -202,6 +203,7 @@ public class HUDController : MonoBehaviour
     public void Update_LeaderBoardTMP(string txt)
     {
         leaderBoard.text = txt;
+        leaderBoard2.text = txt;
         Debug.Log("리더보드 갱신");
     }
 }

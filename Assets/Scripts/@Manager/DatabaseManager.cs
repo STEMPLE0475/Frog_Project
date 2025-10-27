@@ -3,6 +3,8 @@ using Firebase.Firestore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Text;
+using System.Linq;
 using UnityEngine;
 
 public class DatabaseManager : MonoBehaviour
@@ -37,24 +39,13 @@ public class DatabaseManager : MonoBehaviour
     private void Start()
     {
         // === 간단 동작 테스트 ===
-        // 에디터에서 DatabaseManager 단독 실행 시,
-        // 한 번의 세션을 흉내 내며 로그가 잘 쌓이는지 확인합니다.
         if (ENABLE_DB_START_TEST)
         {
-            // 1) 세션 시작
-            string sid = StartNewSession("manual_test"); // 세션 ID 반환
-
-            // 2) 점프/착지 로그 2회
+            string sid = StartNewSession("manual_test");
             LogLanding(new Vector3(1.2f, 0f, 3.4f), "Perfect");
             LogLanding(new Vector3(2.5f, 0f, 4.1f), "Good");
-
-            // 3) 콤보 갱신(예: 7콤보)
             LogCombo(7);
-
-            // 4) 사망 위치 기록
             LogDeath(new Vector3(5.0f, -2.0f, 8.0f));
-
-            // 5) 세션 종료(최종점수=1234)
             EndCurrentSession(finalScore: 1234);
         }
     }
@@ -76,39 +67,17 @@ public class DatabaseManager : MonoBehaviour
         return deviceID;
     }
 
+    // ✅ 중복 허용: 닉네임이 들어오면 내 문서에 그대로 저장하고, 인증은 내 deviceID로만 처리
     public void HandleUserAuthentication(string inputNickname)
     {
-        if (string.IsNullOrEmpty(inputNickname))
+        if (!string.IsNullOrWhiteSpace(inputNickname))
         {
-            ProcessDataByDeviceID(currentDeviceID, inputNickname);
-            return;
+            // 표시용 닉네임을 저장(비동기, 중복 허용)
+            _ = SaveNicknameRawAsync(inputNickname);
         }
 
-        db.Collection("users")
-          .WhereEqualTo("Nickname", inputNickname)
-          .Limit(1)
-          .GetSnapshotAsync()
-          .ContinueWithOnMainThread(queryTask =>
-          {
-              QuerySnapshot snapshot = queryTask.Result;
-
-              if (snapshot.Count > 0)
-              {
-                  // 닉네임 일치 시 ID 교체
-                  string existingDocId = snapshot[0].Id;
-                  PlayerPrefs.SetString(DEVICE_ID_KEY, existingDocId);
-                  PlayerPrefs.Save();
-                  currentDeviceID = existingDocId;
-
-                  ProcessDataByDeviceID(existingDocId, inputNickname);
-              }
-              else
-              {
-                  ProcessDataByDeviceID(currentDeviceID, inputNickname);
-              }
-          });
-        // ProcessDataByDeviceID가 성공적으로 loadedUserData를 채웠을 때
-        // OnUserDataLoaded?.Invoke(loadedUserData); 를 호출해야 함.
+        // 내 deviceID 기준으로만 데이터 로드
+        ProcessDataByDeviceID(currentDeviceID, inputNickname ?? "");
     }
 
     private void ProcessDataByDeviceID(string docId, string inputNickname)
@@ -128,7 +97,6 @@ public class DatabaseManager : MonoBehaviour
             }
             else
             {
-                // 권장: CreatedAt(Timestamp) 필드 추가를 고려하세요(신규/복귀 집계에 유리)
                 UserData initialData = new UserData
                 {
                     Nickname = finalNickname,
@@ -141,10 +109,7 @@ public class DatabaseManager : MonoBehaviour
                 loadedUserData = initialData;
             }
 
-            // DAU 마킹(선택) - KST 당일 활성 흔적
             MarkDailyActive("app_open");
-
-            // 데이터 로드 알림
             OnUserDataLoaded?.Invoke(loadedUserData);
         });
     }
@@ -158,14 +123,14 @@ public class DatabaseManager : MonoBehaviour
           .UpdateAsync("GameStartCount", FieldValue.Increment(1));
     }
 
-    // 최고 점수 저장 시
+    // 최고 점수 저장 시(기존 로컬용)
     public void SaveHighScore(int newHighScore)
     {
         if (loadedUserData == null || newHighScore <= loadedUserData.HighScore) return;
 
-        loadedUserData.HighScore = newHighScore; // 로컬 데이터 갱신
-
+        loadedUserData.HighScore = newHighScore;
         if (string.IsNullOrEmpty(currentDeviceID)) return;
+
         DocumentReference docRef = db.Collection("users").Document(currentDeviceID);
         docRef.UpdateAsync("HighScore", newHighScore);
     }
@@ -196,15 +161,6 @@ public class DatabaseManager : MonoBehaviour
     }
 
     // ===================== 신규: 세션 로깅용 공개 API =====================
-
-    /// <summary>
-    /// 세션 시작 함수
-    /// - 언제 호출? : "게임 시작" 버튼 직후(실제 플레이 진입 시)
-    /// - 인수 : startReason(string) - 세션 시작 사유(예: "start_button", "retry" 등)
-    /// - 반환 : sessionId(string) - 이후 이벤트/종료에 사용할 세션 식별자
-    /// - 저장 위치 : /users/{uid}/sessions/{sessionId}
-    /// - 효과 : 내부 카운터 초기화, startedAt 기록
-    /// </summary>
     public string StartNewSession(string startReason = "start_button")
     {
         if (string.IsNullOrEmpty(currentDeviceID))
@@ -213,7 +169,7 @@ public class DatabaseManager : MonoBehaviour
             return null;
         }
 
-        _currentSessionId = Guid.NewGuid().ToString("N"); // 32자
+        _currentSessionId = Guid.NewGuid().ToString("N");
         _sessionStartLocal = DateTime.UtcNow;
         _sessionJumpCount = 0;
         _sessionBestCombo = 0;
@@ -226,7 +182,7 @@ public class DatabaseManager : MonoBehaviour
 
         var payload = new Dictionary<string, object>
         {
-            { "startedAt", FieldValue.ServerTimestamp }, // 서버 기준
+            { "startedAt", FieldValue.ServerTimestamp },
             { "startReason", startReason },
             { "jumpCount", 0 },
             { "bestCombo", 0 },
@@ -236,20 +192,10 @@ public class DatabaseManager : MonoBehaviour
         };
 
         sessionRef.SetAsync(payload);
-        MarkDailyActive("game_start"); // DAU용 흔적
-
+        MarkDailyActive("game_start");
         return _currentSessionId;
     }
 
-    /// <summary>
-    /// 세션 종료 함수
-    /// - 언제 호출? : "게임 오버" 또는 "스테이지 클리어" 등 플레이 종료 시점
-    /// - 인수 :
-    ///   finalScore(int) - 세션 최종 점수
-    /// - 반환 : void
-    /// - 저장 위치 : /users/{uid}/sessions/{sessionId}
-    /// - 효과 : endedAt, 최종 점수, 점프 수, 최고 콤보, 사망 지점까지 요약 반영
-    /// </summary>
     public void EndCurrentSession(int finalScore)
     {
         if (!EnsureSession("EndCurrentSession")) return;
@@ -269,21 +215,9 @@ public class DatabaseManager : MonoBehaviour
         };
 
         sessionRef.UpdateAsync(update);
-
-        // 세션 종료 후 내부 상태 정리(선택)
-        // _currentSessionId = null;  // 필요 시 주석 해제
+        // _currentSessionId = null; // 필요 시 해제
     }
 
-    /// <summary>
-    /// ✅ 점프 착지 이벤트 기록
-    /// - 언제 호출? : 플레이어가 "착지" 판정을 받은 즉시
-    /// - 인수 :
-    ///   landingPosition(Vector3) - 착지 좌표(월드/로컬 중 한 기준으로 통일)
-    ///   accuracy(string)         - "Perfect", "Good" 등 판정 텍스트
-    /// - 반환 : void
-    /// - 저장 위치 : /users/{uid}/sessions/{sessionId}/events/{autoId}
-    /// - 효과 : 원시 이벤트로 남기며, 세션 jumpCount 증가
-    /// </summary>
     public void LogLanding(Vector3 landingPosition, string accuracy)
     {
         if (!EnsureSession("LogLanding")) return;
@@ -293,7 +227,7 @@ public class DatabaseManager : MonoBehaviour
         var evRef = db.Collection("users")
                       .Document(currentDeviceID)
                       .Collection("sessions").Document(_currentSessionId)
-                      .Collection("events").Document(); // autoId
+                      .Collection("events").Document();
 
         var payload = new Dictionary<string, object>
         {
@@ -306,15 +240,6 @@ public class DatabaseManager : MonoBehaviour
         evRef.SetAsync(payload);
     }
 
-    /// <summary>
-    /// ✅ 사망(실패) 이벤트 기록
-    /// - 언제 호출? : 플레이어가 실패/사망 판정될 때(물에 떨어짐 등)
-    /// - 인수 :
-    ///   deathPosition(Vector3) - 사망 좌표
-    /// - 반환 : void
-    /// - 저장 위치 : /users/{uid}/sessions/{sessionId}/events/{autoId}
-    /// - 효과 : 세션 요약에 마지막 사망 지점으로도 반영
-    /// </summary>
     public void LogDeath(Vector3 deathPosition)
     {
         if (!EnsureSession("LogDeath")) return;
@@ -336,15 +261,6 @@ public class DatabaseManager : MonoBehaviour
         evRef.SetAsync(payload);
     }
 
-    /// <summary>
-    /// ✅ 콤보 갱신 이벤트
-    /// - 언제 호출? : 콤보 수가 갱신될 때(점프 연속 성공 등)
-    /// - 인수 :
-    ///   combo(int) - 현재 콤보 수
-    /// - 반환 : void
-    /// - 저장 위치 : /users/{uid}/sessions/{sessionId}/events/{autoId}
-    /// - 효과 : 세션 최고 콤보 갱신(bestCombo), 원시 이벤트 남김
-    /// </summary>
     public void LogCombo(int combo)
     {
         if (!EnsureSession("LogCombo")) return;
@@ -367,8 +283,6 @@ public class DatabaseManager : MonoBehaviour
     }
 
     // ===================== 내부 유틸 =====================
-
-    // Vector3 -> Firestore 저장용 Map
     private Dictionary<string, object> Vec(Vector3 v)
     {
         return new Dictionary<string, object>
@@ -377,7 +291,6 @@ public class DatabaseManager : MonoBehaviour
         };
     }
 
-    // 세션이 없을 때 방어 + 경고 로그
     private bool EnsureSession(string caller)
     {
         if (string.IsNullOrEmpty(currentDeviceID))
@@ -391,6 +304,119 @@ public class DatabaseManager : MonoBehaviour
             return false;
         }
         return true;
+    }
+
+    private DocumentReference CurrentUserRef()
+    {
+        return db.Collection("users").Document(currentDeviceID);
+    }
+
+    private string NormalizeNicknameLower(string s)
+    {
+        if (string.IsNullOrWhiteSpace(s)) return "";
+        return s.Trim().ToLowerInvariant();
+    }
+
+    // ==================== 닉네임 '그대로' 저장(중복 허용) + 리더보드 동기화 ====================
+    public async Task SaveNicknameRawAsync(string nicknameRaw)
+    {
+        if (string.IsNullOrEmpty(currentDeviceID)) return;
+
+        var userRef = CurrentUserRef();
+        var lbRef = db.Collection("leaderboard").Document(currentDeviceID);
+
+        await Task.WhenAll(
+            userRef.SetAsync(new Dictionary<string, object> {
+                { "Nickname", nicknameRaw },
+                { "UpdatedAt", FieldValue.ServerTimestamp }
+            }, SetOptions.MergeAll),
+
+            lbRef.SetAsync(new Dictionary<string, object> {
+                { "uid", currentDeviceID },
+                { "nickname", nicknameRaw },                         // 표시용 원문
+                { "nicknameLower", NormalizeNicknameLower(nicknameRaw) }, // 조회 최적화
+                { "UpdatedAt", FieldValue.ServerTimestamp }
+            }, SetOptions.MergeAll)
+        );
+
+        if (loadedUserData == null) loadedUserData = new UserData();
+        loadedUserData.Nickname = nicknameRaw;
+        OnUserDataLoaded?.Invoke(loadedUserData);
+    }
+
+    // ==================== 최고기록 저장(더 클 때만) ====================
+    public async Task SaveHighScoreIfBestAsync(int candidateScore)
+    {
+        if (string.IsNullOrEmpty(currentDeviceID)) return;
+
+        int currentBest = loadedUserData?.HighScore ?? 0;
+        if (candidateScore <= currentBest) return;
+
+        if (loadedUserData == null) loadedUserData = new UserData();
+        loadedUserData.HighScore = candidateScore;
+
+        var userRef = CurrentUserRef();
+        var lbRef = db.Collection("leaderboard").Document(currentDeviceID);
+
+        var nicknameRaw = loadedUserData.Nickname ?? ("User_" + currentDeviceID.Substring(0, 5).ToUpper());
+        var nicknameLower = NormalizeNicknameLower(nicknameRaw);
+
+        await Task.WhenAll(
+            userRef.UpdateAsync(new Dictionary<string, object> {
+                { "HighScore", candidateScore },
+                { "UpdatedAt", FieldValue.ServerTimestamp }
+            }),
+            lbRef.SetAsync(new Dictionary<string, object> {
+                { "uid", currentDeviceID },
+                { "nickname", nicknameRaw },
+                { "nicknameLower", nicknameLower },
+                { "HighScore", candidateScore },
+                { "UpdatedAt", FieldValue.ServerTimestamp }
+            }, SetOptions.MergeAll)
+        );
+    }
+
+    // ==================== 특정 닉네임의 최고기록 조회(동닉네임 다수 → 최고점 1건) ====================
+    public async Task<int?> GetHighScoreByNicknameAsync(string nicknameRaw)
+    {
+        string nicknameLower = NormalizeNicknameLower(nicknameRaw);
+        if (string.IsNullOrEmpty(nicknameLower)) return null;
+
+        var snap = await db.Collection("leaderboard")
+            .WhereEqualTo("nicknameLower", nicknameLower)
+            .OrderByDescending("HighScore")   // 동닉네임 중 최고점 1건
+            .Limit(1)
+            .GetSnapshotAsync();
+
+        var doc = snap.Documents.FirstOrDefault();  // IEnumerable → 인덱싱 대신
+        if (doc == null) return null;
+
+        return doc.ContainsField("HighScore")
+            ? (int)(doc.GetValue<long>("HighScore"))
+            : 0;
+    }
+
+    // ==================== TOP10 랭킹 문자열 ====================
+    public async Task<string> GetTop10RankingStringAsync()
+    {
+        var snap = await db.Collection("leaderboard")
+            .OrderByDescending("HighScore")
+            .OrderBy("UpdatedAt") // 동점 시 최근 갱신 우선
+            .Limit(10)
+            .GetSnapshotAsync();
+
+        if (snap.Count == 0) return "랭킹 데이터가 없습니다.";
+
+        StringBuilder sb = new StringBuilder();
+        int rank = 1;
+        foreach (var doc in snap.Documents)
+        {
+            string name = doc.ContainsField("nickname") ? doc.GetValue<string>("nickname") : "(닉네임없음)";
+            int score = doc.ContainsField("HighScore") ? (int)(doc.GetValue<long>("HighScore")) : 0;
+            sb.AppendLine($"{rank}위 {name} - {score}");
+            rank++;
+        }
+        return sb.ToString();
     }
 }
 

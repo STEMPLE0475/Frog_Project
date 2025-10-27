@@ -93,6 +93,7 @@ public class GameManager : MonoBehaviour
             canvasManager.SetInGameScoreActive(true);
             databaseManager.StartNewSession("start_button");
             canvasManager.StartTutorialImageBlink();
+
         };
 
         // 게임 종료
@@ -100,6 +101,8 @@ public class GameManager : MonoBehaviour
         {
             scoreManager.SaveScore();
             databaseManager.EndCurrentSession(scoreManager.GetMaxScore());
+            // 랭킹(최고기록) 반영
+            _ = databaseManager.SaveHighScoreIfBestAsync(scoreManager.GetMaxScore());
             hudController.GameOver();
             cinemachineCameraManager.DeathZoomStart();
             canvasManager.SetInGameScoreActive(false);
@@ -157,12 +160,44 @@ public class GameManager : MonoBehaviour
 
     // === 함수 ===
 
-    private void HandleStartGameRequest(string nickname)
+    private async void HandleStartGameRequest(string nickname)
     {
-        // 1. DB에 인증 요청
+        if (string.IsNullOrWhiteSpace(nickname))
+        {
+            Debug.LogWarning("닉네임이 비어있습니다.");
+            return;
+        }
+
+        // 🔹 닉네임을 그대로 저장 (중복 허용)
+        await databaseManager.SaveNicknameRawAsync(nickname);
+
+        // 🔹 유저 데이터 로드 및 세션 준비
         databaseManager.HandleUserAuthentication(nickname);
 
-        // 2. 게임 상태 매니저에 시작 명령
+        // 🔹 게임 시작
         gameStateManager.StartGame();
+    }
+
+    // 랭킹 화면을 열 때 호출 (버튼 OnClick 등에 연결해도 됨)
+    public void ShowTop10Ranking()
+    {
+        StartCoroutine(CoShowTop10Ranking());
+    }
+
+    private System.Collections.IEnumerator CoShowTop10Ranking()
+    {
+        var task = databaseManager.GetTop10RankingStringAsync(); // 문자열 한 방에 받기
+        while (!task.IsCompleted) yield return null;
+
+        if (task.Exception != null)
+        {
+            Debug.LogWarning($"랭킹 조회 실패: {task.Exception}");
+            yield break;
+        }
+
+        string top10 = task.Result;
+        // TODO: 프로젝트 UI에 맞게 표시 (예시)
+        // canvasManager.UpdateTop10Text(top10);
+        Debug.Log($"[TOP10]\n{top10}");
     }
 }

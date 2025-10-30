@@ -2,6 +2,8 @@
 using UnityEngine.InputSystem;
 using System;
 
+[RequireComponent(typeof(PlayerState))]
+[RequireComponent(typeof(PlayerInput))]
 public class PlayerInputHandler : MonoBehaviour
 {
     [Header("점프 파워 설정")]
@@ -21,43 +23,58 @@ public class PlayerInputHandler : MonoBehaviour
     private bool isCharging = false;
     private bool inputEnabled = true;
 
-    public void initiate()
+    public void Initiate()
     {
         playerState = GetComponent<PlayerState>();
         playerInput = GetComponent<PlayerInput>();
         keyboard = Keyboard.current;
+
+        if (playerState == null) Debug.LogError("[PlayerInputHandler] PlayerState가 없습니다.");
+        if (playerInput == null) Debug.LogError("[PlayerInputHandler] PlayerInput이 없습니다.");
+        if (keyboard == null) Debug.LogWarning("[PlayerInputHandler] Keyboard.current가 null (플랫폼/포커스 확인)");
         currentJumpForce = minJumpForce;
     }
 
     void Update()
     {
-        if (!inputEnabled || playerState.IsFloating || keyboard == null) return;
+        // 아직 초기화 안됐으면 재시도하고, 그래도 없으면 리턴
+        if (keyboard == null)
+            keyboard = Keyboard.current;
+
+        if (!inputEnabled || playerState == null || keyboard == null || playerState.IsFloating)
+            return;
 
         HandleInput();
     }
 
     private void HandleInput()
     {
-        // 스페이스바를 처음 눌렀을 때
-        if (keyboard.spaceKey.wasPressedThisFrame && !playerState.IsAirborne)
+        if (keyboard == null || playerState == null) return;
+
+        // 일부 플랫폼/디바이스에서 spaceKey가 null일 수도 있어 보호
+        var space = keyboard.spaceKey;
+        if (space == null) return;
+
+        // 스페이스 처음 눌렀을 때
+        if (space.wasPressedThisFrame && !playerState.IsAirborne)
         {
             isCharging = true;
             currentJumpForce = minJumpForce;
-            OnChargeStarted?.Invoke(); // "충전 시작!" 이벤트 발생
+            OnChargeStarted?.Invoke();
         }
 
-        // 스페이스바를 누르고 있는 동안
-        if (keyboard.spaceKey.isPressed && isCharging)
+        // 누르는 중
+        if (space.isPressed && isCharging)
         {
             currentJumpForce += chargeRate * Time.deltaTime;
             currentJumpForce = Mathf.Clamp(currentJumpForce, minJumpForce, maxJumpForce);
         }
 
-        // 스페이스바에서 손을 뗐을 때
-        if (keyboard.spaceKey.wasReleasedThisFrame && isCharging && !playerState.IsAirborne)
+        // 뗐을 때
+        if (space.wasReleasedThisFrame && isCharging && !playerState.IsAirborne)
         {
             isCharging = false;
-            OnJumpRequested?.Invoke(currentJumpForce); // "이 힘으로 점프!" 이벤트 발생
+            OnJumpRequested?.Invoke(currentJumpForce);
         }
     }
 

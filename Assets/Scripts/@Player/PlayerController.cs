@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
         effects = GetComponent<PlayerEffects>();
         collisionHandler = GetComponent<PlayerCollisionHandler>();
 
-        inputHandler.initiate();
+        inputHandler.Initiate();
         movement.Initiate();
         effects.Initiate();
         collisionHandler.Initiate();

@@ -2,6 +2,7 @@
 using System;
 
 [RequireComponent(typeof(BoxCollider))]
+[RequireComponent(typeof(PlayerState))]
 public class PlayerCollisionHandler : MonoBehaviour
 {
     // PlayerController가 구독할 이벤트
@@ -18,35 +19,40 @@ public class PlayerCollisionHandler : MonoBehaviour
     {
         playerState = GetComponent<PlayerState>();
         boxCollider = GetComponent<BoxCollider>();
+        if (playerState == null) Debug.LogError("[PlayerCollisionHandler] PlayerState가 없습니다.");
+        if (boxCollider == null) Debug.LogError("[PlayerCollisionHandler] BoxCollider가 없습니다.");
     }
 
     private void OnCollisionEnter(Collision collision)
     {
+        // playerState 미초기화 방어
+        if (playerState == null) return;
+
         if (collision.gameObject.CompareTag(SeaTag))
         {
-            OnSeaCollision?.Invoke(transform.position); // "바다와 충돌!"
+            OnSeaCollision?.Invoke(transform.position);
             return;
         }
 
         if (collision.gameObject.CompareTag(BlockTag) && playerState.IsAirborne)
         {
-            Block blockScript = collision.gameObject.GetComponent<Block>();
+            var blockScript = collision.gameObject.GetComponent<Block>();
             if (blockScript == null) return;
-           
+
             if (blockScript.blockType == BlockType.Sink)
             {
-                if (blockScript.isComboable == true)
+                if (blockScript.isComboable)
                 {
                     blockScript.CollisionPlayer();
-                    LandingAccuracy accuracy = CalculateLandingAccuracy(transform.position, collision.collider, blockScript);
-                    OnLanded?.Invoke(accuracy);
+                    var acc = CalculateLandingAccuracy(transform.position, collision.collider, blockScript);
+                    OnLanded?.Invoke(acc);
                 }
                 else
                 {
                     OnLanded?.Invoke(LandingAccuracy.Excep);
                 }
-                
-            } else if (blockScript.blockType == BlockType.Normal)
+            }
+            else if (blockScript.blockType == BlockType.Normal)
             {
                 blockScript.CollisionPlayer();
                 OnLanded?.Invoke(LandingAccuracy.Excep);

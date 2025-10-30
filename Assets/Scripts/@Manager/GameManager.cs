@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour
     [Header("Game Variables")]
     [SerializeField] private List<ButtonSound> buttonSounds;
 
-    private void Awake()
+    private async void Awake()
     {
         // 1. 모든 전문 매니저 컴포넌트 가져오기
         gameStateManager = GetComponent<GameStateManager>();
@@ -42,12 +42,17 @@ public class GameManager : MonoBehaviour
         windManager = GetComponent<WindManager>();
 
         // 2. 각 매니저 'Initiate' (의존성 주입)
-        databaseManager.Initiate();
+        await databaseManager.Initiate();
         audioManager.Initiate(buttonSounds);
         scoreManager.Initiate();
 
         // (씬에 있는 객체들 초기화)
         playerController.Initiate();
+        var collisionHandler = playerController.GetComponent<PlayerCollisionHandler>();
+        collisionHandler?.Initiate();
+
+        var inputHandler = playerController.GetComponent<PlayerInputHandler>();
+        inputHandler?.Initiate();
         cinemachineCameraManager.Initiate(playerController.transform);
 
         blockManager.Initiate();
@@ -131,7 +136,7 @@ public class GameManager : MonoBehaviour
         playerController.OnLanded += (acc, combo, playerPos, sessionLandCount) =>
         {
             scoreManager.HandleLanding(acc);
-            databaseManager.LogLanding(playerPos, acc.ToString());
+            //databaseManager.LogLanding(playerPos, acc.ToString());// 착지로그 비활성화
             windManager.SetLandCount(sessionLandCount);
             cinemachineCameraManager.ShakeCamera(combo);
         };
@@ -166,15 +171,16 @@ public class GameManager : MonoBehaviour
 
     // === 함수 ===
 
-    private void HandleStartGameRequest(string nickname) // async 필요 없음
+    private void HandleStartGameRequest(string nickname)
     {
         if (string.IsNullOrWhiteSpace(nickname))
         {
             Debug.LogWarning("닉네임이 비어있습니다.");
             return;
         }
-        databaseManager.HandleUserAuthentication(nickname);
+        databaseManager.HandleUserAuthentication(nickname); 
     }
+
 
     // 랭킹 화면을 열 때 호출 (버튼 OnClick 등에 연결해도 됨)
     public void ShowTop10Ranking()

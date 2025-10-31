@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 // 모든 전문 매니저가 이 게임오브젝트에 같이 붙어있다고 가정
 [RequireComponent(typeof(GameStateManager))]
@@ -31,6 +32,11 @@ public class GameManager : MonoBehaviour
 
     [Header("Game Variables")]
     [SerializeField] private List<ButtonSound> buttonSounds;
+
+    [Header("Events")]
+    public UnityEvent<Wind> OnWindChanged; // 바람 방향 변화 시 : Wind 구조체(direction, power) 전달
+    public UnityEvent<float> OnJumpStart; // 점프 시작 시 : 점프 시간(float) 전달
+    public UnityEvent<Vector3> OnSeaCollision; // 바다에 빠질 때 : 플레이어 위치 전달 (Vector3)
 
     private async void Awake()
     {
@@ -133,39 +139,34 @@ public class GameManager : MonoBehaviour
 
         // --- 플레이어 이벤트 
 
-        playerController.OnLanded += (acc, combo, playerPos, sessionLandCount) =>
+        /*playerController.OnLanded += (acc, combo, playerPos, sessionLandCount) =>
         {
             scoreManager.HandleLanding(acc);
             //databaseManager.LogLanding(playerPos, acc.ToString());// 착지로그 비활성화
             windManager.SetLandCount(sessionLandCount);
             cinemachineCameraManager.ShakeCamera(combo);
-        };
+        };*/
         /*playerController.OnLanded += (acc, combo) =>
         {
             if (acc == LandingAccuracy.Perfect) canvasEffectManager.PlayIllustEffect(combo);
-        };*/
+        };*/ // 일러스트 띄우는건 미사용
 
         // (Player의 OnCombo 이벤트를 각 이펙트가 구독)
-        playerController.OnCombo += (combo) =>
-        {
-            Vector3 pos = playerController.transform.position;
-            comboTextEffect.Show(combo, pos);
-        };
-        playerController.OnCombo += audioManager.PlayComboSound; // (AudioManager에 이 기능이 추가되었다고 가정)
-        playerController.OnCombo += (combo) => databaseManager.LogCombo(combo);
+        /*playerController.OnCombo += (combo, pos) => comboTextEffect.Show(combo, pos);
+        playerController.OnCombo += (combo, pos) => audioManager.PlayComboSound(combo); // (AudioManager에 이 기능이 추가되었다고 가정)
+        playerController.OnCombo += (combo, pos) => databaseManager.LogCombo(combo);*/
 
-        // (Player의 OnSeaCollision 이벤트를 GameStateManager가 구독)
-        playerController.OnSeaCollision += gameStateManager.TriggerGameOver;
-        playerController.OnSeaCollision += () => databaseManager.LogDeath(playerController.GetPlayerPos());
+        /*playerController.OnSeaCollision += (pos) => gameStateManager.TriggerGameOver();
+        playerController.OnSeaCollision += (pos) => databaseManager.LogDeath(pos);*/
 
-        playerController.OnJumpStart += cinemachineCameraManager.OnZoomStart;
-        playerController.OnJumpStart += (jumpDuration) => windManager.StartMakeNewWind();
+        /*playerController.OnJumpStart += cinemachineCameraManager.OnZoomStart;
+        playerController.OnJumpStart += (jumpDuration) => windManager.StartMakeNewWind();*/
 
         // --- WindManager Event
-        windManager.OnWindChanged += (wind) => playerController.ApplyNewWind(wind);
+        /*windManager.OnWindChanged += (wind) => playerController.ApplyNewWind(wind);
         windManager.OnWindChanged += (wind) => canvasManager.UpdateWind(wind);
         windManager.OnWindChanged += (wind) => seaManager.SetSeaSpeed(wind);
-        windManager.OnWindChanged += (wind) => audioManager.PlayStartWindSound(wind);
+        windManager.OnWindChanged += (wind) => audioManager.PlayStartWindSound(wind);*/
 
     }
 

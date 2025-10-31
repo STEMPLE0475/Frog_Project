@@ -44,7 +44,7 @@ public class ComboVolumeEffect : MonoBehaviour
         // 4. PlayerController의 OnCombo 이벤트 구독
         if (playerController != null)
         {
-            playerController.OnCombo += TriggerEffect;
+            playerController.OnCombo += (combo, pos) => TriggerEffect(combo);
         }
     }
 
@@ -53,7 +53,7 @@ public class ComboVolumeEffect : MonoBehaviour
         // 5. 오브젝트 파괴 시 이벤트 구독 해제 (메모리 누수 방지)
         if (playerController != null)
         {
-            playerController.OnCombo -= TriggerEffect;
+            playerController.OnCombo -= (combo, pos) => TriggerEffect(combo);
         }
 
         // (안전장치) 만약 꺼졌을 때 원래 값으로 복구

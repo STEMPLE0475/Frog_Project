@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using UnityEngine.UIElements;
 
 // 모든 전문가 컴포넌트가 반드시 있도록 강제
 [RequireComponent(typeof(PlayerState))]
@@ -29,13 +30,10 @@ public class PlayerController : MonoBehaviour
 
     // --- 이벤트 선언 ---
 
-    // 1. 내부용 이벤트 (Player -> PlayerEffects)
-    public event Action<int> OnCombo;
-
-    // 2. 외부 보고용 이벤트 (Player -> GameManager/ScoreManager 등)
+    public event Action<int, Vector3> OnCombo;
     public event Action<float> OnJumpStart;
     public event Action<LandingAccuracy, int, Vector3, int> OnLanded; 
-    public event Action OnSeaCollision; 
+    public event Action<Vector3> OnSeaCollision; 
 
     public void Initiate()
     {
@@ -65,9 +63,9 @@ public class PlayerController : MonoBehaviour
         inputHandler.OnJumpRequested += HandleJumpRequested;
 
         collisionHandler.OnLanded += HandleLand;
-        collisionHandler.OnSeaCollision += HandleSeaCollision;
+        collisionHandler.OnSeaCollision += (pos) => HandleSeaCollision(pos);
 
-        OnCombo += effects.UpdateTrail; // 콤보 변경 시 이펙트 업데이트
+        OnCombo += (combo, pos) => effects.UpdateTrail(combo); // 콤보 변경 시 이펙트 업데이트
     }
 
     // --- 이벤트 핸들러 (보고 처리) ---
@@ -136,7 +134,7 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(FloatingCoroutine(collisionPos));
 
         // (⭐ 신규: 외부에 "바다에 빠졌다"고 보고)
-        OnSeaCollision?.Invoke();
+        OnSeaCollision?.Invoke(transform.position);
     }
 
     // --- 외부 호출용 public 함수 ---
@@ -149,8 +147,6 @@ public class PlayerController : MonoBehaviour
         inputHandler.EnableInput(on);
     }
 
-    // (⭐ 수정됨: GameOver() -> RespawnPlayer()로 변경 및 통합)
-    // GameStateManager가 게임 시작/재시작 시 이 함수를 호출
     public void RespawnPlayer()
     {
         StopAllCoroutines(); // 둥둥 코루틴 정지
@@ -195,11 +191,13 @@ public class PlayerController : MonoBehaviour
     private void PlusCombo()
     {
         combo++;
-        OnCombo?.Invoke(combo); // 내부 이펙트 갱신용
+
+        OnCombo?.Invoke(combo, transform.position); 
     }
     private void ResetCombo()
     {
         combo = 0;
-        OnCombo?.Invoke(combo); // 내부 이펙트 갱신용
+        OnCombo?.Invoke(combo, transform.position); 
     }
+
 }

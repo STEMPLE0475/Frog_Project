@@ -29,10 +29,7 @@ public class PlayerController : MonoBehaviour
 
     // --- 이벤트 선언 ---
 
-    // 1. 내부용 이벤트 (Player -> PlayerEffects)
-    public event Action<int> OnCombo;
-
-    // 2. 외부 보고용 이벤트 (Player -> GameManager/ScoreManager 등)
+    public event Action<int, Vector3> OnCombo; // 콤보, 플레이어 좌표
     public event Action<float> OnJumpStart;
     public event Action<LandingAccuracy, int, Vector3, int> OnLanded; 
     public event Action OnSeaCollision; 
@@ -67,7 +64,7 @@ public class PlayerController : MonoBehaviour
         collisionHandler.OnLanded += HandleLand;
         collisionHandler.OnSeaCollision += HandleSeaCollision;
 
-        OnCombo += effects.UpdateTrail; // 콤보 변경 시 이펙트 업데이트
+        OnCombo += (combo, pos) => effects.UpdateTrail(combo); // 콤보 변경 시 이펙트 업데이트
     }
 
     // --- 이벤트 핸들러 (보고 처리) ---
@@ -195,11 +192,11 @@ public class PlayerController : MonoBehaviour
     private void PlusCombo()
     {
         combo++;
-        OnCombo?.Invoke(combo); // 내부 이펙트 갱신용
+        OnCombo?.Invoke(combo, transform.position); // 내부 이펙트 갱신용
     }
     private void ResetCombo()
     {
         combo = 0;
-        OnCombo?.Invoke(combo); // 내부 이펙트 갱신용
+        OnCombo?.Invoke(combo, transform.position); // 내부 이펙트 갱신용
     }
 }

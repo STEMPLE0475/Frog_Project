@@ -2,38 +2,35 @@
 using Unity.Cinemachine;
 using UnityEngine;
 
-public class CinemachineCameraManager : MonoBehaviour
+public class CameraController : MonoBehaviour
 {
-    private CinemachineCamera cam;
-    [SerializeField] private Camera effect_cam;
 
     private Transform playerTransform;
-    private Vector3 defaultCinemachineFollowOffset;
     private CinemachineImpulseSource impulseSource;
-
-    [SerializeField] private float defaultFOV = 5f;
-    [SerializeField] private Vector3 targetCinemachineFollowOffset = new Vector3(1f, 10f, -10f);
     Coroutine zoomCoroutine;
 
+    [Header("카메라 오브젝트")]
+    [SerializeField] private CinemachineCamera cinemachineCamera;
+    [SerializeField] private Camera brightEffectCamera;
+
+    [Header("환경 변수")]
+    [SerializeField] private float defaultFOV = 5f;
     [SerializeField] private float zoomEndFOV = 4.7f;
     [SerializeField] private float zoomDuration = 0.2f; // 줌 인/아웃에 걸리는 시간
-
     [SerializeField] private float deathZoomFov = 4f;
     [SerializeField] private float deathZoomDuration = 3f;
-
-    //흔들림 강도 계수
-    public float baseIntensityPerLevel = 0.1f;
+    [SerializeField] private float baseIntensityPerLevel = 0.1f; //흔들림 강도 계수
 
     public void Initiate(Transform playerTransform)
     {
         this.playerTransform = playerTransform;
-        impulseSource = GetComponent<CinemachineImpulseSource>();
-        cam = GetComponent<CinemachineCamera>();
+        impulseSource = cinemachineCamera.GetComponent<CinemachineImpulseSource>();
+        cinemachineCamera = cinemachineCamera.GetComponent<CinemachineCamera>();
         OnFollowStart();
         SetAllCameraFOV(defaultFOV);
     }
 
-    private void OnFollowStart() => cam.Follow = playerTransform;
+    private void OnFollowStart() => cinemachineCamera.Follow = playerTransform;
 
     public void OnZoomStart(float jumpDuration)
     {
@@ -64,9 +61,9 @@ public class CinemachineCameraManager : MonoBehaviour
         }
 
         // 정확한 목표 값으로 최종 설정
-        var lensAfterZoomIn = cam.Lens;
+        var lensAfterZoomIn = cinemachineCamera.Lens;
         lensAfterZoomIn.OrthographicSize = zoomEndFOV;
-        cam.Lens = lensAfterZoomIn;
+        cinemachineCamera.Lens = lensAfterZoomIn;
 
 
         // 2. 대기 (Hold / Wait)
@@ -91,9 +88,9 @@ public class CinemachineCameraManager : MonoBehaviour
         }
 
         // 줌 아웃 완료: 원래의 시작 FOV로 정확히 설정
-        var finalLens = cam.Lens;
+        var finalLens = cinemachineCamera.Lens;
         SetAllCameraFOV(defaultFOV);
-        cam.Lens = finalLens;
+        cinemachineCamera.Lens = finalLens;
 
         zoomCoroutine = null;
     }
@@ -140,7 +137,7 @@ public class CinemachineCameraManager : MonoBehaviour
     //유틸리티
     private void SetAllCameraFOV(float targetFOV)
     {
-        cam.Lens.OrthographicSize = targetFOV;
-        effect_cam.orthographicSize = targetFOV;
+        cinemachineCamera.Lens.OrthographicSize = targetFOV;
+        brightEffectCamera.orthographicSize = targetFOV;
     }
 }

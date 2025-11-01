@@ -15,7 +15,7 @@ public class CanvasManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI gameOverScoreTMP;
     [SerializeField] private TextMeshProUGUI gameOverScoreBestTMP;
     [SerializeField] private TutorialImage tutorialImage;
-    [SerializeField] private WindChangeEffect windChangeEffect;
+    [SerializeField] private WindowWindEffect windChangeEffect;
 
     public void Initiate()
     {
@@ -48,19 +48,15 @@ public class CanvasManager : MonoBehaviour
         if (windIcon != null)
         {
             windIcon.text = GetWindText(wind);
-
-            // 텍스트가 -이 아닐 경우 (바람이 있을 경우) 텍스트 컴포넌트를 활성화하고
-            // -일 경우 (바람이 없을 경우) 그대로 두거나 비활성화 여부를 선택할 수 있습니다.
-            // 여기서는 텍스트가 -이더라도 표시하는 것을 기본으로 합니다.
-            // windIcon.enabled = true; 
         }
         else
         {
             Debug.LogError("windIcon (TextMeshProUGUI)이 할당되지 않았습니다.");
         }
 
-        // 기존 바람 변화 효과 메서드는 그대로 유지
-        windChangeEffect.StartWindChangeEffect(wind);
+        // 바람 변화 효과 사용 중지
+        // windChangeEffect.StartWindChangeEffect(wind);
+        
     }
     private string GetWindText(Wind wind)
     {

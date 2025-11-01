@@ -15,7 +15,6 @@ public class GameManager : MonoBehaviour
     private DataManager dataManager;
     private AudioManager audioManager;
     private NetworkManager networkManager;
-    private WindManager windManager;
 
     [Header("Scene Dependencies (Assign in Editor)")]
     [SerializeField] private CanvasManager canvasManager;
@@ -31,6 +30,10 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private BlockManager blockManager;
     [SerializeField] private SeaManager seaManager;
+    [SerializeField] private WindManager windManager;
+    [SerializeField] private WindEffectController windEffectController;
+
+    [SerializeField] private WindowComboEffect windowComboEffect;
 
     [Header("Game Variables")]
     [SerializeField] private List<ButtonSound> buttonSounds;
@@ -42,7 +45,6 @@ public class GameManager : MonoBehaviour
         dataManager = GetComponent<DataManager>();
         audioManager = GetComponent<AudioManager>();
         networkManager = GetComponent<NetworkManager>();
-        windManager = GetComponent<WindManager>();
 
         // 2. 각 매니저 'Initiate' (의존성 주입)
         await networkManager.Initiate();
@@ -61,12 +63,15 @@ public class GameManager : MonoBehaviour
 
         blockManager.Initiate();
         windManager.Initiate();
+        windEffectController.Initiate(playerController.transform);
         seaManager.Initiate();
 
         canvasManager.Initiate();
         canvasEffectManager.Initiate();
         comboTextEffect.Initiate(mainCamera);
         hudController.Initiate();
+
+        windowComboEffect.Initiate();
 
         gameStateManager.Initiate(playerController, hudController, audioManager);
 
@@ -165,6 +170,7 @@ public class GameManager : MonoBehaviour
             comboTextEffect.Show(combo, playerPos);
             volumeController.ComboFadeInOut(combo);
             audioManager.PlayComboSound(combo);
+            windowComboEffect.StartComboEffect(combo);
         };
 
         // 바다에 떨어지는 이벤트 (게임오버)
@@ -181,6 +187,7 @@ public class GameManager : MonoBehaviour
             canvasManager.UpdateWind(wind);
             seaManager.SetSeaSpeed(wind);
             audioManager.PlayStartWindSound(wind);
+            windEffectController.UpdateWindEffect(wind);
         };
     }
 

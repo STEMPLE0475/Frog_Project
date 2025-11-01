@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class WindChangeEffect : MonoBehaviour
+public class WindowWindEffect : MonoBehaviour
 {
     [SerializeField] private List<Sprite> windEffectSprites;
     private Image windEffectImage;

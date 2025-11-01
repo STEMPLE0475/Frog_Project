@@ -21,6 +21,10 @@ public class WindManager : MonoBehaviour
     // '바람 없음(Power 0)'의 기본 가중치 (값이 높을수록 초반에 바람이 안 불 확률 증가)
     [SerializeField] private float noWindBaseWeight = 6f;
 
+    // 파티클 시스템
+    [Header("Effects (Assign in Editor)")]
+    [SerializeField] private ParticleSystem windEffect;
+
     public Wind wind;
 
     public event Action<Wind> OnWindChanged;

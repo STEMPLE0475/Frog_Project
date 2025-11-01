@@ -15,7 +15,7 @@ public class CanvasManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI gameOverScoreTMP;
     [SerializeField] private TextMeshProUGUI gameOverScoreBestTMP;
     [SerializeField] private TutorialImage tutorialImage;
-    [SerializeField] private WindowWindEffect windChangeEffect;
+    [SerializeField] private WindowWindEffect windowWindEffect;
 
     public void Initiate()
     {
@@ -25,7 +25,7 @@ public class CanvasManager : MonoBehaviour
         Update_Header_CurrentScore(0);
         Update_GameOverCurrentScore(0);
         Update_GameOverMaxScore(0);
-        windChangeEffect.Initiate();
+        windowWindEffect.Initiate();
     }
     public void StartTutorialImageBlink() => tutorialImage.StartBlink();
 
@@ -55,7 +55,7 @@ public class CanvasManager : MonoBehaviour
         }
 
         // 바람 변화 효과 사용 중지
-        // windChangeEffect.StartWindChangeEffect(wind);
+        // windowWindEffect.StartWindChangeEffect(wind);
         
     }
     private string GetWindText(Wind wind)

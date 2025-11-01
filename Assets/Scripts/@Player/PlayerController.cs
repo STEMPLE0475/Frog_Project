@@ -62,10 +62,37 @@ public class PlayerController : MonoBehaviour
     // 모든 컴포넌트의 이벤트를 구독
     void EventBind()
     {
-        inputHandler.OnChargeStarted += HandleChargeStarted;
-        inputHandler.OnJumpRequested += HandleJumpRequested;
-        inputHandler.OnChargeUpdated += HandleChargeUpdated;
-        inputHandler.OnChargeStopped += HandleChargeStopped;
+        inputHandler.OnJumpRequested += (jumpForce) =>
+        {
+            movement.HideTrajectory();
+            movement.ExecuteJump(jumpForce, () => {
+                effects.StopChargingSfx();
+                effects.PlayJumpSound();
+                effects.PlayJumpAnimation();
+                effects.StopChargeEffect();
+                OnJumpStart?.Invoke(movement.jumpDuration);
+            });
+        };
+
+        inputHandler.OnChargeStarted += () =>
+        {
+            effects.PlayChargeAnimation();
+            effects.PlayChargingSfx();
+            effects.PlayChargeEffect();
+            chargeGaugeController.HandleChargeStarted();
+        };
+
+        inputHandler.OnChargeUpdated += (normalForce, currentForce) =>
+        {
+            movement.UpdateTrajectory(currentForce);
+            chargeGaugeController.HandleChargeUpdated(normalForce);
+        };
+
+        inputHandler.OnChargeStopped += () =>
+        {
+            chargeGaugeController.HandleChargeStopped();
+            movement.HideTrajectory();
+        };
 
         collisionHandler.OnLanded += HandleLand;
         collisionHandler.OnSeaCollision += HandleSeaCollision;
@@ -73,37 +100,7 @@ public class PlayerController : MonoBehaviour
         OnCombo += (combo, pos) => effects.UpdateTrail(combo); // 콤보 변경 시 이펙트 업데이트
     }
 
-    // --- 이벤트 핸들러 (보고 처리) ---
-
-    private void HandleChargeStarted()
-    {
-        effects.PlayChargeAnimation();
-        effects.PlayChargingSfx();
-        effects.PlayChargeEffect();
-        chargeGaugeController.HandleChargeStarted();
-    }
-    private void HandleChargeUpdated(float charge)
-    {
-        chargeGaugeController.HandleChargeUpdated(charge);
-    }
-    private void HandleChargeStopped()
-    {
-        chargeGaugeController.HandleChargeStopped();
-    }
-
-    // 2. 입력 핸들러가 "점프 요청" 보고
-    private void HandleJumpRequested(float jumpForce)
-    {
-        movement.ExecuteJump(jumpForce, () => {
-            effects.StopChargingSfx();
-            effects.PlayJumpSound();
-            effects.PlayJumpAnimation();
-            effects.StopChargeEffect();
-            OnJumpStart?.Invoke(movement.jumpDuration);
-        });
-    }
-
-    // 3. 충돌 핸들러가 "착지 결과" 보고
+    // 충돌 핸들러가 "착지 결과" 보고
     private void HandleLand(LandingAccuracy accuracy)
     {
         playerState.SetAirborne(false); // 상태 변경

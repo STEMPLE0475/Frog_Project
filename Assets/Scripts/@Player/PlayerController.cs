@@ -27,12 +27,15 @@ public class PlayerController : MonoBehaviour
     private PlayerEffects effects;
     private PlayerCollisionHandler collisionHandler;
 
+    [SerializeField] private ChargeGaugeController chargeGaugeController;
+
+
     // --- 이벤트 선언 ---
 
     public event Action<int, Vector3> OnCombo; // 콤보, 플레이어 좌표
     public event Action<float> OnJumpStart;
     public event Action<LandingAccuracy, int, Vector3, int> OnLanded; 
-    public event Action OnSeaCollision; 
+    public event Action OnSeaCollision;
 
     public void Initiate()
     {
@@ -49,6 +52,7 @@ public class PlayerController : MonoBehaviour
         movement.Initiate();
         effects.Initiate();
         collisionHandler.Initiate();
+        chargeGaugeController.Initiate();
 
         transform.position = playerSpawnPos;
 
@@ -60,6 +64,8 @@ public class PlayerController : MonoBehaviour
     {
         inputHandler.OnChargeStarted += HandleChargeStarted;
         inputHandler.OnJumpRequested += HandleJumpRequested;
+        inputHandler.OnChargeUpdated += HandleChargeUpdated;
+        inputHandler.OnChargeStopped += HandleChargeStopped;
 
         collisionHandler.OnLanded += HandleLand;
         collisionHandler.OnSeaCollision += HandleSeaCollision;
@@ -69,12 +75,20 @@ public class PlayerController : MonoBehaviour
 
     // --- 이벤트 핸들러 (보고 처리) ---
 
-    // 1. 입력 핸들러가 "충전 시작" 보고
     private void HandleChargeStarted()
     {
         effects.PlayChargeAnimation();
         effects.PlayChargingSfx();
         effects.PlayChargeEffect();
+        chargeGaugeController.HandleChargeStarted();
+    }
+    private void HandleChargeUpdated(float charge)
+    {
+        chargeGaugeController.HandleChargeUpdated(charge);
+    }
+    private void HandleChargeStopped()
+    {
+        chargeGaugeController.HandleChargeStopped();
     }
 
     // 2. 입력 핸들러가 "점프 요청" 보고

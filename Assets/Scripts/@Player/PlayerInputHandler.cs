@@ -13,7 +13,9 @@ public class PlayerInputHandler : MonoBehaviour
 
     // PlayerController가 구독할 이벤트
     public event Action OnChargeStarted;
-    public event Action<float> OnJumpRequested; // 점프 힘을 실어서 보냄
+    public event Action<float> OnChargeUpdated;
+    public event Action OnChargeStopped;
+    public event Action<float> OnJumpRequested;
 
     private PlayerState playerState;
     private PlayerInput playerInput;
@@ -61,6 +63,7 @@ public class PlayerInputHandler : MonoBehaviour
             isCharging = true;
             currentJumpForce = minJumpForce;
             OnChargeStarted?.Invoke();
+            OnChargeUpdated?.Invoke(0f);
         }
 
         // 누르는 중
@@ -68,6 +71,9 @@ public class PlayerInputHandler : MonoBehaviour
         {
             currentJumpForce += chargeRate * Time.deltaTime;
             currentJumpForce = Mathf.Clamp(currentJumpForce, minJumpForce, maxJumpForce);
+
+            float normalizedValue = (currentJumpForce - minJumpForce) / (maxJumpForce - minJumpForce);
+            OnChargeUpdated?.Invoke(normalizedValue);
         }
 
         // 뗐을 때
@@ -75,6 +81,7 @@ public class PlayerInputHandler : MonoBehaviour
         {
             isCharging = false;
             OnJumpRequested?.Invoke(currentJumpForce);
+            OnChargeStopped?.Invoke();
         }
     }
 

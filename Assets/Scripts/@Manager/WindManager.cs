@@ -11,15 +11,15 @@ public class WindManager : MonoBehaviour
     [SerializeField] private int maxWindPower = 3;
     [SerializeField] private int minWindPower = 0;
 
-    [SerializeField] private float makeNewWindDelay = 1f;
+    [SerializeField] private float makeNewWindDelay = 0.5f;
 
     private int currentSessionLandCount = 0;
 
     [Header("바람 난이도 설정")]
     // 착지 횟수에 비례하여 바람 강도 증가에 영향을 주는 계수
-    [SerializeField] private float windDifficultyFactor = 0.1f;
+    [SerializeField] private float windDifficultyFactor = 0.05f;
     // '바람 없음(Power 0)'의 기본 가중치 (값이 높을수록 초반에 바람이 안 불 확률 증가)
-    [SerializeField] private float noWindBaseWeight = 2f;
+    [SerializeField] private float noWindBaseWeight = 6f;
 
     public Wind wind;
 
@@ -44,7 +44,6 @@ public class WindManager : MonoBehaviour
     }
 
     public void StartMakeNewWind() {
-        //Debug.Log(currentSessionLandCount);
         if (currentSessionLandCount > 0 && currentSessionLandCount % baseChangeWindCycleTerm == 0)
         {
             StartCoroutine(MakeNewWindCoroutine(currentSessionLandCount));

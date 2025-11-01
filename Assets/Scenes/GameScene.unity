@@ -5874,7 +5874,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &364696198
 RectTransform:
   m_ObjectHideFlags: 0
@@ -30994,7 +30994,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1991530919}
   - component: {fileID: 1991530918}
-  - component: {fileID: 1991530924}
   - component: {fileID: 1991530923}
   - component: {fileID: 1991530922}
   - component: {fileID: 1991530921}
@@ -31002,6 +31001,7 @@ GameObject:
   - component: {fileID: 1991530926}
   - component: {fileID: 1991530925}
   - component: {fileID: 1991530928}
+  - component: {fileID: 1991530929}
   m_Layer: 0
   m_Name: '@Managers'
   m_TagString: Untagged
@@ -31101,18 +31101,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0f044ace1db1dc9499a946d1a03c974b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1991530924
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1991530917}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9c27866e5124d14393a4b0be5d38b08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!82 &1991530925
@@ -31424,6 +31412,18 @@ MonoBehaviour:
   makeNewWindDelay: 0.5
   windDifficultyFactor: 0.05
   noWindBaseWeight: 6
+--- !u!114 &1991530929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1991530917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5735c0c79dcbabf438901b2c9329e7f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1996942603
 GameObject:
   m_ObjectHideFlags: 0
@@ -44902,7 +44902,10 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 268010241db5c5f4c93e7a2964f7dd97, type: 2}
   - {fileID: 2100000, guid: d3b85d6f587333d4b834d357cce9b0b0, type: 2}
   - {fileID: 2100000, guid: b88eb41bcee683143924d64bc0fb4950, type: 2}
-  - {fileID: 2100000, guid: 1442d0ff519b46445979ce8cd2e98730, type: 2}
+  - {fileID: 2100000, guid: 8aa166fad6ea7b24ab163322b4f8268f, type: 2}
+  - {fileID: 2100000, guid: f47e693dad082b94e91f41b2347485e6, type: 2}
+  - {fileID: 2100000, guid: 384510d81b01fc344b3fcf73f2b32cfe, type: 2}
+  - {fileID: 2100000, guid: 8033e77742a62ed46be1d526d54b7704, type: 2}
   sfxSource: {fileID: 7466288415502755218}
   chargingSfxSource: {fileID: 9097379838414393002}
   jumpSfx: {fileID: 8300000, guid: 01fe88ed1f6e253429256d1691c8b207, type: 3}

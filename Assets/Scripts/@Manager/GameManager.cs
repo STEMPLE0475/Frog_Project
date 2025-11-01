@@ -3,20 +3,21 @@ using System.Collections.Generic;
 
 // 모든 전문 매니저가 이 게임오브젝트에 같이 붙어있다고 가정
 [RequireComponent(typeof(GameStateManager))]
-[RequireComponent(typeof(ScoreManager))]
+[RequireComponent(typeof(DataManager))]
 [RequireComponent(typeof(AudioManager))]
-[RequireComponent(typeof(DatabaseManager))]
+[RequireComponent(typeof(NetworkManager))]
 public class GameManager : MonoBehaviour
 {
+    string version = "0.3.2"; // 빌드시 버전 명을 반드시 명시할 것!!
+
     [Header("Managers (Internal)")]
     private GameStateManager gameStateManager;
-    private ScoreManager scoreManager;
+    private DataManager dataManager;
     private AudioManager audioManager;
-    private DatabaseManager databaseManager;
+    private NetworkManager networkManager;
     private WindManager windManager;
 
     [Header("Scene Dependencies (Assign in Editor)")]
-    // (⭐ 수정됨: UI/Effect 매니저들을 세분화하여 참조)
     [SerializeField] private CanvasManager canvasManager;
     [SerializeField] private CanvasEffectManager canvasEffectManager;
     [SerializeField] private ComboTextEffect comboTextEffect;
@@ -38,15 +39,15 @@ public class GameManager : MonoBehaviour
     {
         // 1. 모든 전문 매니저 컴포넌트 가져오기
         gameStateManager = GetComponent<GameStateManager>();
-        scoreManager = GetComponent<ScoreManager>();
+        dataManager = GetComponent<DataManager>();
         audioManager = GetComponent<AudioManager>();
-        databaseManager = GetComponent<DatabaseManager>();
+        networkManager = GetComponent<NetworkManager>();
         windManager = GetComponent<WindManager>();
 
         // 2. 각 매니저 'Initiate' (의존성 주입)
-        await databaseManager.Initiate();
+        await networkManager.Initiate();
         audioManager.Initiate(buttonSounds);
-        scoreManager.Initiate();
+        dataManager.Initiate(version);
 
         // (씬에 있는 객체들 초기화)
         playerController.Initiate();
@@ -69,65 +70,73 @@ public class GameManager : MonoBehaviour
 
         gameStateManager.Initiate(playerController, hudController, audioManager);
 
-        ShowTop10Ranking();
+        ShowLeaderBoard();
 
         // 3. === 이벤트 연결 ===
 
         // DB 로드 이벤트 (UserData userData)
-        databaseManager.OnUserDataLoaded += (userData) => {
-            scoreManager.SetInitialMaxScore(userData);
-            canvasManager.Update_GameOverMaxScore(userData.HighScore);
-            canvasManager.Update_Header_MaxScore(userData.HighScore);
+        networkManager.OnUserDataLoaded += (userData) => {
+            dataManager.SetInitialUserData(userData);
+            //dataManager.SetInitialMaxScore(userData);
+            //canvasManager.Update_GameOverMaxScore(userData.HighScore);
+            //canvasManager.Update_Header_MaxScore(userData.HighScore);
             gameStateManager.StartGame();
         };
 
         // --- 스코어 변경 이벤트 ---
-        scoreManager.OnScoreChanged += (score) => {
+        dataManager.OnScoreChanged += (score) => {
             canvasManager.Update_Header_CurrentScore(score);
             canvasManager.Update_GameOverCurrentScore(score);
         };
-        scoreManager.OnMaxScoreChanged += (maxScore) => {
+        dataManager.OnMaxScoreChanged += (maxScore) => {
             canvasManager.Update_Header_MaxScore(maxScore);
             canvasManager.Update_GameOverMaxScore(maxScore);
         };
+        dataManager.OnComboChanged += (combo) => {
+            // canvasManager.UpdateCombo(combo);
+        };
+
 
         // --- 게임 상태 이벤트 ---
 
         //  게임 시작
         gameStateManager.OnGameStart += () =>
         {
-            GameReset();
-            databaseManager.StartNewSession("start_button");
+            string sessionId = GameReset();
+            networkManager.StartNewSession(sessionId, "start_button");
             canvasManager.StartTutorialImageBlink();
-            
         };
 
         // 게임 재시작
         gameStateManager.OnGameResume += () =>
         {
             GameReset();
-            databaseManager.StartNewSession("restart_button");
+            networkManager.StartNewSession("restart_button");
         };
 
-        void GameReset()
+        string GameReset()
         {
             playerController.ResetCurSessionLandCount();
-            databaseManager.IncrementGameStartCount();
             blockManager.ResetBlocks();
-            scoreManager.ResetScore();
+            string newSessionId = dataManager.StartNewSession();
             playerController.RespawnPlayer();
             windManager.ResetWindMangaer();
             cameraController.ResetCamera();
             canvasManager.SetActive_Header(true);
+
+            return newSessionId;
         }
 
         // 게임 종료
         gameStateManager.OnGameOver += () =>
         {
-            scoreManager.SaveScore();
-            databaseManager.EndCurrentSession(scoreManager.GetMaxScore());
-            _ = databaseManager.SaveHighScoreIfBestAsync(scoreManager.GetMaxScore());
-            ShowTop10Ranking(); // 리더보드 갱신
+            SessionData finalSessionData = dataManager.EndSessionAndGetResults();
+            if (finalSessionData != null) networkManager.EndCurrentSession(finalSessionData);
+
+            int maxScore = dataManager.GetMaxScore();
+            _ = networkManager.SaveHighScoreIfBestAsync(maxScore);
+
+            ShowLeaderBoard();
             hudController.GameOver();
             cameraController.DeathZoomStart();
             canvasManager.SetActive_Header(false);
@@ -139,30 +148,30 @@ public class GameManager : MonoBehaviour
         hudController.OnQuitGameClicked += gameStateManager.QuitGame;
         hudController.OnRestartClicked += gameStateManager.RestartGame;
 
-        // 플레이어 착지 이벤트 (LandingAccuracy acc, int combo, vector3 playerPos, int sessionLandCount)
+        // 플레이어 착지 이벤트 (LandingAccuracy acc, int _currentCombo, vector3 playerPos, int sessionLandCount)
         playerController.OnLanded += (acc, combo, playerPos, sessionLandCount) =>
         {
-            //databaseManager.LogLanding(playerPos, acc.ToString());
-            scoreManager.HandleLanding(acc);
+            dataManager.HandleLanding(acc);
             windManager.SetLandCount(sessionLandCount);
             cameraController.ShakeCamera(combo);
         };
 
-        // 콤보 성공시 이벤트 (int combo, vector playerPos)
+        // 플레이어 점프 시작 이벤트
+        playerController.OnJumpStart += (jumpduration) => windManager.StartMakeNewWind();
+
+        // 콤보 성공시 이벤트 (int _currentCombo, vector playerPos)
         playerController.OnCombo += (combo, playerPos) =>
         {
-            //databaseManager.LogCombo(combo);
             comboTextEffect.Show(combo, playerPos);
             volumeController.ComboFadeInOut(combo);
             audioManager.PlayComboSound(combo);
-            //canvasEffectManager.PlayIllustEffect(combo);
         };
 
         // 바다에 떨어지는 이벤트 (게임오버)
         playerController.OnSeaCollision += () =>
         {
+            dataManager.LogDeath(playerController.GetPlayerPos());
             gameStateManager.TriggerGameOver();
-            databaseManager.LogDeath(playerController.GetPlayerPos());
         };
 
         // 바람 변화시 이벤트 (Wind wind)
@@ -184,19 +193,18 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("닉네임이 비어있습니다.");
             return;
         }
-        databaseManager.HandleUserAuthentication(nickname); 
+        networkManager.HandleUserAuthentication(nickname); 
     }
 
 
-    // 랭킹 화면을 열 때 호출 (버튼 OnClick 등에 연결해도 됨)
-    public void ShowTop10Ranking()
+    // 랭킹 화면을 열 때 호출 
+    public void ShowLeaderBoard()
     {
-        StartCoroutine(CoShowTop10Ranking());
+        StartCoroutine(ShowLeaderBoardCoroutine());
     }
-
-    private System.Collections.IEnumerator CoShowTop10Ranking()
+    private System.Collections.IEnumerator ShowLeaderBoardCoroutine()
     {
-        var task = databaseManager.GetTop10RankingStringAsync(); // 문자열 한 방에 받기
+        var task = networkManager.GetTop10RankingStringAsync(); // 문자열 한 방에 받기
         while (!task.IsCompleted) yield return null;
 
         if (task.Exception != null)

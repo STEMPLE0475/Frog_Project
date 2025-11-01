@@ -43,6 +43,7 @@ public class WindManager : MonoBehaviour
         currentSessionLandCount = sessionLandCount;
     }
 
+    // GameManager에서 Jump 시작시 호출?
     public void StartMakeNewWind() {
         if (currentSessionLandCount > 0 && currentSessionLandCount % baseChangeWindCycleTerm == 0)
         {
@@ -56,7 +57,6 @@ public class WindManager : MonoBehaviour
     {
         
         yield return new WaitForSecondsRealtime(makeNewWindDelay);
-
         wind.direction = (UnityEngine.Random.Range(0, 2) == 0) ? -1 : 1;
         wind.power = GetWeightedRandomPower(currentLandCount);
         OnWindChanged?.Invoke(wind);

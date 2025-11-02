@@ -189,6 +189,11 @@ public class GameManager : MonoBehaviour
             audioManager.PlayStartWindSound(wind);
             windEffectController.UpdateWindEffect(wind);
         };
+
+        blockManager.OnEnterCheckPoint += (checkpoint) =>
+        {
+            dataManager.HandleCheckPoint(checkpoint);
+        };
     }
 
     // === 함수 ===

@@ -145,7 +145,8 @@ public class NetworkManager : MonoBehaviour
             { "perfectCount", sessionData.PerfectLandings },
             { "goodCount", sessionData.GoodLandings },
             { "badCount", sessionData.BadLandings },
-            { "lastDeath_X", sessionData.DeathPosition?.x ?? 0f }
+            { "lastDeath_X", sessionData.DeathPosition?.x ?? 0f },
+            //{ "totalCheckPoint", sessionData.TotalCheckPoint }
         });
     }
 

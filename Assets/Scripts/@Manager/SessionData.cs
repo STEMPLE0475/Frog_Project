@@ -15,6 +15,7 @@ public class SessionData
     // 1. 점수 및 콤보
     public int FinalScore { get; set; }
     public int BestCombo { get; set; }
+    public int TotalCheckPoint { get; set; }
 
     // 2. 착지 관련
     public int TotalLandings { get; set; } // 총 착지 횟수
@@ -36,6 +37,7 @@ public class SessionData
 
         FinalScore = 0;
         BestCombo = 0;
+        TotalCheckPoint = 0;
         TotalLandings = 0;
         PerfectLandings = 0;
         GoodLandings = 0;

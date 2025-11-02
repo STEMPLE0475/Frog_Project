@@ -1,23 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using UnityEngine;
 
-public class Block : MonoBehaviour
+public class SinkBlock : MonoBehaviour
 {
-    public BlockType blockType = BlockType.Sink;
     public float perfectThreshold = 0.35f;
     public float goodThreshold = 0.8f;
-    public bool isComboable = true;
+    public bool isNotLanded = true;
 
-    // 1. 블록의 '진짜' 시작 위치를 저장할 변수
     private Vector3 originalPosition;
-    // 2. 실행 중인 코루틴을 저장할 변수
     private Coroutine runningSinkCoroutine;
-
-    private void Awake()
-    {
-        // Start()나 Initiate()보다 먼저, 생성 시점의 위치를 저장
-        originalPosition = transform.position;
-    }
 
     private void Start()
     {
@@ -26,41 +18,27 @@ public class Block : MonoBehaviour
 
     public void InitiateBlock()
     {
-        if (blockType == BlockType.Sink)
-        {
-            GetComponent<BlockTargetZone>().EnableTargetZone(perfectThreshold);
-        }
-        isComboable = true;
+        originalPosition = transform.position;
+        GetComponent<BlockTargetZone>().EnableTargetZone(perfectThreshold);
+        isNotLanded = true;
     }
 
     public void CollisionPlayer()
     {
-        if (blockType == BlockType.Sink)
-        {
-            // 이미 가라앉는 중이라면 중복 실행 방지
-            if (runningSinkCoroutine != null)
-            {
-                StopCoroutine(runningSinkCoroutine);
-            }
-            // 2. 코루틴을 변수에 저장
-            runningSinkCoroutine = StartCoroutine(StartSink());
-        }
-        isComboable = false;
+        if (runningSinkCoroutine != null) StopCoroutine(runningSinkCoroutine);
+        runningSinkCoroutine = StartCoroutine(StartSink());
+        isNotLanded = false;
     }
 
-    // 3. BlockManager가 호출할 공개 리셋 함수
     public void ResetBlock()
     {
-        // 1. 실행 중인 코루틴이 있다면 강제 중지
         if (runningSinkCoroutine != null)
         {
             StopCoroutine(runningSinkCoroutine);
             runningSinkCoroutine = null;
         }
-
-        // 2. 위치를 '진짜' 시작 위치로 되돌림
         transform.position = originalPosition;
-        isComboable = true;
+        isNotLanded = true;
     }
 
     IEnumerator StartSink()
@@ -111,10 +89,4 @@ public class Block : MonoBehaviour
         // 2. 코루틴이 정상 종료되었으므로 참조를 비움
         runningSinkCoroutine = null;
     }
-}
-
-public enum BlockType
-{
-    Normal,
-    Sink,
 }

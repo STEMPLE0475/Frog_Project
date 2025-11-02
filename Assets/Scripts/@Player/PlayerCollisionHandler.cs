@@ -36,15 +36,13 @@ public class PlayerCollisionHandler : MonoBehaviour
 
         if (collision.gameObject.CompareTag(BlockTag) && playerState.IsAirborne)
         {
-            var blockScript = collision.gameObject.GetComponent<Block>();
-            if (blockScript == null) return;
-
-            if (blockScript.blockType == BlockType.Sink)
+            var sinkBlock = collision.gameObject.GetComponent<SinkBlock>();
+            if(sinkBlock != null)
             {
-                if (blockScript.isComboable)
+                if (sinkBlock.isNotLanded)
                 {
-                    blockScript.CollisionPlayer();
-                    var acc = CalculateLandingAccuracy(transform.position, collision.collider, blockScript);
+                    sinkBlock.CollisionPlayer();
+                    var acc = CalculateLandingAccuracy(transform.position, collision.collider, sinkBlock);
                     OnLanded?.Invoke(acc);
                 }
                 else
@@ -52,15 +50,14 @@ public class PlayerCollisionHandler : MonoBehaviour
                     OnLanded?.Invoke(LandingAccuracy.Excep);
                 }
             }
-            else if (blockScript.blockType == BlockType.Normal)
+            else
             {
-                blockScript.CollisionPlayer();
                 OnLanded?.Invoke(LandingAccuracy.Excep);
             }
         }
     }
 
-    LandingAccuracy CalculateLandingAccuracy(Vector3 landingPosition, Collider blockCollider, Block blockScript)
+    LandingAccuracy CalculateLandingAccuracy(Vector3 landingPosition, Collider blockCollider, SinkBlock blockScript)
     {
         BoxCollider box = blockCollider as BoxCollider;
         if (box == null) return LandingAccuracy.Bad;

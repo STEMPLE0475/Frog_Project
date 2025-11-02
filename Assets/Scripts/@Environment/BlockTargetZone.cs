@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-// 이 스크립트는 BoxCollider가 있는 'Block' 오브젝트에 추가해야 합니다.
+// 이 스크립트는 BoxCollider가 있는 'SinkBlock' 오브젝트에 추가해야 합니다.
 [RequireComponent(typeof(BoxCollider))]
 public class BlockTargetZone : MonoBehaviour
 {

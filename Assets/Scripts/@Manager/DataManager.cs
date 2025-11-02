@@ -29,6 +29,7 @@ public class DataManager : MonoBehaviour
     {
         _currentSession = new SessionData(version);
         ResetCombo();
+        _currentSession.TotalCheckPoint = 0;
 
         // UI 리셋
         OnScoreChanged?.Invoke(0);
@@ -54,6 +55,7 @@ public class DataManager : MonoBehaviour
             case LandingAccuracy.Good: 
                 _currentSession.GoodLandings++;
                 ResetCombo();
+                PlusScore(10);
                 break;
             case LandingAccuracy.Perfect: 
                 _currentSession.PerfectLandings++;
@@ -61,6 +63,12 @@ public class DataManager : MonoBehaviour
                 PlusScore(10 * _currentCombo);
                 break;
         }
+    }
+
+    public void HandleCheckPoint(int checkPointNum)
+    {
+        _currentSession.TotalCheckPoint = checkPointNum;
+        PlusScore(150 * checkPointNum);
     }
 
     public void LogDeath(Vector3 deathPosition)

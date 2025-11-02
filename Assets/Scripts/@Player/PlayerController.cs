@@ -95,7 +95,11 @@ public class PlayerController : MonoBehaviour
         };
 
         collisionHandler.OnLanded += HandleLand;
-        collisionHandler.OnSeaCollision += HandleSeaCollision;
+        collisionHandler.OnSeaCollision += (playerPos) =>
+        {
+            HandleSeaCollision(playerPos);
+            movement.UpdateTrajectory(-1f);
+        };
 
         OnCombo += (combo, pos) => effects.UpdateTrail(combo); // 콤보 변경 시 이펙트 업데이트
     }

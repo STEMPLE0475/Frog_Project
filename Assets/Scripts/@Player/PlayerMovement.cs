@@ -17,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LineRenderer trajectoryLine; // 인스펙터에서 할당
     [SerializeField] private int lineSegmentCount = 30; // 궤적의 부드러움
 
+
     public void Initiate()
     {
         rb = GetComponent<Rigidbody>();
@@ -92,6 +93,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void UpdateTrajectory(float currentJumpForce)
     {
+        if (currentJumpForce < 0f) { HideTrajectory(); return; }
         if (trajectoryLine == null) return;
 
         // 1. 현재 조건 (점프 힘, 바람)으로 궤적 포인트 계산

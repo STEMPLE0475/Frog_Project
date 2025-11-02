@@ -17,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LineRenderer trajectoryLine; // 인스펙터에서 할당
     [SerializeField] private int lineSegmentCount = 30; // 궤적의 부드러움
 
+    private bool hideTrajectoryLineByCheckPoint = false;
 
     public void Initiate()
     {
@@ -26,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
         if (trajectoryLine == null)
             trajectoryLine = GetComponent<LineRenderer>();
         HideTrajectory(); // 시작 시 궤적 숨기기
+        SetTrajectoryLineByCheckPoint(true);
     }
 
     // PlayerController가 이 메서드를 호출
@@ -93,6 +95,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void UpdateTrajectory(float currentJumpForce)
     {
+        if (!hideTrajectoryLineByCheckPoint) return;
         if (currentJumpForce < 0f) { HideTrajectory(); return; }
         if (trajectoryLine == null) return;
 
@@ -113,6 +116,9 @@ public class PlayerMovement : MonoBehaviour
             trajectoryLine.enabled = false;
         }
     }
+
+    public void SetTrajectoryLineByCheckPoint(bool isCheck) => hideTrajectoryLineByCheckPoint = isCheck;
+
     private Vector3[] CalculateTrajectoryPoints(float jumpForce, Vector3 windForce, Vector3 startPos)
     {
         List<Vector3> points = new List<Vector3>();

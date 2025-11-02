@@ -177,6 +177,7 @@ public class PlayerController : MonoBehaviour
         effects.SetPlayerMesh(false); // 원본 메시
         effects.SetTrail(true);
         inputHandler.EnableInput(true);
+        movement.SetTrajectoryLineByCheckPoint(true);
     }
 
     public void ApplyNewWind(Wind wind)
@@ -185,6 +186,8 @@ public class PlayerController : MonoBehaviour
         Debug.Log("바람 플레이어에게 Set. In Player Controller");
         Debug.Log(wind.power + " " +  wind.direction);
     }
+
+    public void HideTrajectoryByCheckPoint() => movement.SetTrajectoryLineByCheckPoint(false);
 
     // --- 내부 로직 ---
 

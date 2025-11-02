@@ -193,6 +193,7 @@ public class GameManager : MonoBehaviour
         blockManager.OnEnterCheckPoint += (checkpoint) =>
         {
             dataManager.HandleCheckPoint(checkpoint);
+            if (checkpoint == 1) playerController.HideTrajectoryByCheckPoint();
         };
     }
 

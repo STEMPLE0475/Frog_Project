@@ -4,16 +4,27 @@ using UnityEngine.UI;
 public class ChargeGaugeController : MonoBehaviour
 {
     [SerializeField] private Image chargeGaugeImage; // 체력바처럼 'Filled' 타입 이미지
+    [SerializeField] private Vector3 worldOffset;
+
+    private Transform playerTransform;
+    private RectTransform rectTransform; 
+    private Camera mainCamera;
 
     // 0. 초기화 (GameManager가 호출)
-    public void Initiate()
+    public void Initiate(Transform playerTransform)
     {
+        this.playerTransform = playerTransform;
+        this.mainCamera = Camera.main;
+        this.rectTransform = GetComponent<RectTransform>();
+
         if (chargeGaugeImage == null)
             chargeGaugeImage = GetComponent<Image>();
 
         // 시작 시 게이지 숨기기
         chargeGaugeImage.fillAmount = 0;
         gameObject.SetActive(false);
+
+        UpdateGaugePosition();
     }
 
     // 1. OnChargeStarted 이벤트가 호출할 함수
@@ -35,5 +46,19 @@ public class ChargeGaugeController : MonoBehaviour
     {
         chargeGaugeImage.fillAmount = 0;
         gameObject.SetActive(false);
+    }
+
+    private void UpdateGaugePosition()
+    {
+        if (playerTransform == null || mainCamera == null)
+        {
+            return;
+        }
+
+        Vector3 targetWorldPos = playerTransform.position + worldOffset;
+
+        Vector2 screenPos = mainCamera.WorldToScreenPoint(targetWorldPos);
+
+        rectTransform.position = screenPos;
     }
 }

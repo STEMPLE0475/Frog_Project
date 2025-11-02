@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Sea
   - Block
+  - CheckPoint
   layers:
   - Default
   - TransparentFX

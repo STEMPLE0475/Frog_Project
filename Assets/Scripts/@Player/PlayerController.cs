@@ -52,7 +52,7 @@ public class PlayerController : MonoBehaviour
         movement.Initiate();
         effects.Initiate();
         collisionHandler.Initiate();
-        chargeGaugeController.Initiate();
+        chargeGaugeController.Initiate(transform);
 
         transform.position = playerSpawnPos;
 
@@ -98,6 +98,7 @@ public class PlayerController : MonoBehaviour
         collisionHandler.OnSeaCollision += (playerPos) =>
         {
             HandleSeaCollision(playerPos);
+            chargeGaugeController.HandleChargeStopped();
             movement.UpdateTrajectory(-1f);
         };
 

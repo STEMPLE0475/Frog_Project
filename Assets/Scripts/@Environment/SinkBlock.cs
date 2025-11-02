@@ -60,7 +60,7 @@ public class SinkBlock : MonoBehaviour
         transform.position = endPos1;
 
         // === 3. 두 번째 하강 ===
-        float duration2 = 5f;
+        float duration2 = 8f;
         float secondSinkingTimer = 0;
         while (secondSinkingTimer < duration2)
         {

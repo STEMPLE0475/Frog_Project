@@ -945,7 +945,7 @@ MonoBehaviour:
     - line: '|   cloudProjectId: b50f5b23-63d9-408a-a97e-d5004843a170'
     - line: '|   framebufferDepthMemorylessMode: 0'
     - line: '|   qualitySettingsNames: []'
-    - line: '|   projectName: My project (2) 2025-09-24_13-27-54'
+    - line: '|   projectName: FrogJump'
     - line: '|   organizationId: stemule0'
     - line: '|   cloudEnabled: 0'
     - line: '|   legacyClampBlendShapeWeights: 0'

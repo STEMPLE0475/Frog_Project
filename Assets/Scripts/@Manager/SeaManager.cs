@@ -14,7 +14,7 @@ public class SeaManager : MonoBehaviour
         float speed;
         if(wind.power == 0)
         {
-            speed = defaultSeaSpeed;
+            speed = (-1f) * defaultSeaSpeed;
         }
         else
         {

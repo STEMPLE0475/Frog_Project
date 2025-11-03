@@ -4,6 +4,7 @@ using System;
 public class DataManager : MonoBehaviour
 {
     public event Action<int> OnScoreChanged;
+    public event Action<int> OnScorePlus;
     public event Action<int> OnMaxScoreChanged;
     public event Action<int> OnComboChanged;
 
@@ -82,6 +83,7 @@ public class DataManager : MonoBehaviour
         if (_currentSession == null) return;
 
         _currentSession.FinalScore += addScore;
+        OnScorePlus?.Invoke(addScore);
         OnScoreChanged?.Invoke(_currentSession.FinalScore); // 점수가 변경되었음을 알림
     }
 

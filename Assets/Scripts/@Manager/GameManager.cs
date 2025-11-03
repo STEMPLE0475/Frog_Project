@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 // 모든 전문 매니저가 이 게임오브젝트에 같이 붙어있다고 가정
 [RequireComponent(typeof(GameStateManager))]
@@ -35,6 +36,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private WindowComboEffect windowComboEffect;
     [SerializeField] private FireworkController fireworkController;
+    [SerializeField] private ScoreTextEffectController scoreTextEffectController;
 
     [Header("Game Variables")]
     [SerializeField] private List<ButtonSound> buttonSounds;
@@ -74,6 +76,7 @@ public class GameManager : MonoBehaviour
 
         windowComboEffect.Initiate();
         fireworkController.Initiate();
+        scoreTextEffectController.Initiate(playerController.transform);
 
         gameStateManager.Initiate(playerController, hudController, audioManager);
 
@@ -94,6 +97,7 @@ public class GameManager : MonoBehaviour
         dataManager.OnScoreChanged += (score) => {
             canvasManager.Update_Header_CurrentScore(score);
             canvasManager.Update_GameOverCurrentScore(score);
+            
         };
         dataManager.OnMaxScoreChanged += (maxScore) => {
             canvasManager.Update_Header_MaxScore(maxScore);
@@ -101,6 +105,10 @@ public class GameManager : MonoBehaviour
         };
         dataManager.OnComboChanged += (combo) => {
             // canvasManager.UpdateCombo(combo);
+        };
+        dataManager.OnScorePlus += (addScore) =>
+        {
+            scoreTextEffectController.Show(addScore);
         };
 
 

@@ -475,8 +475,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &29383176
 MonoBehaviour:
@@ -1181,8 +1181,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &68563233
 MonoBehaviour:
@@ -1321,8 +1321,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &73832139
 MonoBehaviour:
@@ -2865,8 +2865,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &189899858
 MonoBehaviour:
@@ -4015,8 +4015,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &268879265
 MonoBehaviour:
@@ -4367,8 +4367,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &286051397
 MonoBehaviour:
@@ -4507,8 +4507,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &296409255
 MonoBehaviour:
@@ -4953,8 +4953,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &313708086
 MonoBehaviour:
@@ -5572,8 +5572,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &352939714
 MonoBehaviour:
@@ -6004,8 +6004,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &376349052
 MonoBehaviour:
@@ -6366,8 +6366,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &395542404
 MonoBehaviour:
@@ -6904,8 +6904,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &420076963
 MonoBehaviour:
@@ -7626,13 +7626,13 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1195815636}
-  - {fileID: 1510298051}
   - {fileID: 311343985}
   - {fileID: 255946848}
   - {fileID: 1901587386}
   - {fileID: 188427494}
   - {fileID: 910745159}
   - {fileID: 1059746089}
+  - {fileID: 1690411820}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -190.668, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -8239,8 +8239,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &485651647
 MonoBehaviour:
@@ -8389,8 +8389,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &489421735
 MonoBehaviour:
@@ -9952,8 +9952,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &602217442
 MonoBehaviour:
@@ -11029,8 +11029,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &706080291
 MonoBehaviour:
@@ -11620,8 +11620,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &793094110
 MonoBehaviour:
@@ -11916,8 +11916,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &799871122
 MonoBehaviour:
@@ -17446,8 +17446,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &863050098
 MonoBehaviour:
@@ -17596,8 +17596,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &872149396
 MonoBehaviour:
@@ -17736,8 +17736,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &875671698
 MonoBehaviour:
@@ -18148,8 +18148,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &893246053
 MonoBehaviour:
@@ -18560,8 +18560,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &917212550
 MonoBehaviour:
@@ -19730,8 +19730,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &994732288
 MonoBehaviour:
@@ -19870,8 +19870,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &995395682
 MonoBehaviour:
@@ -21359,8 +21359,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1078105378
 MonoBehaviour:
@@ -21960,8 +21960,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1121689419
 MonoBehaviour:
@@ -22317,8 +22317,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1154552827
 MonoBehaviour:
@@ -22457,8 +22457,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1154924954
 MonoBehaviour:
@@ -23036,7 +23036,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1195815636
 RectTransform:
   m_ObjectHideFlags: 0
@@ -23417,8 +23417,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1230867910
 MonoBehaviour:
@@ -23676,8 +23676,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1247356529
 MonoBehaviour:
@@ -23909,8 +23909,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1260614698
 MonoBehaviour:
@@ -25707,8 +25707,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1394482337
 MonoBehaviour:
@@ -25847,8 +25847,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1401232114
 MonoBehaviour:
@@ -26007,8 +26007,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1412299845
 MonoBehaviour:
@@ -26687,8 +26687,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1437482442
 MonoBehaviour:
@@ -27119,8 +27119,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1446943024
 MonoBehaviour:
@@ -27778,8 +27778,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1474997229
 MonoBehaviour:
@@ -28086,8 +28086,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1486312184
 MonoBehaviour:
@@ -28331,8 +28331,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1491475580
 MonoBehaviour:
@@ -28564,8 +28564,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1496225200
 MonoBehaviour:
@@ -28977,81 +28977,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1502749032}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1510298050
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1510298051}
-  - component: {fileID: 1510298053}
-  - component: {fileID: 1510298052}
-  m_Layer: 5
-  m_Name: Panel
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!224 &1510298051
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1510298050}
-  m_LocalRotation: {x: -0.016201353, y: 0.02056432, z: 0.22285546, w: 0.97449994}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 454278929}
-  m_LocalEulerAnglesHint: {x: -2.335, y: 1.885, z: 25.724}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -257.93274, y: 220.55469}
-  m_SizeDelta: {x: -206.1272, y: -240.6033}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1510298052
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1510298050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.8}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &1510298053
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1510298050}
-  m_CullTransparentMesh: 1
 --- !u!1 &1511264717
 GameObject:
   m_ObjectHideFlags: 0
@@ -29102,8 +29027,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1511264720
 MonoBehaviour:
@@ -30752,8 +30677,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1640144875
 MonoBehaviour:
@@ -31305,6 +31230,159 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5127958073645891181, guid: 71328e54710c2c54abcf77fd0cd1b07e, type: 3}
   m_PrefabInstance: {fileID: 217434003}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1690411819
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1690411820}
+  - component: {fileID: 1690411823}
+  - component: {fileID: 1690411822}
+  - component: {fileID: 1690411821}
+  m_Layer: 5
+  m_Name: ScoreTextEffect
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1690411820
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1690411819}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 454278929}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 200, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1690411821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1690411819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0a9c7aa4d3a03a42a49ec1f32be4672, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  worldOffset: {x: 1, y: 4, z: 0}
+  scaleUpDuration: 0.1
+  holdDuration: 0.5
+  scaleDownDuration: 0.1
+--- !u!114 &1690411822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1690411819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: + 100
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 2bc5664f48efb334f87ee2cbda7ee190, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 2bc5664f48efb334f87ee2cbda7ee190, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 36
+  m_fontSizeBase: 36
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 18
+  m_fontSizeMax: 72
+  m_fontStyle: 0
+  m_HorizontalAlignment: 1
+  m_VerticalAlignment: 256
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &1690411823
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1690411819}
+  m_CullTransparentMesh: 1
 --- !u!1 &1695305846
 GameObject:
   m_ObjectHideFlags: 0
@@ -31477,8 +31555,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1697462425
 MonoBehaviour:
@@ -31617,8 +31695,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1702371737
 MonoBehaviour:
@@ -32281,8 +32359,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1753136224
 MonoBehaviour:
@@ -33446,8 +33524,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1842236167
 MonoBehaviour:
@@ -34002,8 +34080,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1871103636
 MonoBehaviour:
@@ -34450,8 +34528,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1892380942
 MonoBehaviour:
@@ -35004,8 +35082,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1929617745
 MonoBehaviour:
@@ -35372,8 +35450,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1949337593
 MonoBehaviour:
@@ -35512,8 +35590,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1952407898
 MonoBehaviour:
@@ -36079,8 +36157,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1981766653
 MonoBehaviour:
@@ -36355,8 +36433,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1984282827
 MonoBehaviour:
@@ -36495,8 +36573,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &1986741806
 MonoBehaviour:
@@ -36738,6 +36816,7 @@ MonoBehaviour:
   windEffectController: {fileID: 801387905}
   windowComboEffect: {fileID: 1954053843}
   fireworkController: {fileID: 2087303298}
+  scoreTextEffectController: {fileID: 1690411821}
   buttonSounds:
   - {fileID: 417549611}
   - {fileID: 1996942608}
@@ -37299,8 +37378,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &2005004202
 MonoBehaviour:
@@ -37449,8 +37528,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &2014350568
 MonoBehaviour:
@@ -37682,8 +37761,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &2020996895
 MonoBehaviour:
@@ -37822,8 +37901,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &2021849052
 MonoBehaviour:
@@ -38312,8 +38391,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &2044480887
 MonoBehaviour:
@@ -38642,8 +38721,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!1 &2059580931
 GameObject:
@@ -39049,8 +39128,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &2074303423
 MonoBehaviour:
@@ -39304,8 +39383,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &2087312030
 MonoBehaviour:
@@ -39537,8 +39616,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.47
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &2097448124
 MonoBehaviour:
@@ -40107,8 +40186,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5656c3107cc445bc2531b2d2021c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  perfectThreshold: 0.35
-  goodThreshold: 0.8
+  perfectThreshold: 0.7
+  goodThreshold: 0.9
   isNotLanded: 1
 --- !u!114 &2139583985
 MonoBehaviour:

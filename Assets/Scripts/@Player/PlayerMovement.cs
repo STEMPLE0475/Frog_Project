@@ -119,6 +119,53 @@ public class PlayerMovement : MonoBehaviour
 
     public void SetTrajectoryLineByCheckPoint(bool isCheck) => hideTrajectoryLineByCheckPoint = isCheck;
 
+
+    public void ReduceTrajectoryAlpha()
+    {
+        if (trajectoryLine == null || trajectoryLine.material == null)
+        {
+            Debug.LogWarning("궤적 라인 또는 머티리얼이 할당되지 않았습니다.");
+            return;
+        }
+
+        // .material에 접근하면 이 LineRenderer만의 고유 머티리얼 인스턴스가 생성됩니다.
+        Material lineMat = trajectoryLine.material;
+
+        // URP/Unlit의 기본 색상 프로퍼티는 "_BaseColor"입니다.
+        if (lineMat.HasProperty("_Color"))
+        {
+            // 1. 현재 색상 가져오기
+            Color currentColor = lineMat.GetColor("_Color");
+
+            // 2. 알파 값 0.1f 감소 (0 미만으로 내려가지 않도록 Clamp)
+            float newAlpha = Mathf.Clamp(currentColor.a - 0.1f, 0f, 1f);
+
+            // 3. 알파 값이 적용된 새 색상 설정
+            currentColor.a = newAlpha;
+            lineMat.SetColor("_Color", currentColor);
+        }
+        else
+        {
+            Debug.LogWarning("머티리얼에 '_Color' 프로퍼티가 없습니다. 셰이더를 확인하세요.");
+        }
+    }
+    public void ResetTrajectoryAlpha()
+    {
+        if (trajectoryLine == null || trajectoryLine.material == null)
+        {
+            return; // ReduceTrajectoryAlpha에서 이미 경고했을 수 있으므로 여기선 생략
+        }
+
+        Material lineMat = trajectoryLine.material;
+
+        if (lineMat.HasProperty("_Color"))
+        {
+            Color currentColor = lineMat.GetColor("_Color");
+            currentColor.a = 1.0f;
+            lineMat.SetColor("_Color", currentColor);
+        }
+    }
+
     private Vector3[] CalculateTrajectoryPoints(float jumpForce, Vector3 windForce, Vector3 startPos)
     {
         List<Vector3> points = new List<Vector3>();

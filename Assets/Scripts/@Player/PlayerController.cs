@@ -112,6 +112,7 @@ public class PlayerController : MonoBehaviour
         effects.PlayLandSound();
         effects.PlayLandParticles(accuracy);
         effects.ResetScale();
+        movement.ReduceTrajectoryAlpha();
 
         // 콤보 계산 (내부 이펙트 연동을 위해 콤보는 Player가 관리)
         switch (accuracy)
@@ -169,14 +170,18 @@ public class PlayerController : MonoBehaviour
         StopAllCoroutines(); // 둥둥 코루틴 정지
         ResetCombo();
 
-        movement.ResetVelocity();
         transform.position = playerSpawnPos;
-        effects.ResetScale();
         playerState.ResetState(); // 상태 초기화
         collisionHandler.SetCollider(true);
-        effects.SetPlayerMesh(false); // 원본 메시
+
+        effects.ResetScale();
+        effects.SetPlayerMesh(false); 
         effects.SetTrail(true);
+
         inputHandler.EnableInput(true);
+
+        movement.ResetVelocity();
+        movement.ResetTrajectoryAlpha();
         movement.SetTrajectoryLineByCheckPoint(true);
     }
 

@@ -9,7 +9,7 @@ using UnityEngine.SocialPlatforms.Impl;
 [RequireComponent(typeof(NetworkManager))]
 public class GameManager : MonoBehaviour
 {
-    string version = "0.4.0"; // 빌드시 버전 명을 반드시 명시할 것!!
+    string version = "0.4.1"; // 빌드시 버전 명을 반드시 명시할 것!!
 
     [Header("Managers (Internal)")]
     private GameStateManager gameStateManager;

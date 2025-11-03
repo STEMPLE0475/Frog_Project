@@ -138,7 +138,7 @@ public class PlayerMovement : MonoBehaviour
             Color currentColor = lineMat.GetColor("_Color");
 
             // 2. 알파 값 0.1f 감소 (0 미만으로 내려가지 않도록 Clamp)
-            float newAlpha = Mathf.Clamp(currentColor.a - 0.1f, 0f, 1f);
+            float newAlpha = Mathf.Clamp(currentColor.a - 0.07f, 0.01f, 1f);
 
             // 3. 알파 값이 적용된 새 색상 설정
             currentColor.a = newAlpha;
@@ -161,7 +161,7 @@ public class PlayerMovement : MonoBehaviour
         if (lineMat.HasProperty("_Color"))
         {
             Color currentColor = lineMat.GetColor("_Color");
-            currentColor.a = 1.0f;
+            currentColor.a = 0.7f;
             lineMat.SetColor("_Color", currentColor);
         }
     }

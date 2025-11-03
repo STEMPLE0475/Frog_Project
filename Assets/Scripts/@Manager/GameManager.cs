@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private WindEffectController windEffectController;
 
     [SerializeField] private WindowComboEffect windowComboEffect;
+    [SerializeField] private FireworkController fireworkController;
 
     [Header("Game Variables")]
     [SerializeField] private List<ButtonSound> buttonSounds;
@@ -72,6 +73,7 @@ public class GameManager : MonoBehaviour
         hudController.Initiate();
 
         windowComboEffect.Initiate();
+        fireworkController.Initiate();
 
         gameStateManager.Initiate(playerController, hudController, audioManager);
 
@@ -190,9 +192,11 @@ public class GameManager : MonoBehaviour
             windEffectController.UpdateWindEffect(wind);
         };
 
+        // 체크포인트 진입 이벤트
         blockManager.OnEnterCheckPoint += (checkpoint) =>
         {
             dataManager.HandleCheckPoint(checkpoint);
+            fireworkController.PlayEffect();
             if (checkpoint == 1) playerController.HideTrajectoryByCheckPoint();
         };
     }

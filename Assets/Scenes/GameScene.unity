@@ -2746,7 +2746,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 363.34497, y: -189.84001}
-  m_SizeDelta: {x: 266.69, y: 230.32}
+  m_SizeDelta: {x: 301.72, y: 256.8437}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &188427495
 MonoBehaviour:
@@ -2771,6 +2771,13 @@ MonoBehaviour:
   - {fileID: 21300000, guid: b0c17c034ca9a1642b0469ab5698f569, type: 3}
   - {fileID: 21300000, guid: 8e49f2a96232a6345b2f86d196ad8c9b, type: 3}
   - {fileID: 21300000, guid: 9743cb12895b810489a9c5a2273eb0cb, type: 3}
+  - {fileID: 21300000, guid: e5f01492dde38ec4fb7fdf6e48278055, type: 3}
+  - {fileID: 21300000, guid: 5248500f4bb04514d853d9c1ed83721e, type: 3}
+  - {fileID: 21300000, guid: 462bcc37e6d52664094b9e80ff377f2d, type: 3}
+  - {fileID: 21300000, guid: 0b79fd22ae731b94cba21aa29a1db34f, type: 3}
+  - {fileID: 21300000, guid: 3ecbf4a7ed7f3ca49a50107665a6e3a0, type: 3}
+  - {fileID: 21300000, guid: bf006480972494d47aaf01c3f376c557, type: 3}
+  - {fileID: 21300000, guid: 3ac94167c21a7a040b35fdb9ec9da49f, type: 3}
   animationDuration: 0.1
   initialScale: 0.5
   peakScale: 1.5
@@ -8044,8 +8051,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 16.02
-  m_fontSizeBase: 16.02
+  m_fontSize: 13.22
+  m_fontSizeBase: 13.22
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -50620,6 +50627,8 @@ MonoBehaviour:
   heightMultiplier: 1
   trajectoryLine: {fileID: 7466288415502755225}
   lineSegmentCount: 30
+  defaultLineAlpha: 0.4
+  minusLineAlpha: 0.08
 --- !u!114 &7466288415502755222
 MonoBehaviour:
   m_ObjectHideFlags: 0

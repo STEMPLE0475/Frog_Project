@@ -19,6 +19,7 @@ public class PlayerInputHandler : MonoBehaviour
 
     private PlayerState playerState;
     private PlayerInput playerInput;
+    private Touchscreen touchscreen;
     private Keyboard keyboard;
 
     private float currentJumpForce;
@@ -30,6 +31,7 @@ public class PlayerInputHandler : MonoBehaviour
         playerState = GetComponent<PlayerState>();
         playerInput = GetComponent<PlayerInput>();
         keyboard = Keyboard.current;
+        touchscreen = Touchscreen.current;
 
         if (playerState == null) Debug.LogError("[PlayerInputHandler] PlayerState가 없습니다.");
         if (playerInput == null) Debug.LogError("[PlayerInputHandler] PlayerInput이 없습니다.");
@@ -39,26 +41,49 @@ public class PlayerInputHandler : MonoBehaviour
 
     void Update()
     {
-        // 아직 초기화 안됐으면 재시도하고, 그래도 없으면 리턴
+        if (!inputEnabled || playerState == null || playerState.IsFloating)
+            return;
+
         if (keyboard == null)
             keyboard = Keyboard.current;
-
-        if (!inputEnabled || playerState == null || keyboard == null || playerState.IsFloating)
-            return;
+        if (touchscreen == null)
+            touchscreen = Touchscreen.current;
 
         HandleInput();
     }
 
     private void HandleInput()
     {
-        if (keyboard == null || playerState == null) return;
+        bool pressStarted = false;
+        bool isPressed = false;
+        bool pressReleased = false;
 
-        // 일부 플랫폼/디바이스에서 spaceKey가 null일 수도 있어 보호
-        var space = keyboard.spaceKey;
-        if (space == null) return;
+        // --- 키보드 입력 ---
+        if (keyboard != null)
+        {
+            var space = keyboard.spaceKey;
+            if (space != null)
+            {
+                pressStarted |= space.wasPressedThisFrame;
+                isPressed |= space.isPressed;
+                pressReleased |= space.wasReleasedThisFrame;
+            }
+        }
 
-        // 스페이스 처음 눌렀을 때
-        if (space.wasPressedThisFrame && !playerState.IsAirborne)
+        // --- 모바일 터치 입력 ---
+        if (touchscreen != null && touchscreen.primaryTouch != null)
+        {
+            var touch = touchscreen.primaryTouch;
+            if (touch.press.wasPressedThisFrame)
+                pressStarted = true;
+            if (touch.press.isPressed)
+                isPressed = true;
+            if (touch.press.wasReleasedThisFrame)
+                pressReleased = true;
+        }
+
+        // --- 입력 처리 ---
+        if (pressStarted && !playerState.IsAirborne)
         {
             isCharging = true;
             currentJumpForce = minJumpForce;
@@ -66,8 +91,7 @@ public class PlayerInputHandler : MonoBehaviour
             OnChargeUpdated?.Invoke(0f, currentJumpForce);
         }
 
-        // 누르는 중
-        if (space.isPressed && isCharging)
+        if (isPressed && isCharging)
         {
             currentJumpForce += chargeRate * Time.deltaTime;
             currentJumpForce = Mathf.Clamp(currentJumpForce, minJumpForce, maxJumpForce);
@@ -76,8 +100,7 @@ public class PlayerInputHandler : MonoBehaviour
             OnChargeUpdated?.Invoke(normalizedValue, currentJumpForce);
         }
 
-        // 뗐을 때
-        if (space.wasReleasedThisFrame && isCharging && !playerState.IsAirborne)
+        if (pressReleased && isCharging && !playerState.IsAirborne)
         {
             isCharging = false;
             OnJumpRequested?.Invoke(currentJumpForce);

@@ -129,13 +129,51 @@ public class NetworkManager : MonoBehaviour
     public void EndCurrentSession(SessionData sessionData)
     {
         if (sessionData == null || string.IsNullOrEmpty(sessionData.SessionId))
-        {
-            Debug.LogWarning("EndCurrentSession: sessionData가 null입니다.");
-            return;
-        }
+            {
+                Debug.LogWarning("EndCurrentSession: sessionData가 null입니다.");
+                return;
+            }
 
-        // 'game_end' 요약 이벤트 전송
-        AnalyticsService.Instance.RecordEvent(new CustomEvent("session_result_0")
+        // 1) 메타/진행
+        AnalyticsService.Instance.RecordEvent(new CustomEvent("session_meta_a1")
+        {
+            { "version", sessionData.Version },
+            { "sessionId_str", sessionData.SessionId },
+            { "landCount", sessionData.TotalLandings },
+            { "totalCheckPoint", sessionData.TotalCheckPoint },
+        });
+
+        // 2) 점수/콤보
+        AnalyticsService.Instance.RecordEvent(new CustomEvent("session_score_a1")
+        {
+            { "version", sessionData.Version },
+            { "sessionId_str", sessionData.SessionId },
+            { "finalScore", sessionData.FinalScore },
+            { "bestCombo", sessionData.BestCombo }
+        });
+
+        // 3) 정확도
+        AnalyticsService.Instance.RecordEvent(new CustomEvent("session_accuracy_a1")
+        {
+            { "version", sessionData.Version },
+            { "sessionId_str", sessionData.SessionId },
+            { "perfectCount", sessionData.PerfectLandings },
+            { "goodCount", sessionData.GoodLandings },
+            { "badCount", sessionData.BadLandings }
+        });
+
+        // 4) 종료/사망
+        AnalyticsService.Instance.RecordEvent(new CustomEvent("session_death_a1")
+        {
+            { "version", sessionData.Version },
+            { "sessionId_str", sessionData.SessionId },
+            { "lastDeath_X", sessionData.DeathPosition?.x ?? 0f },
+            { "lastDeath_Y", sessionData.DeathPosition?.y ?? 0f },
+            { "lastDeath_Z", sessionData.DeathPosition?.z ?? 0f }, 
+        });
+
+        //기존 result0
+        AnalyticsService.Instance.RecordEvent(new CustomEvent("session_result0")
         {
             { "version", sessionData.Version },
             { "sessionId_str", sessionData.SessionId },

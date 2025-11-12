@@ -159,9 +159,9 @@ public class GameManager : MonoBehaviour
 
             ShowLeaderBoard();
             hudController.GameOver();
+            mapManager.DisableMap();
             cameraController.DeathZoomStart();
             canvasManager.SetActive_Header(false);
-            mapManager.DisableMap();
         };
 
         // --- HUD 버튼 이벤트 ---
@@ -176,7 +176,6 @@ public class GameManager : MonoBehaviour
             dataManager.HandleLanding(acc);
             windManager.SetLandCount(sessionLandCount);
             cameraController.ShakeCamera(combo);
-            mapManager.UpdateMap();
         };
 
         // 플레이어 점프 시작 이벤트
@@ -191,7 +190,7 @@ public class GameManager : MonoBehaviour
             windowComboEffect.StartComboEffect(combo);
         };
 
-        // 바다에 떨어지는 이벤트 (게임오버)
+        // 바다에 빠진 이벤트 (게임오버)
         playerController.OnSeaCollision += () =>
         {
             dataManager.LogDeath(playerController.GetPlayerPos());
@@ -249,5 +248,10 @@ public class GameManager : MonoBehaviour
         string top10 = task.Result;
 
         hudController.Update_LeaderBoardTMP(top10);
+    }
+
+    private void Update()
+    {
+        mapManager.UpdateMap();
     }
 }

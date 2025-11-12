@@ -9,7 +9,9 @@ using UnityEngine.SocialPlatforms.Impl;
 [RequireComponent(typeof(NetworkManager))]
 public class GameManager : MonoBehaviour
 {
-    string version = "0.4.2"; // 빌드시 버전 명을 반드시 명시할 것!!
+    [Header("반드시 빌드 전 작성해야 하는 변수!!!")]
+    string version = "0.5"; // 빌드시 버전 명을 반드시 명시할 것!!
+    bool isDevelopMode = true; // 반드시 빌드시 개발자 모드 해제할 것!!
 
     [Header("Managers (Internal)")]
     private GameStateManager gameStateManager;
@@ -37,6 +39,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private WindowComboEffect windowComboEffect;
     [SerializeField] private FireworkController fireworkController;
     [SerializeField] private ScoreTextEffectController scoreTextEffectController;
+    [SerializeField] private MapManager mapManager;
 
     [Header("Game Variables")]
     [SerializeField] private List<ButtonSound> buttonSounds;
@@ -48,6 +51,7 @@ public class GameManager : MonoBehaviour
         dataManager = GetComponent<DataManager>();
         audioManager = GetComponent<AudioManager>();
         networkManager = GetComponent<NetworkManager>();
+        NetworkManager.SetDeveloperMode(isDevelopMode);
 
         // 2. 각 매니저 'Initiate' (의존성 주입)
         await networkManager.Initiate();
@@ -79,6 +83,7 @@ public class GameManager : MonoBehaviour
         scoreTextEffectController.Initiate(playerController.transform);
 
         gameStateManager.Initiate(playerController, hudController, audioManager);
+        mapManager.Initiate(blockManager, playerController);
 
         ShowLeaderBoard();
 
@@ -138,6 +143,7 @@ public class GameManager : MonoBehaviour
             windManager.ResetWindMangaer();
             cameraController.ResetCamera();
             canvasManager.SetActive_Header(true);
+            mapManager.EnableMap();
 
             return newSessionId;
         }
@@ -155,6 +161,7 @@ public class GameManager : MonoBehaviour
             hudController.GameOver();
             cameraController.DeathZoomStart();
             canvasManager.SetActive_Header(false);
+            mapManager.DisableMap();
         };
 
         // --- HUD 버튼 이벤트 ---
@@ -169,6 +176,7 @@ public class GameManager : MonoBehaviour
             dataManager.HandleLanding(acc);
             windManager.SetLandCount(sessionLandCount);
             cameraController.ShakeCamera(combo);
+            mapManager.UpdateMap();
         };
 
         // 플레이어 점프 시작 이벤트

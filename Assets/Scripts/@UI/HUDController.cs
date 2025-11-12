@@ -204,6 +204,5 @@ public class HUDController : MonoBehaviour
     {
         leaderBoard.text = txt;
         leaderBoard2.text = txt;
-        Debug.Log("리더보드 갱신");
     }
 }

@@ -44,5 +44,5 @@ public class BlockManager : MonoBehaviour
         }
     }
 
-
+    public float GetEndCheckPointXPos() => checkPoint_triggers[checkPoint_triggers.Count - 1].transform.position.x;
 }

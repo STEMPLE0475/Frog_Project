@@ -12,6 +12,9 @@ using Newtonsoft.Json;
 
 public class NetworkManager : MonoBehaviour
 {
+    public static bool IsDeveloperMode = false;
+    public static void SetDeveloperMode(bool isDevMode) => IsDeveloperMode = isDevMode;
+
     public event Action<UserData> OnUserDataLoaded; // 데이터 로드 완료 이벤트
 
     private UserData loadedUserData;
@@ -25,6 +28,8 @@ public class NetworkManager : MonoBehaviour
     // 1) UGS 초기화 (GameManager에서 await networkManager.Initiate();)
     public async Task Initiate()
     {
+        if (IsDeveloperMode) return;
+
         try
         {
             await UnityServices.InitializeAsync();
@@ -59,6 +64,16 @@ public class NetworkManager : MonoBehaviour
     // 내부 비동기 구현
     private async Task ProcessDataByUserIDAsync(string normalizedUserID, string displayNickname)
     {
+        // 개발자 모드: 통신 차단 및 데이터 로컬 초기화
+        if (IsDeveloperMode)
+        {
+            loadedUserData = new UserData(displayNickname);
+            loadedUserData.GameOpenedCount++; // 로컬에서 카운트만 흉내
+            loadedUserData.Nickname = displayNickname;
+            OnUserDataLoaded?.Invoke(loadedUserData);
+            return;
+        }
+
         try
         {
             var dict = await CloudSaveService.Instance.Data.Player.LoadAsync(
@@ -108,6 +123,8 @@ public class NetworkManager : MonoBehaviour
             return;
         }
 
+        if (IsDeveloperMode) return; // 개발자 모드: 애널리틱스 및 저장 차단
+
         if (loadedUserData != null)
         {
             loadedUserData.SessionStartCount++;
@@ -129,10 +146,12 @@ public class NetworkManager : MonoBehaviour
     public void EndCurrentSession(SessionData sessionData)
     {
         if (sessionData == null || string.IsNullOrEmpty(sessionData.SessionId))
-            {
-                Debug.LogWarning("EndCurrentSession: sessionData가 null입니다.");
-                return;
-            }
+        {
+            Debug.LogWarning("EndCurrentSession: sessionData가 null입니다.");
+            return;
+        }
+
+        if (IsDeveloperMode) return; // 개발자 모드: 애널리틱스 이벤트 전송 차단
 
         // 1) 메타/진행
         AnalyticsService.Instance.RecordEvent(new CustomEvent("session_meta_a1")
@@ -196,6 +215,8 @@ public class NetworkManager : MonoBehaviour
 
         loadedUserData.HighScore = candidateScore;
 
+        if (IsDeveloperMode) return; // 개발자 모드: 저장 및 리더보드 반영 차단
+
         var saveTask = SaveUserDataAsync();
         // 최신 API: AddPlayerScoreAsync 사용
         var leaderboardTask = LeaderboardsService.Instance.AddPlayerScoreAsync(
@@ -215,6 +236,11 @@ public class NetworkManager : MonoBehaviour
     // 6) 리더보드 Top10
     public async Task<string> GetTop10RankingStringAsync()
     {
+        if (IsDeveloperMode)
+        {
+            return "Developer Mode!!!"; // 통신 차단 메시지 반환
+        }
+
         try
         {
             var res = await LeaderboardsService.Instance.GetScoresAsync(
@@ -247,6 +273,7 @@ public class NetworkManager : MonoBehaviour
             Debug.LogWarning("SaveUserDataAsync: loadedUserData가 null이라 저장할 수 없습니다.");
             return;
         }
+        if (IsDeveloperMode) return; // 개발자 모드: 클라우드 저장 차단
 
         string json = JsonConvert.SerializeObject(loadedUserData);
         var data = new Dictionary<string, object> { { CLOUD_SAVE_USER_DATA_KEY, json } };

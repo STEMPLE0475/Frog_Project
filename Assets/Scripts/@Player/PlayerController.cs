@@ -59,6 +59,8 @@ public class PlayerController : MonoBehaviour
         EventBind();
     }
 
+    public Vector3 GetPlayerSpawnPos() => playerSpawnPos;
+
     // 모든 컴포넌트의 이벤트를 구독
     void EventBind()
     {

@@ -41,6 +41,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private ScoreTextEffectController scoreTextEffectController;
     [SerializeField] private MapManager mapManager;
 
+    [SerializeField] private NextCharacter nextCharacterManager;
+    [SerializeField] private CheatManager cheatManager; // 개발자용 치트
+
     [Header("Game Variables")]
     [SerializeField] private List<ButtonSound> buttonSounds;
 
@@ -84,6 +87,8 @@ public class GameManager : MonoBehaviour
 
         gameStateManager.Initiate(playerController, hudController, audioManager);
         mapManager.Initiate(blockManager, playerController);
+        nextCharacterManager.Initiate();
+        if (isDevelopMode) cheatManager.Initiate(playerController, blockManager);
 
         ShowLeaderBoard();
 
@@ -144,7 +149,7 @@ public class GameManager : MonoBehaviour
             cameraController.ResetCamera();
             canvasManager.SetActive_Header(true);
             mapManager.EnableMap();
-
+            nextCharacterManager.StartAnimation();
             return newSessionId;
         }
 

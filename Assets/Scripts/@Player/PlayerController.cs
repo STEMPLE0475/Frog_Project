@@ -215,14 +215,27 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void PlusCombo()
+    //CheatManager : 해당 좌표로 강제 텔레포트
+    public void ForceTeleport(Vector3 targetPos)
+    {
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+        transform.position = targetPos;
+        playerState.SetAirborne(false);
+    }
+
+    public void PlusCombo()
     {
         combo++;
         OnCombo?.Invoke(combo, transform.position); // 내부 이펙트 갱신용
-    }
-    private void ResetCombo()
+    } // PlayerController, CheatManager
+    public void ResetCombo()
     {
         combo = 0;
         OnCombo?.Invoke(combo, transform.position); // 내부 이펙트 갱신용
-    }
+    } // PlayerController, CheatManager
 }

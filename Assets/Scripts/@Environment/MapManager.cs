@@ -30,7 +30,7 @@ public class MapManager : MonoBehaviour
             checkPointAnchors.Add(child.gameObject);
         }
         // 체크 포인트 UI의 눈금을 체크포인트의 위치에 맡게 이동시킨다.
-        checkPointXPos = blockManager.GetCheckPointXPos();
+        checkPointXPos = blockManager.GetCheckPointXPosList();
         RectTransform rectTransform;
         rectTransform = checkPointAnchors[0].GetComponent<RectTransform>();
         rectTransform.anchoredPosition = new Vector2(470 / 2 * (-1f), rectTransform.anchoredPosition.y);

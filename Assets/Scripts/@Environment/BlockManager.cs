@@ -5,9 +5,11 @@ using UnityEngine;
 
 public class BlockManager : MonoBehaviour
 {
+    //내부 변수
     private List<SinkBlock> sink_blocks;
     private List<CheckPointTrigger> checkPoint_triggers;
 
+    //블록이 담긴 폴더
     [SerializeField] private GameObject sink_blocks_folder;
     [SerializeField] private GameObject checkPoint_blocks_folder;
 
@@ -44,6 +46,7 @@ public class BlockManager : MonoBehaviour
         }
     }
 
-    public List<float> GetCheckPointXPos() => checkPoint_triggers.Select(t => t.transform.position.x).ToList();
+    public List<float> GetCheckPointXPosList() => checkPoint_triggers.Select(t => t.transform.position.x).ToList();
+    public Vector3 GetCheckPointXPos(int index) => checkPoint_triggers[index -1].transform.position;
     public float GetEndCheckPointXPos() => checkPoint_triggers[checkPoint_triggers.Count - 1].transform.position.x;
 }

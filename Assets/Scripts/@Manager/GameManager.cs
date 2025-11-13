@@ -232,6 +232,11 @@ public class GameManager : MonoBehaviour
         {
             cameraController.OnFollowStart(nextTarget);
         };
+        nextCharacterManager.OnGameEnd += () =>
+        {
+            dataManager.LogDeath(playerController.GetPlayerPos());
+            gameStateManager.TriggerGameOver();
+        };
     }
 
     // === 함수 ===

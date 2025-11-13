@@ -30,6 +30,7 @@ public class NextCharacter : MonoBehaviour
     private float turnaroundTime = 1f;
     private float turnaroundAndWaitDelay = 1f;
     public Action<Transform> OnCharacterAnimationEnd;
+    public Action OnGameEnd;
 
     public void Initiate()
     {
@@ -123,6 +124,8 @@ public class NextCharacter : MonoBehaviour
 
         spawnedEndCharacterObj.transform.position = endPos;
         spawnedEndCharacterObj.transform.rotation = startRotation;
+
+        OnGameEnd?.Invoke();
     }
 
     

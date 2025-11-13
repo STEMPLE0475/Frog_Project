@@ -8,6 +8,7 @@ public class GameStateManager : MonoBehaviour
     public event Action OnGamePause;
     public event Action OnGameResume;
     public event Action OnGameOver;
+    public event Action OnGameEnd;
 
     private bool isPaused = false;
     private bool isGameStarted = false; // 메인화면/인게임 구분
@@ -98,6 +99,13 @@ public class GameStateManager : MonoBehaviour
                                // playerController.GameOver(); // 이건 PlayerController가 스스로 처리 (ex: OnSeaCollision)
 
         OnGameOver?.Invoke(); // 게임 오버 이벤트 발생
+    }
+
+    // 마지막 체크포인트에 도달시 GameManager를 통해 호출
+    public void EndGame()
+    {
+        playerController.EnableInput(false);
+        OnGameEnd?.Invoke();
     }
 
     // (PlayerController의 GameOver()가 호출하는) 리스폰 로직

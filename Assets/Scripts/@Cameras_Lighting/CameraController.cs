@@ -26,11 +26,19 @@ public class CameraController : MonoBehaviour
         this.playerTransform = playerTransform;
         impulseSource = cinemachineCamera.GetComponent<CinemachineImpulseSource>();
         cinemachineCamera = cinemachineCamera.GetComponent<CinemachineCamera>();
-        OnFollowStart();
+        FollowPlayer();
         SetAllCameraFOV(defaultFOV);
     }
 
-    private void OnFollowStart() => cinemachineCamera.Follow = playerTransform;
+    public void FollowPlayer()
+    {
+        cinemachineCamera.Follow = playerTransform;
+    }
+
+    public void OnFollowStart(Transform targetTransform)
+    {
+        cinemachineCamera.Follow = targetTransform;
+    }
 
     public void OnZoomStart(float jumpDuration)
     {
@@ -127,6 +135,7 @@ public class CameraController : MonoBehaviour
 
     public void ResetCamera()
     {
+        FollowPlayer();
         if (zoomCoroutine != null)
         {
             StopCoroutine(zoomCoroutine);

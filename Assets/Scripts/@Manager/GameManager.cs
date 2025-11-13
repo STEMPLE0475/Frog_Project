@@ -149,7 +149,9 @@ public class GameManager : MonoBehaviour
             cameraController.ResetCamera();
             canvasManager.SetActive_Header(true);
             mapManager.EnableMap();
-            nextCharacterManager.StartAnimation();
+            nextCharacterManager.SpawnFrog();
+            nextCharacterManager.PlayStartAnimation();
+
             return newSessionId;
         }
 
@@ -218,6 +220,17 @@ public class GameManager : MonoBehaviour
             dataManager.HandleCheckPoint(checkpoint);
             fireworkController.PlayEffect();
             if (checkpoint == 1) playerController.HideTrajectoryByCheckPoint();
+            if (checkpoint == 5) gameStateManager.EndGame();
+        };
+
+        gameStateManager.OnGameEnd += () =>
+        {
+            nextCharacterManager.PlayEndAnimation();
+        };
+
+        nextCharacterManager.OnCharacterAnimationEnd += (Transform nextTarget) =>
+        {
+            cameraController.OnFollowStart(nextTarget);
         };
     }
 

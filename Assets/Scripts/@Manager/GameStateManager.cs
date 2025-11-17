@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 public class GameStateManager : MonoBehaviour
 {
@@ -11,21 +12,21 @@ public class GameStateManager : MonoBehaviour
     public event Action OnGameEnd;
 
     private bool isPaused = false;
-    private bool isGameStarted = false; // 메인화면/인게임 구분
+    public bool isGameStarted = false; // 메인화면/인게임 구분
+    public bool isClear = false;
 
     // 이 매니저가 제어해야 할 다른 컴포넌트들
     private PlayerController playerController;
     private HUDController hudController;
     private AudioManager audioManager;
 
-    public void Initiate(PlayerController pc, HUDController hud, AudioManager audio)
+    public void Initiate(PlayerController pc, AudioManager audio)
     {
         this.playerController = pc;
-        this.hudController = hud;
         this.audioManager = audio;
 
         // 처음엔 게임을 멈춘 상태(메인화면)로 시작
-        Time.timeScale = 0f;
+        //Time.timeScale = 0f;
         isPaused = true;
         isGameStarted = false;
         playerController.EnableInput(false);
@@ -36,37 +37,42 @@ public class GameStateManager : MonoBehaviour
         // 게임이 시작된 후에만 ESC 키가 작동하도록
         if (isGameStarted && Input.GetKeyDown(KeyCode.Escape))
         {
-            TogglePause();
+            //TogglePause();
+        }
+
+        if (!isGameStarted && Input.GetKey(KeyCode.Space))
+        {
+            Debug.Log("시작 버튼 눌림");
+            StartGame();
         }
     }
 
-    public void TogglePause()
+/*    public void TogglePause()
     {
         isPaused = !isPaused;
         if (isPaused)
             PauseGame();
         else
             ResumeGame();
-    }
+    }*/
 
     public void StartGame()
     {
-        hudController.ShowHUD(false);
-        hudController.EnableHUDInputOnly(false);
-
-        Time.timeScale = 1f;
         isPaused = false;
         isGameStarted = true;
         playerController.EnableInput(true);
+        isClear = false;
 
-        OnGameStart?.Invoke(); 
+        OnGameStart?.Invoke();
+
     }
 
     public void PauseGame()
     {
         if (!isGameStarted) return; // 메인 화면에서는 Pause가 작동 안 함
 
-        Time.timeScale = 0f;
+        
+        //Time.timeScale = 0f;
         isPaused = true;
         playerController.EnableInput(false);
         hudController.ShowHUD(true, instant: true);
@@ -78,7 +84,7 @@ public class GameStateManager : MonoBehaviour
         OnGamePause?.Invoke();
     }
 
-    public void ResumeGame()
+/*    public void ResumeGame()
     {
         hudController.ShowPausePanel(false);
         hudController.ShowHUD(false);
@@ -89,7 +95,7 @@ public class GameStateManager : MonoBehaviour
         //audioManager.PauseBGM(false);
 
         OnGameResume?.Invoke();
-    }
+    }*/
 
     // PlayerController가 바다에 빠졌을 때 GameManager를 통해 호출됨
     public void TriggerGameOver()
@@ -106,14 +112,16 @@ public class GameStateManager : MonoBehaviour
     {
         playerController.EnableInput(false);
         OnGameEnd?.Invoke();
+        isClear = true;
     }
 
     // (PlayerController의 GameOver()가 호출하는) 리스폰 로직
     public void RestartGame()
     {
-        // 이 함수는 PlayerController의 GameOver() -> GameManager의 GameOver() ->
-        // GameOver 화면의 '다시하기' 버튼이 눌렸을 때 호출되어야 함.
-        // playerController.GameOver(); // (기존 GameOver() -> RespawnPlayer())
+        isPaused = false;
+        isGameStarted = true;
+        isClear = false;
+        playerController.EnableInput(true);
         OnGameStart?.Invoke(); // 게임 재시작
     }
 

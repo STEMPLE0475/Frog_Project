@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dc0e87fe71ecdc4780944eb0e195b58, type: 3}
+  m_Name: 1GoldenFrog
+  m_EditorClassIdentifier: Assembly-CSharp::SkinData
+  Index: 1
+  Name: "\uB808\uC778\uBCF4\uC6B0"
+  Context: "\uB05D\uC5D0 \uB2E4\uB2E4\uB978 \uC790"
+  isSelected: 0
+  material: {fileID: 2100000, guid: d660cbd311b43ea42838c2cd57945220, type: 2}

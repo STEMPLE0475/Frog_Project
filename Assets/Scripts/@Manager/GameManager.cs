@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using JetBrains.Annotations;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
 
@@ -11,7 +12,8 @@ public class GameManager : MonoBehaviour
 {
     [Header("반드시 빌드 전 작성해야 하는 변수!!!")]
     string version = "0.5"; // 빌드시 버전 명을 반드시 명시할 것!!
-    bool isDevelopMode = true; // 반드시 빌드시 개발자 모드 해제할 것!!
+    bool isDevelopMode = false; // 반드시 빌드시 개발자 모드 해제할 것!!
+    bool isClear = false;
 
     [Header("Managers (Internal)")]
     private GameStateManager gameStateManager;
@@ -20,8 +22,7 @@ public class GameManager : MonoBehaviour
     private NetworkManager networkManager;
 
     [Header("Scene Dependencies (Assign in Editor)")]
-    [SerializeField] private CanvasManager canvasManager;
-    [SerializeField] private CanvasEffectManager canvasEffectManager;
+    [SerializeField] private PlayCanvas_Controller playCanvas_Controller;
     [SerializeField] private ComboTextEffect comboTextEffect;
 
     [SerializeField] private CameraController cameraController;
@@ -43,7 +44,9 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private NextCharacter nextCharacterManager;
     [SerializeField] private CheatManager cheatManager; // 개발자용 치트
-
+    [SerializeField] private SkinCanvas_Controller skinCanvas_Contoller;
+    [SerializeField] private MainCanvasManager mainCanvasManager;
+    
     [Header("Game Variables")]
     [SerializeField] private List<ButtonSound> buttonSounds;
 
@@ -76,45 +79,51 @@ public class GameManager : MonoBehaviour
         windEffectController.Initiate(playerController.transform);
         seaManager.Initiate();
 
-        canvasManager.Initiate();
-        canvasEffectManager.Initiate();
         comboTextEffect.Initiate(mainCamera);
-        hudController.Initiate();
+        //hudController.Initiate();
 
         windowComboEffect.Initiate();
         fireworkController.Initiate();
         scoreTextEffectController.Initiate(playerController.transform);
 
-        gameStateManager.Initiate(playerController, hudController, audioManager);
+        //gameStateManager.Initiate(playerController, hudController, audioManager);
+        gameStateManager.Initiate(playerController, audioManager);
         mapManager.Initiate(blockManager, playerController);
         nextCharacterManager.Initiate();
-        if (isDevelopMode) cheatManager.Initiate(playerController, blockManager);
+        cheatManager.Initiate(playerController, blockManager);
+        if (!isDevelopMode) cheatManager.gameObject.SetActive(false);
+        skinCanvas_Contoller.Initiate(playerController);
+        mainCanvasManager.Initiate(playerController);
 
         ShowLeaderBoard();
 
+        nextCharacterManager.SpawnFrog();
         // 3. === 이벤트 연결 ===
 
         // DB 로드 이벤트 (UserData userData)
         networkManager.OnUserDataLoaded += (userData) => {
             dataManager.SetInitialUserData(userData);
-            //dataManager.SetInitialMaxScore(userData);
-            //canvasManager.Update_GameOverMaxScore(userData.HighScore);
-            //canvasManager.Update_Header_MaxScore(userData.HighScore);
-            gameStateManager.StartGame();
+            Debug.Log("유저 데이터 로드 완료");
+            mainCanvasManager.EnableMainPanel();
+
+            if (userData.isClear)
+            {
+                isClear = true;
+            }
         };
 
         // --- 스코어 변경 이벤트 ---
         dataManager.OnScoreChanged += (score) => {
-            canvasManager.Update_Header_CurrentScore(score);
-            canvasManager.Update_GameOverCurrentScore(score);
-            
+            playCanvas_Controller.Update_Header_CurrentScore(score);
+            playCanvas_Controller.Update_GameOverCurrentScore(score);
+
         };
         dataManager.OnMaxScoreChanged += (maxScore) => {
-            canvasManager.Update_Header_MaxScore(maxScore);
-            canvasManager.Update_GameOverMaxScore(maxScore);
+            playCanvas_Controller.Update_Header_MaxScore(maxScore);
+            playCanvas_Controller.Update_GameOverMaxScore(maxScore);
         };
         dataManager.OnComboChanged += (combo) => {
-            // canvasManager.UpdateCombo(combo);
+            //playCanvas_Controller.UpdateCombo(combo);
         };
         dataManager.OnScorePlus += (addScore) =>
         {
@@ -127,17 +136,17 @@ public class GameManager : MonoBehaviour
         //  게임 시작
         gameStateManager.OnGameStart += () =>
         {
+            Debug.Log("Event : OnGameStart");
             string sessionId = GameReset();
             networkManager.StartNewSession(sessionId, "start_button");
-            canvasManager.StartTutorialImageBlink();
+            
         };
 
-        // 게임 재시작
-        gameStateManager.OnGameResume += () =>
+        /*gameStateManager.OnGameResume += () =>
         {
             GameReset();
             networkManager.StartNewSession("restart_button");
-        };
+        };*/
 
         string GameReset()
         {
@@ -147,13 +156,19 @@ public class GameManager : MonoBehaviour
             playerController.RespawnPlayer();
             windManager.ResetWindMangaer();
             cameraController.ResetCamera();
-            canvasManager.SetActive_Header(true);
+            mainCanvasManager.EnablePlayPanel_PlayStart();
             mapManager.EnableMap();
             nextCharacterManager.SpawnFrog();
             nextCharacterManager.PlayStartAnimation();
 
+            if (isClear)
+            {
+                skinCanvas_Contoller.SetClearSkin();
+            }
+
             return newSessionId;
         }
+
 
         // 게임 종료
         gameStateManager.OnGameOver += () =>
@@ -165,17 +180,18 @@ public class GameManager : MonoBehaviour
             _ = networkManager.SaveHighScoreIfBestAsync(maxScore);
 
             ShowLeaderBoard();
-            hudController.GameOver();
+            mainCanvasManager.EnablePlayPanel_GameOver(gameStateManager.isClear);
             mapManager.DisableMap();
             cameraController.DeathZoomStart();
-            canvasManager.SetActive_Header(false);
         };
 
         // --- HUD 버튼 이벤트 ---
-        hudController.OnStartGameClicked += HandleStartGameRequest;
-        hudController.OnResumeGameClicked += gameStateManager.ResumeGame;
-        hudController.OnQuitGameClicked += gameStateManager.QuitGame;
-        hudController.OnRestartClicked += gameStateManager.RestartGame;
+        mainCanvasManager.OnNickNameWrite += HandleLoginRequest;
+
+        //hudController.OnResumeGameClicked += gameStateManager.ResumeGame;
+        //hudController.OnQuitGameClicked += gameStateManager.QuitGame;
+        //hudController.OnRestartClicked += gameStateManager.RestartGame;
+        mainCanvasManager.OnRestartClicked += gameStateManager.RestartGame;
 
         // 플레이어 착지 이벤트 (LandingAccuracy acc, int _currentCombo, vector3 playerPos, int sessionLandCount)
         playerController.OnLanded += (acc, combo, playerPos, sessionLandCount) =>
@@ -208,7 +224,7 @@ public class GameManager : MonoBehaviour
         windManager.OnWindChanged += (wind) =>
         {
             playerController.ApplyNewWind(wind);
-            canvasManager.UpdateWind(wind);
+            playCanvas_Controller.UpdateWind(wind);
             seaManager.SetSeaSpeed(wind);
             audioManager.PlayStartWindSound(wind);
             windEffectController.UpdateWindEffect(wind);
@@ -226,6 +242,8 @@ public class GameManager : MonoBehaviour
         gameStateManager.OnGameEnd += () =>
         {
             nextCharacterManager.PlayEndAnimation();
+            _ = networkManager.SetGameClearAsync();
+            isClear = true;
         };
 
         nextCharacterManager.OnCharacterAnimationEnd += (Transform nextTarget) =>
@@ -241,7 +259,7 @@ public class GameManager : MonoBehaviour
 
     // === 함수 ===
 
-    private void HandleStartGameRequest(string nickname)
+    private void HandleLoginRequest(string nickname)
     {
         if (string.IsNullOrWhiteSpace(nickname))
         {
@@ -270,11 +288,27 @@ public class GameManager : MonoBehaviour
 
         string top10 = task.Result;
 
-        hudController.Update_LeaderBoardTMP(top10);
+
+        mainCanvasManager.Update_LeaderBoardTMP(top10);
+    }
+
+    public void GameOverToHome()
+    {
+        gameStateManager.isGameStarted = false;
+        blockManager.ResetBlocks();
+        playerController.RespawnPlayer();
+        windManager.ResetWindMangaer();
+        cameraController.ResetCamera();
+        nextCharacterManager.SpawnFrog();
+        mainCanvasManager.EnableMainPanel();
     }
 
     private void Update()
     {
-        mapManager.UpdateMap();
+        if (gameStateManager.isGameStarted)
+        {
+            mapManager.UpdateMap();
+        }
+        
     }
 }

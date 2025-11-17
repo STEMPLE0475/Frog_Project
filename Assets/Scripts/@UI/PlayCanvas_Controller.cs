@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CanvasManager : MonoBehaviour
+public class PlayCanvas_Controller : MonoBehaviour
 {
     [Header("Header")]
     [SerializeField] private GameObject Header;
@@ -11,32 +12,74 @@ public class CanvasManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI Header_MaxScoreTMP;
     [SerializeField] private TextMeshProUGUI windIcon;
 
+    [SerializeField] private GameObject PlayPanel;
+    [SerializeField] private GameObject PausePanel;
+    [SerializeField] private GameObject GameOverPanel;
+
+    [SerializeField] private GameObject clearPanel;
+
     [Header("ETC")]
     [SerializeField] private TextMeshProUGUI gameOverScoreTMP;
     [SerializeField] private TextMeshProUGUI gameOverScoreBestTMP;
-    [SerializeField] private TutorialImage tutorialImage;
     [SerializeField] private WindowWindEffect windowWindEffect;
 
     public void Initiate()
     {
-        SetActive_Header(false);
-
-        // 게임 시작 시 점수판 초기화
         Update_Header_CurrentScore(0);
         Update_GameOverCurrentScore(0);
         Update_GameOverMaxScore(0);
         windowWindEffect.Initiate();
     }
-    public void StartTutorialImageBlink() => tutorialImage.StartBlink();
+
+    public void DisablePanel()
+    {
+        ResetAllPanel();
+    }
+
+    public void EnablePlayPanel_PlayStart()
+    {
+        ResetAllPanel();
+        PlayPanel.gameObject.SetActive(true);
+    }
+
+    public void EnablePlayPanel_Pause()
+    {
+        ResetAllPanel();
+        PausePanel.gameObject.SetActive(true);
+    }
+
+    public void EnablePlayPanel_GameOver()
+    {
+        ResetAllPanel();
+        GameOverPanel.gameObject.SetActive(true);
+    }
+
+    public void EnableGameClearPanel()
+    {
+        ResetAllPanel();
+        //클리어 호면 alpha 1.0
+    }
+
+    public void ResetAllPanel()
+    {
+        PlayPanel.gameObject.SetActive(false);
+        PausePanel.gameObject.SetActive(false);
+        GameOverPanel.gameObject.SetActive(false);
+    }
+
+
+    public void EnableClearPanel(bool isClear)
+    {
+        clearPanel.SetActive(isClear);
+    }
 
     // 헤더 UI
-    public void SetActive_Header(bool isActive) => Header.SetActive(isActive);
     public void Update_Header_CurrentScore(int score) => Header_CurrentScoreTMP.text = score.ToString() + "점";
     public void Update_Header_MaxScore(int score) => Header_MaxScoreTMP.text = score.ToString() + "점";
 
     // 게임 종료 UI
-    public void Update_GameOverCurrentScore(int currentScore) => gameOverScoreTMP.text = "현재 점수 : " + currentScore.ToString() + "점";
-    public void Update_GameOverMaxScore(int maxScore) => gameOverScoreBestTMP.text = "최고 점수 : " + maxScore.ToString() + "점";
+    public void Update_GameOverCurrentScore(int currentScore) => gameOverScoreTMP.text = currentScore.ToString();
+    public void Update_GameOverMaxScore(int maxScore) => gameOverScoreBestTMP.text = "BEST   " + maxScore.ToString();
 
     // Wind 관련
     public void UpdateWind(Wind wind)
@@ -97,4 +140,5 @@ public class CanvasManager : MonoBehaviour
 
         return arrowString;
     }
+
 }

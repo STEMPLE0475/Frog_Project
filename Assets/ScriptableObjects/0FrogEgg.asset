@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dc0e87fe71ecdc4780944eb0e195b58, type: 3}
+  m_Name: 0FrogEgg
+  m_EditorClassIdentifier: Assembly-CSharp::SkinData
+  Index: 0
+  Name: "\uAC1C\uAD6C\uB9AC"
+  Context: "\uD3C9\uBC94\uD55C \uAC1C\uAD6C\uB9AC"
+  isSelected: 0
+  material: {fileID: 2100000, guid: a3da6079794431148be1dbb56b4f729f, type: 2}

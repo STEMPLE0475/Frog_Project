@@ -64,12 +64,14 @@ public class NetworkManager : MonoBehaviour
     // 내부 비동기 구현
     private async Task ProcessDataByUserIDAsync(string normalizedUserID, string displayNickname)
     {
+        Debug.Log("로그인 시도 중 ...");
         // 개발자 모드: 통신 차단 및 데이터 로컬 초기화
         if (IsDeveloperMode)
         {
             loadedUserData = new UserData(displayNickname);
             loadedUserData.GameOpenedCount++; // 로컬에서 카운트만 흉내
             loadedUserData.Nickname = displayNickname;
+            Debug.Log("개발자 모드로 임시 데이터로 대체합니다");
             OnUserDataLoaded?.Invoke(loadedUserData);
             return;
         }
@@ -285,6 +287,30 @@ public class NetworkManager : MonoBehaviour
     {
         if (string.IsNullOrWhiteSpace(s)) return "";
         return s.Trim().ToLowerInvariant();
+    }
+
+    public async Task SetGameClearAsync()
+    {
+        if (loadedUserData == null)
+        {
+            Debug.LogWarning("SetGameClearAsync: loadedUserData가 null이라 클리어 상태를 저장할 수 없습니다.");
+            return;
+        }
+
+        // 1. 메모리에 로드된 UserData 객체의 isClear 값을 true로 변경
+        // (UserData 클래스에 public bool isClear; 필드가 있다고 가정)
+        loadedUserData.isClear = true;
+
+        // 2. 변경된 UserData 객체를 클라우드에 통째로 저장
+        try
+        {
+            await SaveUserDataAsync();
+            Debug.Log("게임 클리어 상태 저장 완료: isClear = true");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"SetGameClearAsync 저장 실패: {e.Message}");
+        }
     }
 }
 

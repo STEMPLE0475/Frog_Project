@@ -8,6 +8,7 @@ public class UserData
     public long Coin { get; set; }
     public long GameOpenedCount { get; set; }
     public long SessionStartCount { get; set; }
+    public bool isClear { get; set; }
 
     public UserData(string nickname)
     {
@@ -16,5 +17,6 @@ public class UserData
         Coin = 0;
         GameOpenedCount = 1; // ? 
         SessionStartCount = 0; 
+        isClear = false;
     }
 }

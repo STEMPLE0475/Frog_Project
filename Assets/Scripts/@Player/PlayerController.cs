@@ -28,7 +28,8 @@ public class PlayerController : MonoBehaviour
     private PlayerCollisionHandler collisionHandler;
 
     [SerializeField] private ChargeGaugeController chargeGaugeController;
-
+    [SerializeField] private GameObject Mesh_Main;
+    [SerializeField] private GameObject Mesh_Shadow;
 
     // --- 이벤트 선언 ---
 
@@ -238,4 +239,10 @@ public class PlayerController : MonoBehaviour
         combo = 0;
         OnCombo?.Invoke(combo, transform.position); // 내부 이펙트 갱신용
     } // PlayerController, CheatManager
+
+    public void SetSkin(Material material)
+    {
+        Mesh_Main.GetComponent<MeshRenderer>().material = material;
+        Mesh_Shadow.GetComponent<MeshRenderer>().material = material;
+    }
 }

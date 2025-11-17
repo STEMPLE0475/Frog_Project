@@ -163,8 +163,6 @@ public class HUDController : MonoBehaviour
         ShowHUD(false);
         EnableHUDInputOnly(false);
 
-        // 2. 외부에 "시작" 보고 (닉네임과 함께)
-        OnStartGameClicked?.Invoke(input_field.text);
     }
 
     // (이 로직은 순수 내부 로직이므로 변경 없음)

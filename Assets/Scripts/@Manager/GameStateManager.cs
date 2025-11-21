@@ -1,15 +1,16 @@
 ﻿using UnityEngine;
 using System;
-using System.Runtime.InteropServices.WindowsRuntime;
+using UnityEngine.InputSystem;
 
 public class GameStateManager : MonoBehaviour
 {
+
     // 상태 변경 시 다른 매니저들에게 알려주기 위한 이벤트
     public event Action OnGameStart;
     public event Action OnGamePause;
     public event Action OnGameResume;
     public event Action OnGameOver;
-    public event Action OnGameEnd;
+    public event Action OnGameClear;
 
     private bool isPaused = false;
     public bool isGameStarted = false; // 메인화면/인게임 구분
@@ -39,13 +40,9 @@ public class GameStateManager : MonoBehaviour
         {
             //TogglePause();
         }
-
-        if (!isGameStarted && Input.GetKey(KeyCode.Space))
-        {
-            Debug.Log("시작 버튼 눌림");
-            StartGame();
-        }
     }
+
+    public void OnClickStartButton() => StartGame();
 
 /*    public void TogglePause()
     {
@@ -65,6 +62,33 @@ public class GameStateManager : MonoBehaviour
 
         OnGameStart?.Invoke();
 
+    }
+
+    // 키보드 Space 또는 화면 터치 입력을 감지하는 함수 (Input System 사용)
+    private bool IsStartInputPressed()
+    {
+        bool isInputPressed = false;
+
+        // Input System 장치에 안전하게 접근합니다.
+        var keyboard = Keyboard.current;
+        var touchscreen = Touchscreen.current;
+
+        // 1. 키보드 Space 키 입력 감지
+        // keyboard가 null인지 확인하고 접근
+        if (keyboard != null && keyboard.spaceKey.wasPressedThisFrame)
+        {
+            isInputPressed = true;
+        }
+
+        // 2. 모바일 터치 입력 감지
+        // touchscreen이 null인지 확인하고, primaryTouch의 press가 눌렸는지 확인
+        if (touchscreen != null && touchscreen.primaryTouch.press.wasPressedThisFrame)
+        {
+            isInputPressed = true;
+        }
+
+        // 키보드와 터치 중 하나라도 눌렸으면 true 반환
+        return isInputPressed;
     }
 
     public void PauseGame()
@@ -111,7 +135,7 @@ public class GameStateManager : MonoBehaviour
     public void EndGame()
     {
         playerController.EnableInput(false);
-        OnGameEnd?.Invoke();
+        OnGameClear?.Invoke();
         isClear = true;
     }
 

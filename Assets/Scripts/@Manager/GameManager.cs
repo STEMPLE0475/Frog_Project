@@ -1,7 +1,6 @@
 ﻿using JetBrains.Annotations;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SocialPlatforms.Impl;
 
 // 모든 전문 매니저가 이 게임오브젝트에 같이 붙어있다고 가정
 [RequireComponent(typeof(GameStateManager))]
@@ -11,8 +10,8 @@ using UnityEngine.SocialPlatforms.Impl;
 public class GameManager : MonoBehaviour
 {
     [Header("반드시 빌드 전 작성해야 하는 변수!!!")]
-    string version = "0.5"; // 빌드시 버전 명을 반드시 명시할 것!!
-    bool isDevelopMode = false; // 반드시 빌드시 개발자 모드 해제할 것!!
+    string version = "0.5.1"; // 빌드시 버전 명을 반드시 명시할 것!!
+    bool isDevelopMode = true; // 반드시 빌드시 개발자 모드 해제할 것!!
     bool isClear = false;
 
     [Header("Managers (Internal)")]
@@ -142,47 +141,18 @@ public class GameManager : MonoBehaviour
             
         };
 
-        /*gameStateManager.OnGameResume += () =>
-        {
-            GameReset();
-            networkManager.StartNewSession("restart_button");
-        };*/
-
-        string GameReset()
-        {
-            playerController.ResetCurSessionLandCount();
-            blockManager.ResetBlocks();
-            string newSessionId = dataManager.StartNewSession();
-            playerController.RespawnPlayer();
-            windManager.ResetWindMangaer();
-            cameraController.ResetCamera();
-            mainCanvasManager.EnablePlayPanel_PlayStart();
-            mapManager.EnableMap();
-            nextCharacterManager.SpawnFrog();
-            nextCharacterManager.PlayStartAnimation();
-
-            if (isClear)
-            {
-                skinCanvas_Contoller.SetClearSkin();
-            }
-
-            return newSessionId;
-        }
+        
 
 
         // 게임 종료
         gameStateManager.OnGameOver += () =>
         {
-            SessionData finalSessionData = dataManager.EndSessionAndGetResults();
-            if (finalSessionData != null) networkManager.EndCurrentSession(finalSessionData);
-
-            int maxScore = dataManager.GetMaxScore();
-            _ = networkManager.SaveHighScoreIfBestAsync(maxScore);
-
+            RecordDataToServer();
             ShowLeaderBoard();
             mainCanvasManager.EnablePlayPanel_GameOver(gameStateManager.isClear);
             mapManager.DisableMap();
             cameraController.DeathZoomStart();
+            playerController.EnableInput(false);
         };
 
         // --- HUD 버튼 이벤트 ---
@@ -217,6 +187,7 @@ public class GameManager : MonoBehaviour
         playerController.OnSeaCollision += () =>
         {
             dataManager.LogDeath(playerController.GetPlayerPos());
+            _ = networkManager.SaveUserDataAsync();
             gameStateManager.TriggerGameOver();
         };
 
@@ -239,10 +210,11 @@ public class GameManager : MonoBehaviour
             if (checkpoint == 5) gameStateManager.EndGame();
         };
 
-        gameStateManager.OnGameEnd += () =>
+        gameStateManager.OnGameClear += () =>
         {
             nextCharacterManager.PlayEndAnimation();
-            _ = networkManager.SetGameClearAsync();
+            networkManager.LogClear();
+            _ = networkManager.SaveUserDataAsync();
             isClear = true;
         };
 
@@ -253,6 +225,9 @@ public class GameManager : MonoBehaviour
         nextCharacterManager.OnGameEnd += () =>
         {
             dataManager.LogDeath(playerController.GetPlayerPos());
+            RecordDataToServer();
+            _ = networkManager.SaveUserDataAsync();
+
             gameStateManager.TriggerGameOver();
         };
     }
@@ -292,6 +267,36 @@ public class GameManager : MonoBehaviour
         mainCanvasManager.Update_LeaderBoardTMP(top10);
     }
 
+    public void RecordDataToServer()
+    {
+        SessionData finalSessionData = dataManager.EndSessionAndGetResults();
+        if (finalSessionData != null) networkManager.RecordSessionData(finalSessionData);
+
+        int maxScore = dataManager.GetMaxScore();
+        _ = networkManager.SaveHighScoreIfBestAsync(maxScore);
+
+    }
+
+    public string GameReset()
+    {
+        playerController.ResetCurSessionLandCount();
+        blockManager.ResetBlocks();
+        string newSessionId = dataManager.StartNewSession();
+        playerController.RespawnPlayer();
+        windManager.ResetWindMangaer();
+        cameraController.ResetCamera();
+        mainCanvasManager.EnablePlayPanel_PlayStart();
+        mapManager.EnableMap();
+        nextCharacterManager.SpawnFrog();
+        nextCharacterManager.PlayStartAnimation();
+
+        if (isClear)
+        {
+            skinCanvas_Contoller.SetClearSkin();
+        }
+
+        return newSessionId;
+    }
     public void GameOverToHome()
     {
         gameStateManager.isGameStarted = false;
@@ -301,6 +306,11 @@ public class GameManager : MonoBehaviour
         cameraController.ResetCamera();
         nextCharacterManager.SpawnFrog();
         mainCanvasManager.EnableMainPanel();
+    }
+
+    public void GameOverToRestart()
+    {
+        gameStateManager.RestartGame();
     }
 
     private void Update()

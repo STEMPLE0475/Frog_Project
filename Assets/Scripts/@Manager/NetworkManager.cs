@@ -23,7 +23,7 @@ public class NetworkManager : MonoBehaviour
     private string currentUserNickname_Display; // "MyNick" (표시용 닉네임)
 
     private const string CLOUD_SAVE_USER_DATA_KEY = "USER_DATA";
-    private const string LEADERBOARD_ID = "Frog_Jump"; 
+    private const string LEADERBOARD_ID = "Frog_Jump";
 
     // 1) UGS 초기화 (GameManager에서 await networkManager.Initiate();)
     public async Task Initiate()
@@ -46,7 +46,7 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    // 2) 로그인/유저 데이터 로드 
+    // [UserData] 유저 데이터 로드
     public void HandleUserAuthentication(string inputNickname)
     {
         if (string.IsNullOrWhiteSpace(inputNickname))
@@ -61,7 +61,7 @@ public class NetworkManager : MonoBehaviour
         _ = ProcessDataByUserIDAsync(currentUserID_Normalized, currentUserNickname_Display);
     }
 
-    // 내부 비동기 구현
+    // [UserData] 유저 데이터 로드 : 내부 비동기 구현
     private async Task ProcessDataByUserIDAsync(string normalizedUserID, string displayNickname)
     {
         Debug.Log("로그인 시도 중 ...");
@@ -116,7 +116,7 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    // 4) 세션 시작/종료 (Analytics 이벤트 전송)
+    // [SessionData] 세션 시작/종료 (Analytics 이벤트 전송)
     public void StartNewSession(string sessionId, string startReason = "start_button")
     {
         if (string.IsNullOrEmpty(sessionId))
@@ -145,8 +145,10 @@ public class NetworkManager : MonoBehaviour
         });
     }
 
-    public void EndCurrentSession(SessionData sessionData)
+    // [SessionData] 세션 저장
+    public void RecordSessionData(SessionData sessionData)
     {
+        Debug.Log("세션 데이터를 서버에 기록 중 ...");
         if (sessionData == null || string.IsNullOrEmpty(sessionData.SessionId))
         {
             Debug.LogWarning("EndCurrentSession: sessionData가 null입니다.");
@@ -190,7 +192,7 @@ public class NetworkManager : MonoBehaviour
             { "sessionId_str", sessionData.SessionId },
             { "lastDeath_X", sessionData.DeathPosition?.x ?? 0f },
             { "lastDeath_Y", sessionData.DeathPosition?.y ?? 0f },
-            { "lastDeath_Z", sessionData.DeathPosition?.z ?? 0f }, 
+            { "lastDeath_Z", sessionData.DeathPosition?.z ?? 0f },
         });
 
         //기존 result0
@@ -207,9 +209,14 @@ public class NetworkManager : MonoBehaviour
             { "lastDeath_X", sessionData.DeathPosition?.x ?? 0f },
             { "totalCheckPoint", sessionData.TotalCheckPoint }
         });
+
+        Debug.Log($"세션 데이터 서버에 기록 완료\n" +
+            $"세션 ID : {sessionData.SessionId}" +
+            $"도달 체크포인트 : {sessionData.TotalCheckPoint}" +
+            $"최종 점수 : {sessionData.FinalScore}");
     }
 
-    // 5) 최고점 저장 + 리더보드 반영
+    // [UserData] 최고 점수 저장 -> SaveUserDataAsync
     public async Task SaveHighScoreIfBestAsync(int candidateScore)
     {
         if (loadedUserData == null) return;
@@ -235,7 +242,7 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    // 6) 리더보드 Top10
+    // 리더보드 Top10
     public async Task<string> GetTop10RankingStringAsync()
     {
         if (IsDeveloperMode)
@@ -267,9 +274,10 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    // 8) 저장 유틸 (경고 없는 Player 스코프)
-    private async Task SaveUserDataAsync()
+    // [UserData] 유저 데이터 전부 저장
+    public async Task SaveUserDataAsync()
     {
+        Debug.Log("유저 데이터를 서버에 기록 중 ...");
         if (loadedUserData == null)
         {
             Debug.LogWarning("SaveUserDataAsync: loadedUserData가 null이라 저장할 수 없습니다.");
@@ -279,7 +287,9 @@ public class NetworkManager : MonoBehaviour
 
         string json = JsonConvert.SerializeObject(loadedUserData);
         var data = new Dictionary<string, object> { { CLOUD_SAVE_USER_DATA_KEY, json } };
-
+        Debug.Log($"유저 데이터 서버에 기록 완료\n" +
+            $"닉네임 : {loadedUserData.Nickname}" +
+            $"클리어 여부 : {loadedUserData.isClear}");
         await CloudSaveService.Instance.Data.Player.SaveAsync(data);
     }
 
@@ -289,28 +299,16 @@ public class NetworkManager : MonoBehaviour
         return s.Trim().ToLowerInvariant();
     }
 
-    public async Task SetGameClearAsync()
+    // [UserData] 게임 클리어 여부 저장 [UserData 관리 로직을 DataManager로 이관할 필요 있음]
+    public void LogClear()
     {
         if (loadedUserData == null)
         {
             Debug.LogWarning("SetGameClearAsync: loadedUserData가 null이라 클리어 상태를 저장할 수 없습니다.");
             return;
         }
-
-        // 1. 메모리에 로드된 UserData 객체의 isClear 값을 true로 변경
-        // (UserData 클래스에 public bool isClear; 필드가 있다고 가정)
         loadedUserData.isClear = true;
-
-        // 2. 변경된 UserData 객체를 클라우드에 통째로 저장
-        try
-        {
-            await SaveUserDataAsync();
-            Debug.Log("게임 클리어 상태 저장 완료: isClear = true");
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"SetGameClearAsync 저장 실패: {e.Message}");
-        }
+        Debug.Log("게임 클리어 확인. 전송 대기 중...");
     }
 }
 

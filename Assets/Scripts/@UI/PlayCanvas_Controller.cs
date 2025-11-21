@@ -84,8 +84,6 @@ public class PlayCanvas_Controller : MonoBehaviour
     // Wind 관련
     public void UpdateWind(Wind wind)
     {
-        Debug.Log("바람 방향 : " + wind.direction.ToString());
-        Debug.Log("바람 힘 " + wind.power.ToString());
 
         // 1. 바람 텍스트 설정
         if (windIcon != null)

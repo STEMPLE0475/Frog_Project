@@ -89,7 +89,7 @@ public class SkinCanvas_Controller : MonoBehaviour
     // - 카메라 조작 - 
     private void ShowSkinHandler() 
     {
-        Debug.Log("ShowSkinHandler");
+        //Debug.Log("ShowSkinHandler");
         cam.Follow = skinBlockDic[current_show_index].transform;
         if(current_show_index == current_select_index) 
             SelectButtenSetActive(true);

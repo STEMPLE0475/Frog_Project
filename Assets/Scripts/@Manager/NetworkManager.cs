@@ -65,12 +65,24 @@ public class NetworkManager : MonoBehaviour
     private async Task ProcessDataByUserIDAsync(string normalizedUserID, string displayNickname)
     {
         Debug.Log("로그인 시도 중 ...");
+
+        // 현재 날짜를 "yyyy-MM-dd" 형식으로 저장
+        DateTime today = DateTime.Today;
+        string todayString = today.ToString("yyyy-MM-dd");
+
+        // 통계 정확도를 위한 플래그 추가 (하루에 한 번만 이벤트 전송)
+        bool isNewLoginDay = false;
+
         // 개발자 모드: 통신 차단 및 데이터 로컬 초기화
         if (IsDeveloperMode)
         {
             loadedUserData = new UserData(displayNickname);
             loadedUserData.GameOpenedCount++; // 로컬에서 카운트만 흉내
             loadedUserData.Nickname = displayNickname;
+
+            loadedUserData.ConsecutiveLoginDays = 1; // 임시 데이터이므로 초기화
+            loadedUserData.LastLoginDate = todayString;
+
             Debug.Log("개발자 모드로 임시 데이터로 대체합니다");
             OnUserDataLoaded?.Invoke(loadedUserData);
             return;
@@ -95,12 +107,62 @@ public class NetworkManager : MonoBehaviour
             if (loadedUserData == null)
             {
                 loadedUserData = new UserData(displayNickname);
+                Debug.Log($"새 유저 데이터 생성 완료. 연속 접속: {loadedUserData.ConsecutiveLoginDays}일");
+                isNewLoginDay = true; // 새 유저는 무조건 오늘 처음 접속
             }
             else
             {
                 loadedUserData.GameOpenedCount++;
                 loadedUserData.Nickname = displayNickname;
+
+                if (DateTime.TryParse(loadedUserData.LastLoginDate, out DateTime lastLogin))
+                {
+                    TimeSpan diff = today - lastLogin;
+
+                    if (diff.Days == 0)
+                    {
+                        Debug.Log($"오늘 이미 접속함. 연속 접속 유지: {loadedUserData.ConsecutiveLoginDays}일");
+                        // 오늘 이미 접속함: isNewLoginDay는 false 유지
+                    }
+                    else if (diff.Days == 1)
+                    {
+                        // 어제 접속함: 연속 접속 횟수 1 증가
+                        loadedUserData.ConsecutiveLoginDays++;
+                        Debug.Log($"연속 접속 성공! 연속 접속: {loadedUserData.ConsecutiveLoginDays}일");
+                        isNewLoginDay = true; // 날짜가 바뀌었으므로 이벤트 전송
+                    }
+                    else // diff.Days >= 2
+                    {
+                        // 이틀 이상 미접속: 연속 접속 횟수 초기화 (1일로 설정)
+                        loadedUserData.ConsecutiveLoginDays = 1;
+                        Debug.Log($"연속 접속 실패 (미접속 {diff.Days}일). 연속 접속 초기화: 1일");
+                        isNewLoginDay = true; // 날짜가 바뀌었으므로 이벤트 전송
+                    }
+                }
+                else
+                {
+                    // LastLoginDate 파싱 실패 또는 데이터가 이상한 경우: 1일로 초기화
+                    loadedUserData.ConsecutiveLoginDays = 1;
+                    Debug.Log("LastLoginDate 파싱 실패. 연속 접속 초기화: 1일");
+                    isNewLoginDay = true; // 날짜 기록이 없으므로, 새 접속으로 간주하고 이벤트 전송
+                }
+
+                // 최대 연속 접속 갱신
+                if (loadedUserData.ConsecutiveLoginDays > loadedUserData.MaxConsecutiveLoginDays)
+                {
+                    loadedUserData.MaxConsecutiveLoginDays = loadedUserData.ConsecutiveLoginDays;
+                    Debug.Log($"최대 연속 접속 갱신! 신기록: {loadedUserData.MaxConsecutiveLoginDays}일");
+                }
             }
+
+            // isNewLoginDay가 true일 때, 즉 하루에 한 번만 전송
+            if (isNewLoginDay)
+            {
+                RecordLoginStatsEvent(loadedUserData.ConsecutiveLoginDays, loadedUserData.MaxConsecutiveLoginDays);
+            }
+
+            // 최근 접속일을 오늘 날짜로 갱신 (이벤트 전송 후 저장)
+            loadedUserData.LastLoginDate = todayString;
 
             // 저장 및 닉네임 반영
             await SaveUserDataAsync();
@@ -114,6 +176,22 @@ public class NetworkManager : MonoBehaviour
         {
             Debug.LogError($"ProcessDataByUserIDAsync 실패: {e.Message}");
         }
+    }
+
+    // [Analytics] 로그인 통계 이벤트 전송 (추가된 함수)
+    private void RecordLoginStatsEvent(int currentConsecutiveDays, int maxConsecutiveDays)
+    {
+        if (IsDeveloperMode) return;
+
+        // Unity Analytics로 연속 접속 통계를 전송
+        AnalyticsService.Instance.RecordEvent(new CustomEvent("session_loginstats_a1")
+        {
+            { "Current_Consecutive_Days", currentConsecutiveDays },
+            { "Max_Consecutive_Days", maxConsecutiveDays },
+            { "Total_Game_Open_Count", loadedUserData.GameOpenedCount }
+        });
+
+        Debug.Log($"Analytics Event 전송: login_stats_update, 연속 접속: {currentConsecutiveDays}일");
     }
 
     // [SessionData] 세션 시작/종료 (Analytics 이벤트 전송)

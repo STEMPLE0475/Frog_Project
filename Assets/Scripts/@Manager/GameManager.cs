@@ -10,7 +10,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     [Header("반드시 빌드 전 작성해야 하는 변수!!!")]
-    string version = "0.5.1"; // 빌드시 버전 명을 반드시 명시할 것!!
+    string version = "0.5.2"; // 빌드시 버전 명을 반드시 명시할 것!!
     bool isDevelopMode = false; // 반드시 빌드시 개발자 모드 해제할 것!!
     bool isClear = false;
 

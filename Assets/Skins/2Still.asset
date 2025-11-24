@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dc0e87fe71ecdc4780944eb0e195b58, type: 3}
+  m_Name: 2Still
+  m_EditorClassIdentifier: Assembly-CSharp::SkinData
+  Index: 2
+  Name: "\uAC15\uCCA0 \uAC1C\uAD6C\uB9AC"
+  Context: "\uC774\uBCA4\uD2B8 \uCD9C\uC11D\uCCB4\uD06C \uBCF4\uC0C1"
+  material: {fileID: 2100000, guid: 44850b9e89cf80747b6a2452d11816a7, type: 2}

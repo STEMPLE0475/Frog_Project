@@ -13,11 +13,14 @@ using Newtonsoft.Json;
 public class NetworkManager : MonoBehaviour
 {
     public static bool IsDeveloperMode = false;
-    public static void SetDeveloperMode(bool isDevMode) => IsDeveloperMode = isDevMode;
+    public static bool IsEventPeriod = false;
+    public static void SetDeveloperMode(bool isTrue) => IsDeveloperMode = isTrue;
+    public static void SetEventPeriod(bool isTrue) => IsEventPeriod = isTrue;
 
     public event Action<UserData> OnUserDataLoaded; // 데이터 로드 완료 이벤트
 
     private UserData loadedUserData;
+    public UserData LoadedUserData { get; private set; }
 
     private string currentUserID_Normalized;    // "mynick" (표준화된 ID)
     private string currentUserNickname_Display; // "MyNick" (표시용 닉네임)
@@ -128,7 +131,13 @@ public class NetworkManager : MonoBehaviour
                     {
                         // 어제 접속함: 연속 접속 횟수 1 증가
                         loadedUserData.ConsecutiveLoginDays++;
-                        Debug.Log($"연속 접속 성공! 연속 접속: {loadedUserData.ConsecutiveLoginDays}일");
+                        if (IsEventPeriod) loadedUserData.EventLoginTimes++;
+                        loadedUserData.LoginTimes++;
+                        Debug.Log($"연속 접속 성공! \n" +
+                            $"연속 접속: {loadedUserData.ConsecutiveLoginDays}일\n" +
+                            $"총 접속 일 : {loadedUserData.LoginTimes}일\n" +
+                            $"이벤트 기간 내 출석 : {loadedUserData.EventLoginTimes}일\n");
+
                         isNewLoginDay = true; // 날짜가 바뀌었으므로 이벤트 전송
                     }
                     else // diff.Days >= 2
@@ -153,6 +162,8 @@ public class NetworkManager : MonoBehaviour
                     loadedUserData.MaxConsecutiveLoginDays = loadedUserData.ConsecutiveLoginDays;
                     Debug.Log($"최대 연속 접속 갱신! 신기록: {loadedUserData.MaxConsecutiveLoginDays}일");
                 }
+
+                
             }
 
             // isNewLoginDay가 true일 때, 즉 하루에 한 번만 전송
@@ -388,5 +399,46 @@ public class NetworkManager : MonoBehaviour
         loadedUserData.isClear = true;
         Debug.Log("게임 클리어 확인. 전송 대기 중...");
     }
+
+    // [UserData] 최종적으로 선택한 스킨을 UserData에 저장하고, 백엔드에 세이브함
+    public void SelectSkin(int index)
+    {
+        loadedUserData.SelectedSkin = index;
+        _ = SaveUserDataAsync();
+    }
+
+    // [UserData]
+    public bool IsAcquiredSkin(int index)
+    {
+        if (loadedUserData.AcquiredSkinList.Contains(index))
+        {
+            return true;
+        }
+        return false;
+    }
+    public void AcquireSkin(int index)
+    {
+        loadedUserData.AcquiredSkinList.Add(index);
+    }
+    
+    public int GetEventLoginTime() => loadedUserData.EventLoginTimes;
+
+    public void CheckEventThreeDay()
+    {
+        if(loadedUserData.EventLoginTimes == 3)
+        {
+            AcquireSkin(3);
+        }
+    }
+
+    public void YetClearPlayerCheck()
+    {
+        if (loadedUserData.isClear)
+        {
+            AcquireSkin(2);
+        }
+    }
+
+    public int GetSelectedSkin() => loadedUserData.SelectedSkin;
 }
 

@@ -10,8 +10,11 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     [Header("반드시 빌드 전 작성해야 하는 변수!!!")]
-    string version = "0.5.2"; // 빌드시 버전 명을 반드시 명시할 것!!
+    string version = "0.6"; // 빌드시 버전 명을 반드시 명시할 것!!
     bool isDevelopMode = false; // 반드시 빌드시 개발자 모드 해제할 것!!
+    bool isEventPeriod = true;
+
+
     bool isClear = false;
 
     [Header("Managers (Internal)")]
@@ -45,6 +48,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CheatManager cheatManager; // 개발자용 치트
     [SerializeField] private SkinCanvas_Controller skinCanvas_Contoller;
     [SerializeField] private MainCanvasManager mainCanvasManager;
+
+    [SerializeField] private EventPanelController eventPanelController;
     
     [Header("Game Variables")]
     [SerializeField] private List<ButtonSound> buttonSounds;
@@ -57,6 +62,7 @@ public class GameManager : MonoBehaviour
         audioManager = GetComponent<AudioManager>();
         networkManager = GetComponent<NetworkManager>();
         NetworkManager.SetDeveloperMode(isDevelopMode);
+        NetworkManager.SetEventPeriod(isEventPeriod);
 
         // 2. 각 매니저 'Initiate' (의존성 주입)
         await networkManager.Initiate();
@@ -91,8 +97,10 @@ public class GameManager : MonoBehaviour
         nextCharacterManager.Initiate();
         cheatManager.Initiate(playerController, blockManager);
         if (!isDevelopMode) cheatManager.gameObject.SetActive(false);
-        skinCanvas_Contoller.Initiate(playerController);
+        skinCanvas_Contoller.Initiate(playerController, networkManager);
         mainCanvasManager.Initiate(playerController);
+
+        eventPanelController.Initiate(isEventPeriod, networkManager);
 
         ShowLeaderBoard();
 
@@ -101,14 +109,13 @@ public class GameManager : MonoBehaviour
 
         // DB 로드 이벤트 (UserData userData)
         networkManager.OnUserDataLoaded += (userData) => {
-            dataManager.SetInitialUserData(userData);
             Debug.Log("유저 데이터 로드 완료");
+            dataManager.SetInitialUserData(userData);
             mainCanvasManager.EnableMainPanel();
-
-            if (userData.isClear)
-            {
-                isClear = true;
-            }
+            eventPanelController.ShowEventPanel();
+            networkManager.CheckEventThreeDay();
+            networkManager.YetClearPlayerCheck(); // 이전 클리어 유저 보상
+            skinCanvas_Contoller.SetSkin(networkManager.GetSelectedSkin());
         };
 
         // --- 스코어 변경 이벤트 ---
@@ -138,7 +145,6 @@ public class GameManager : MonoBehaviour
             Debug.Log("Event : OnGameStart");
             string sessionId = GameReset();
             networkManager.StartNewSession(sessionId, "start_button");
-            
         };
 
         
@@ -216,6 +222,7 @@ public class GameManager : MonoBehaviour
             networkManager.LogClear();
             _ = networkManager.SaveUserDataAsync();
             isClear = true;
+            networkManager.AcquireSkin(1);
         };
 
         nextCharacterManager.OnCharacterAnimationEnd += (Transform nextTarget) =>
@@ -290,11 +297,6 @@ public class GameManager : MonoBehaviour
         nextCharacterManager.SpawnFrog();
         nextCharacterManager.PlayStartAnimation();
 
-        if (isClear)
-        {
-            skinCanvas_Contoller.SetClearSkin();
-        }
-
         return newSessionId;
     }
     public void GameOverToHome()
@@ -321,4 +323,5 @@ public class GameManager : MonoBehaviour
         }
         
     }
+
 }

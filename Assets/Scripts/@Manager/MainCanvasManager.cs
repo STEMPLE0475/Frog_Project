@@ -15,6 +15,7 @@ public class MainCanvasManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI GameOverPanel_LeaerBoard;
 
     private PlayerController playerController;
+    private NetworkManager networkManager;
 
     public Action<string> OnNickNameWrite;
     public Action OnRestartClicked;
@@ -22,7 +23,6 @@ public class MainCanvasManager : MonoBehaviour
     public void Initiate(PlayerController playerController)
     {
         EnableLoginPanel();
-        SkinCanvas.Initiate(playerController);
     }
 
     public void EnableLoginPanel()

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4dc0e87fe71ecdc4780944eb0e195b58, type: 3}
-  m_Name: 1GoldenFrog
+  m_Name: 1RainbowFrog
   m_EditorClassIdentifier: Assembly-CSharp::SkinData
   Index: 1
   Name: "\uB808\uC778\uBCF4\uC6B0"
